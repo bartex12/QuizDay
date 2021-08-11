@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">QuizDay</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Настройки</string>
+    <string name="action_help">Справка</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_textquiz">TextQuiz</string>
+    <string name="menu_imagequiz">ImageQuiz</string>
+
+    <string name="text_quiz">Текстовые вопросы</string>
+    <string name="image_quiz">Вопросы в картинках</string>
+    <string name="settings">Настройки</string>
+    <string name="help">Справка</string>
+    <string name="addition">Дополнительно</string>
+    <string name="share">Поделиться</string>
+    <string name="send">Оценить</string>
+    <string name="sound">Звук</string>
+    <string name="is_sound">Включение/выключение звука</string>
+    <string name="cbSortOn">Звук включен</string>
+    <string name="cbSortOff">Звук выключен</string>
+    <string name="name">Название</string>
+    <string name="textQuizMain">Текстовая викторина</string>
+    <string name="imageQuizMain">Викторина в картинках</string>
+
+
+</resources>
