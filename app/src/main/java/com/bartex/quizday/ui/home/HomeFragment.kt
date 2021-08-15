@@ -36,16 +36,15 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        rv_main = view.findViewById(R.id.rv_main)
-
         navController = Navigation.findNavController(view)
+
         homeViewModel.loadData()
         //наблюдение на всякий случай, вдруг потом данные будут меняться
         homeViewModel.getMainList().observe(viewLifecycleOwner, Observer {
             renderData(it)
         })
 
-        initAdapter()
+        initAdapter(view)
 
         //приводим меню тулбара в соответствии с onPrepareOptionsMenu в MainActivity
         //без этой строки меню в тулбаре ведёт себя неправильно
@@ -53,7 +52,8 @@ class HomeFragment : Fragment() {
         requireActivity().invalidateOptionsMenu()
     }
 
-    private fun initAdapter() {
+    private fun initAdapter(view:View) {
+        rv_main = view.findViewById(R.id.rv_main)
         rv_main.layoutManager = LinearLayoutManager(requireActivity())
         adapter = HomeAdapter(getOnClickListener())
         rv_main.adapter = adapter

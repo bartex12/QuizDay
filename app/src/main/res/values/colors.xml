@@ -9,4 +9,6 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="colorFone">#80cff2da</color>
+    <color name="correct_answer">#00CC00</color>
+    <color name="incorrect_answer">#FF0000</color>
 </resources>

@@ -13,7 +13,6 @@ class HomeViewModel(application: Application) :AndroidViewModel(application) {
     val mainRepo:IMainList = MainListImpl(application)
 
     fun getMainList():LiveData<List<MainList>>{
-        //loadData()
         return _mainList
     }
 

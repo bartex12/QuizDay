@@ -1,37 +1,71 @@
 package com.bartex.quizday
 
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.navigation.NavigationView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.GravityCompat
-import androidx.navigation.NavController
+import androidx.preference.PreferenceManager
+import com.bartex.quizday.net.NoInternetDialogFragment
+import com.bartex.quizday.net.isInternetAvailable
+import com.bartex.quizday.ui.flags.FlagsFragment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    companion object{
+        // Ключи для чтения данных из SharedPreferences
+        val CHOICES = "pref_numberOfChoices"
+        const val DIALOG_FRAGMENT = "DIALOG_FRAGMENT_TAG"
+    }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navController:NavController
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toolbar: Toolbar
 
+    private var isNetworkAvailable: Boolean = true //Доступна ли сеть
+    // Настройки изменились? При первом включении это вызывает запуск викторины в onStart
+    private var preferencesChanged = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //при первом включении проверяем наличие интернета вручную - без LiveData
+        if (savedInstanceState == null) {
+            isNetworkAvailable = isInternetAvailable(this)
+            if (!isNetworkAvailable) {
+                showNoInternetConnectionDialog()
+            }
+        }
+
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        // Задание значений по умолчанию в файле SharedPreferences
+        //Логический признак, определяющий, должны ли значения по умолчанию
+        //сбрасываться при каждом вызове метода setDefaultValues, — значение false
+        //указывает, что значения настроек по умолчанию должны задаваться только
+        //при первом вызове этого метода.
+        PreferenceManager.setDefaultValues(this, R.xml.pref_setting, false)
+
+//        // Регистрация слушателя для изменений SharedPreferences
+//        PreferenceManager.getDefaultSharedPreferences(this)
+//                .registerOnSharedPreferenceChangeListener(preferencesChangeListener)
 
         drawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -61,10 +95,57 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
          navView.setNavigationItemSelectedListener(this)
     }
 
+//    //При первом запуске приложения метод onStart вызывается после onCreate.
+//    //В этом случае вызов onStart гарантирует, что приложение будет правильно
+//    //инициализировано в состоянии по умолчанию при установке и первом за-
+//    //пуске или в соответствии с обновленной конфигурацией пользователя при
+//    //последующих запусках.
+//    //  Если приложение выполняется в портретной ориентации, а пользователь
+//    //открывает настройки, активность MainActivity приостанавливается
+//    //на время отображения настроек. Когда пользователь возвращается
+//    //к MainActivity, снова вызывается метод onStart. На этот раз вызов обе-
+//    //спечивает необходимое изменение конфигурации, если пользователь внес
+//    //изменения в настройки.
+//    override fun onStart() {
+//        super.onStart()
+//        if (preferencesChanged) {
+////            // После задания настроек по умолчанию инициализировать
+////            // MainActivityFragment и запустить викторину
+////            val quizFragment: MainActivityFragment? = supportFragmentManager.findFragmentById(
+////                    R.id.quizFragment
+////            ) as MainActivityFragment?
+////            quizFragment?.updateGuessRows(
+////                    PreferenceManager.getDefaultSharedPreferences(this)
+////            )
+////            quizFragment?.updateRegions(
+////                    PreferenceManager.getDefaultSharedPreferences(this)
+////            )
+//    //todo - только этот фрагмент а надо все в зависимости от установок
+//            val flagFragment: FlagsFragment? = supportFragmentManager.findFragmentById(
+//                    R.id.flagsFragment) as FlagsFragment?
+//            flagFragment?.updateGuessRows(PreferenceManager.getDefaultSharedPreferences(this))
+//            flagFragment?.resetQuiz()
+//            preferencesChanged = false
+//        }
+//    }
+
     //щелчки по стрелке вверх - как appBarConfiguration и по гамбургеру - как super.onSupportNavigateUp()
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    fun getNetworkAvailable(): Boolean = isNetworkAvailable
+
+    private fun showNoInternetConnectionDialog() {
+        showAlertDialog(
+                getString(R.string.dialog_title_device_is_offline),
+                getString(R.string.dialog_message_device_is_offline)
+        )
+    }
+
+    private fun showAlertDialog(title: String?, message: String?) {
+        NoInternetDialogFragment.newInstance(title, message).show(supportFragmentManager, DIALOG_FRAGMENT)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -72,6 +153,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
+    //todo  изменять при добавлении фрагментов
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         //нашел способ установить видимость иконок в тулбаре без перебора всех вариантов
         val id = navController.currentDestination?.id
@@ -99,33 +181,41 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     //кроме того пришлось делать перебор всех вариантов (может лучше  убрать меню во фрагменты)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (navController.currentDestination?.id ){
-            R.id.homeFragment ->{
-                when(item.itemId){
+            R.id.homeFragment -> {
+                when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_homeFragment_to_settingsFragment)
                     R.id.action_help -> navController.navigate(R.id.action_homeFragment_to_helpFragment)
                 }
             }
 
-            R.id.textquizFragment ->{
-                when(item.itemId){
+            R.id.textquizFragment -> {
+                when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_textquizFragment_to_settingsFragment)
                     R.id.action_help -> navController.navigate(R.id.action_textquizFragment_to_helpFragment)
                 }
             }
 
-            R.id.imagequizFragment ->{
-                when(item.itemId){
+            R.id.imagequizFragment -> {
+                when (item.itemId) {
                     R.id.action_help -> navController.navigate(R.id.action_imagequizFragment_to_helpFragment)
                     R.id.action_settings -> navController.navigate(R.id.action_imagequizFragment_to_settingsFragment)
                 }
             }
-           R.id.settingsFragment ->{
-               when(item.itemId){
-                   R.id.action_help -> navController.navigate(R.id.action_settingsFragment_to_helpFragment)
-               }
+
+            R.id.flagsFragment -> {
+                when (item.itemId) {
+                    R.id.action_help -> navController.navigate(R.id.action_flagsFragment_to_helpFragment)
+                    R.id.action_settings -> navController.navigate(R.id.action_flagsFragment_to_settingsFragment)
+                }
             }
-            R.id.helpFragment ->{
-                when(item.itemId){
+
+            R.id.settingsFragment -> {
+                when (item.itemId) {
+                    R.id.action_help -> navController.navigate(R.id.action_settingsFragment_to_helpFragment)
+                }
+            }
+            R.id.helpFragment -> {
+                when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_helpFragment_to_settingsFragment)
                 }
             }
@@ -164,4 +254,45 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout.closeDrawer(GravityCompat.START)
         return false
     }
+
+//    // Слушатель изменений в конфигурации SharedPreferences приложения
+//    // Вызывается при изменении настроек приложения
+//    private val preferencesChangeListener =
+//            // key - ключ, который изменился
+//            SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+//
+//                preferencesChanged = true // Пользователь изменил настройки
+////        val quizFragment: MainActivityFragment? = supportFragmentManager.findFragmentById(
+////                R.id.quizFragment
+////        ) as MainActivityFragment?
+//                if (key == CHOICES) { // Изменилось число вариантов
+//                    val flagFragment: FlagsFragment? = supportFragmentManager.findFragmentById(
+//                            R.id.flagsFragment) as FlagsFragment?
+//                    flagFragment?.updateGuessRows(sharedPreferences)
+//                    flagFragment?.resetQuiz()
+////        } else if (key == REGIONS) { // Изменились регионы
+////            val regions = sharedPreferences.getStringSet(REGIONS, null)
+////            if (regions != null && regions.size > 0) {
+////                quizFragment?.updateRegions(sharedPreferences)
+////                quizFragment?.resetQuiz()
+////            } else {
+////                // Хотя бы один регион - по умолчанию Северная Америка
+////                val editor = sharedPreferences.edit()
+////                regions?.add(getString(R.string.default_region))
+////                editor.putStringSet(REGIONS, regions)
+////                editor.apply()
+////                Toast.makeText(
+////                        this@MainActivity,
+////                        R.string.default_region_message,
+////                        Toast.LENGTH_SHORT
+////                ).show()
+////            }
+////        }
+//                    Toast.makeText(
+//                            this@MainActivity,
+//                            R.string.restarting_quiz,
+//                            Toast.LENGTH_SHORT
+//                    ).show()
+//                }
+//            }
 }

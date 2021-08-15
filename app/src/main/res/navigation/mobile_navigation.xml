@@ -42,6 +42,9 @@
         <action
             android:id="@+id/action_imagequizFragment_to_helpFragment"
             app:destination="@id/helpFragment" />
+        <action
+            android:id="@+id/action_imagequizFragment_to_flagsFragment"
+            app:destination="@id/flagsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -62,5 +65,16 @@
             app:destination="@id/settingsFragment"
             app:popUpTo="@id/helpFragment"
             app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/flagsFragment"
+        android:name="com.bartex.quizday.ui.flags.FlagsFragment"
+        android:label="FlagsFragment" >
+        <action
+            android:id="@+id/action_flagsFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_flagsFragment_to_helpFragment"
+            app:destination="@id/helpFragment" />
     </fragment>
 </navigation>

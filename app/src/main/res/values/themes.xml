@@ -22,4 +22,5 @@
     <style name="Theme.QuizDay.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.QuizDay.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 </resources>
