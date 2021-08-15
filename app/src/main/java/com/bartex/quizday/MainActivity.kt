@@ -1,6 +1,8 @@
 package com.bartex.quizday
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.media.AudioManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -30,6 +32,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Ключи для чтения данных из SharedPreferences
         val CHOICES = "pref_numberOfChoices"
         val FLAGS_IN_QUIZ = "pref_numberOfFlags"
+        val SOUND = "pref_cbSound"
         const val DIALOG_FRAGMENT = "DIALOG_FRAGMENT_TAG"
     }
 
@@ -37,6 +40,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var navController:NavController
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toolbar: Toolbar
+    private lateinit var audioManager: AudioManager
 
     private var isNetworkAvailable: Boolean = true //Доступна ли сеть
     // Настройки изменились? При первом включении это вызывает запуск викторины в onStart
@@ -63,10 +67,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //указывает, что значения настроек по умолчанию должны задаваться только
         //при первом вызове этого метода.
         PreferenceManager.setDefaultValues(this, R.xml.pref_setting, false)
-
-//        // Регистрация слушателя для изменений SharedPreferences
-//        PreferenceManager.getDefaultSharedPreferences(this)
-//                .registerOnSharedPreferenceChangeListener(preferencesChangeListener)
+        audioManager=  getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         drawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -95,40 +96,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //то есть если бы все пункты были через navigate, то было бы не нужно, справлялся бы NavController
          navView.setNavigationItemSelectedListener(this)
     }
-
-//    //При первом запуске приложения метод onStart вызывается после onCreate.
-//    //В этом случае вызов onStart гарантирует, что приложение будет правильно
-//    //инициализировано в состоянии по умолчанию при установке и первом за-
-//    //пуске или в соответствии с обновленной конфигурацией пользователя при
-//    //последующих запусках.
-//    //  Если приложение выполняется в портретной ориентации, а пользователь
-//    //открывает настройки, активность MainActivity приостанавливается
-//    //на время отображения настроек. Когда пользователь возвращается
-//    //к MainActivity, снова вызывается метод onStart. На этот раз вызов обе-
-//    //спечивает необходимое изменение конфигурации, если пользователь внес
-//    //изменения в настройки.
-//    override fun onStart() {
-//        super.onStart()
-//        if (preferencesChanged) {
-////            // После задания настроек по умолчанию инициализировать
-////            // MainActivityFragment и запустить викторину
-////            val quizFragment: MainActivityFragment? = supportFragmentManager.findFragmentById(
-////                    R.id.quizFragment
-////            ) as MainActivityFragment?
-////            quizFragment?.updateGuessRows(
-////                    PreferenceManager.getDefaultSharedPreferences(this)
-////            )
-////            quizFragment?.updateRegions(
-////                    PreferenceManager.getDefaultSharedPreferences(this)
-////            )
-//    //todo - только этот фрагмент а надо все в зависимости от установок
-//            val flagFragment: FlagsFragment? = supportFragmentManager.findFragmentById(
-//                    R.id.flagsFragment) as FlagsFragment?
-//            flagFragment?.updateGuessRows(PreferenceManager.getDefaultSharedPreferences(this))
-//            flagFragment?.resetQuiz()
-//            preferencesChanged = false
-//        }
-//    }
 
     //щелчки по стрелке вверх - как appBarConfiguration и по гамбургеру - как super.onSupportNavigateUp()
     override fun onSupportNavigateUp(): Boolean {
@@ -256,44 +223,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return false
     }
 
-//    // Слушатель изменений в конфигурации SharedPreferences приложения
-//    // Вызывается при изменении настроек приложения
-//    private val preferencesChangeListener =
-//            // key - ключ, который изменился
-//            SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-//
-//                preferencesChanged = true // Пользователь изменил настройки
-////        val quizFragment: MainActivityFragment? = supportFragmentManager.findFragmentById(
-////                R.id.quizFragment
-////        ) as MainActivityFragment?
-//                if (key == CHOICES) { // Изменилось число вариантов
-//                    val flagFragment: FlagsFragment? = supportFragmentManager.findFragmentById(
-//                            R.id.flagsFragment) as FlagsFragment?
-//                    flagFragment?.updateGuessRows(sharedPreferences)
-//                    flagFragment?.resetQuiz()
-////        } else if (key == REGIONS) { // Изменились регионы
-////            val regions = sharedPreferences.getStringSet(REGIONS, null)
-////            if (regions != null && regions.size > 0) {
-////                quizFragment?.updateRegions(sharedPreferences)
-////                quizFragment?.resetQuiz()
-////            } else {
-////                // Хотя бы один регион - по умолчанию Северная Америка
-////                val editor = sharedPreferences.edit()
-////                regions?.add(getString(R.string.default_region))
-////                editor.putStringSet(REGIONS, regions)
-////                editor.apply()
-////                Toast.makeText(
-////                        this@MainActivity,
-////                        R.string.default_region_message,
-////                        Toast.LENGTH_SHORT
-////                ).show()
-////            }
-////        }
-//                    Toast.makeText(
-//                            this@MainActivity,
-//                            R.string.restarting_quiz,
-//                            Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-//            }
+    override fun onStop() {
+        super.onStop()
+        audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false)
+    }
 }

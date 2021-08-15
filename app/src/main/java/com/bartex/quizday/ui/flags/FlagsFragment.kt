@@ -1,7 +1,10 @@
 package com.bartex.quizday.ui.flags
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.drawable.Drawable
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -71,6 +74,8 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     // Настройки изменились? При первом включении это вызывает запуск викторины
     private var preferencesChanged = true
 
+    private var mToneGenerator: ToneGenerator? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view: View = inflater.inflate(R.layout.fragment_flags, container, false)
         return view
@@ -78,6 +83,8 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        mToneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
 
         flagsViewModel =
                 ViewModelProvider(this).get(FlagsViewModel::class.java)
@@ -119,10 +126,13 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     override fun onStart() {
         super.onStart()
 
+        updateSoundOnOff(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
         updateFlagsInQuiz(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
         updateGuessRows(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
         resetQuiz()
     }
+
+
 
     val guessButtonListener:   View.OnClickListener =   View.OnClickListener { v ->
         val guessButton = v as Button //нажатая кнопка ответа
@@ -138,6 +148,8 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
             disableButtons()  // Блокировка всех кнопок ответов
             if (correctAnswers == flagsInQuiz) {
+                //в новом потоке чтобы не было задержек времени
+                Thread { mToneGenerator?.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
                 // DialogFragment для вывода статистики и перезапуска
                 //в отдельном файле сделан, а не внутри фрагмента
                 ResultDialog(flagsInQuiz, totalGuesses, this )
@@ -145,6 +157,8 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
             }else { // Ответ правильный, но викторина не закончена
                     // Загрузка следующего флага после двухсекундной задержки
+                //в новом потоке чтобы не было задержек времени
+                Thread { mToneGenerator?.startTone(ToneGenerator.TONE_DTMF_0, 50) }.start()
                     handler.postDelayed(
                         {
                         //todo сделать
@@ -154,6 +168,8 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                     ) // 2000 миллисекунд для двухсекундной задержки
                 }
             }else { // Неправильный ответ
+            //в новом потоке чтобы не было задержек времени
+            Thread { mToneGenerator?.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
                 //todo Встряхивание сделать
             //flagImageView!!.startAnimation(shakeAnimation)  // Встряхивание
 
@@ -173,10 +189,16 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
             }
         }
     }
+    private fun updateSoundOnOff(sharedPreferences: SharedPreferences) {
+        val soung = sharedPreferences.getBoolean(MainActivity.SOUND, true)
+
+        (requireActivity().getSystemService(Context.AUDIO_SERVICE) as AudioManager)
+        .setStreamMute(AudioManager.STREAM_MUSIC, !soung)
+    }
+
     private fun updateFlagsInQuiz(sharedPreferences: SharedPreferences) {
      val flagsNumber: String?  = sharedPreferences.getString(MainActivity.FLAGS_IN_QUIZ, 10.toString())
         flagsNumber?. let{
-           // flagsInQuiz  = it.toInt()
             flagsInQuiz =flagsNumber.toInt()
         }
     }

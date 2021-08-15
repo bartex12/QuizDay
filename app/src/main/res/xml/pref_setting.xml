@@ -35,7 +35,7 @@
         android:title="@string/sound">
 
     <CheckBoxPreference
-        android:key="cbSound"
+        android:key="pref_cbSound"
         android:title="@string/is_sound"
         app:defaultValue="false"
         android:summaryOn="@string/cbSortOn"
