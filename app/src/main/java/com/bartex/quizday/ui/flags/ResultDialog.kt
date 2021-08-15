@@ -18,7 +18,7 @@ class ResultDialog(val total: Int, val totalGuesses :Int, val onResultListener:O
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(activity )
         builder.setMessage(
-                getString(R.string.results, totalGuesses, total, total*100/totalGuesses.toDouble())
+                getString(R.string.results, total, totalGuesses, total*100/totalGuesses.toDouble())
         )
 
         // "Reset Quiz" Button

@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     companion object{
         // Ключи для чтения данных из SharedPreferences
         val CHOICES = "pref_numberOfChoices"
+        val FLAGS_IN_QUIZ = "pref_numberOfFlags"
         const val DIALOG_FRAGMENT = "DIALOG_FRAGMENT_TAG"
     }
 

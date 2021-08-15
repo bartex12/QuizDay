@@ -42,11 +42,13 @@
     <string name="guess_country">Угадайте страну</string>
     <string name="incorrect_answer">Неправильно!</string>
     <string name="number_of_choices">Количество вариантов ответов</string>
+    <string name="number_of_flags">Количество вопросов в викторине</string>
     <string name="number_of_choices_description">Отображаются 2, 4 или 6 кнопок с вариантами ответов</string>
+    <string name="number_of_flags_description">Нужно угадать 5, 10, 15 или 20 флагов</string>
     <string name="restarting_quiz">Викторина перезапустится с новыми настройками</string>
     <string name="restarting_new_block">Загружаем новый блок вопросов викторины</string>
 
-    <string name="results">Использовано %1$d попытки на  %2$d вопроса\n%3$.02f%% правильных ответов</string>
+    <string name="results">Вопросов: %1$d\nПопыток: %2$d\n%3$.01f%% правильных ответов</string>
     <string name="reset_quiz">Новые вопросы</string>
 
 

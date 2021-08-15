@@ -27,8 +27,9 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
     //todo
     // Количество флагов - для разработки - 2 , а вообще - 10 или задавать в настройках
-    private val FLAGS_IN_QUIZ = 2
+   // private val FLAGS_IN_QUIZ = 2
 
+    private var flagsInQuiz = 2
     // Имена файлов с флагами-
     //это имена файлов с изображениями флагов для текущего набора выбранных регионов
     //todo заменить Drawable на картинки svg из базы данных
@@ -106,7 +107,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         }
 
         // Назначение текста questionNumberTextView
-        questionNumberTextView.text = getString(R.string.question, 1, FLAGS_IN_QUIZ)
+        questionNumberTextView.text = getString(R.string.question, 1, flagsInQuiz)
 
         //приводим меню тулбара в соответствии с onPrepareOptionsMenu в MainActivity
         //без этой строки меню в тулбаре ведёт себя неправильно
@@ -118,6 +119,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     override fun onStart() {
         super.onStart()
 
+        updateFlagsInQuiz(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
         updateGuessRows(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
         resetQuiz()
     }
@@ -135,21 +137,11 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                     ContextCompat.getColor(requireActivity(), R.color.correct_answer))
 
             disableButtons()  // Блокировка всех кнопок ответов
-            if (correctAnswers == FLAGS_IN_QUIZ) {
+            if (correctAnswers == flagsInQuiz) {
                 // DialogFragment для вывода статистики и перезапуска
                 //в отдельном файле сделан, а не внутри фрагмента
-                //todo  сделать диалог
-                ResultDialog(FLAGS_IN_QUIZ, totalGuesses, this )
+                ResultDialog(flagsInQuiz, totalGuesses, this )
                         .show(requireActivity().supportFragmentManager, "ResultDialog")
-//                Toast.makeText(requireActivity(),
-//                            R.string.restarting_new_block, Toast.LENGTH_SHORT ).show()
-//    //todo этот метод вызывать из диалога через интерфейс
-//                // Загрузка следующего блока вопросов викторины после  задержки
-//                handler.postDelayed(
-//                        {
-//                            resetQuiz()  //если без анимации
-//                        }, 1000
-//                ) // 2000 миллисекунд для двухсекундной задержки
 
             }else { // Ответ правильный, но викторина не закончена
                     // Загрузка следующего флага после двухсекундной задержки
@@ -181,11 +173,18 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
             }
         }
     }
+    private fun updateFlagsInQuiz(sharedPreferences: SharedPreferences) {
+     val flagsNumber: String?  = sharedPreferences.getString(MainActivity.FLAGS_IN_QUIZ, 10.toString())
+        flagsNumber?. let{
+           // flagsInQuiz  = it.toInt()
+            flagsInQuiz =flagsNumber.toInt()
+        }
+    }
 
     // Обновление guessRows на основании значения SharedPreferences
     fun updateGuessRows(sharedPreferences: SharedPreferences) {
         // Получение количества отображаемых вариантов ответа
-        val choices = sharedPreferences.getString(MainActivity.CHOICES, 2.toString())
+        val choices: String? = sharedPreferences.getString(MainActivity.CHOICES, 2.toString())
         choices?. let{
             guessRows = it.toInt() / 2
         }
@@ -212,7 +211,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         var flagCounter = 1
         val numberOfFlags = fileNameList.size
         // Добавление FLAGS_IN_QUIZ штук  случайных файлов в quizCountriesList
-        while (flagCounter <= FLAGS_IN_QUIZ) {
+        while (flagCounter <= flagsInQuiz) {
             val randomIndex = random.nextInt(numberOfFlags)
             // Получение случайного имени файла
             val filename: TestFlagClass = fileNameList[randomIndex]
@@ -234,7 +233,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
         // Отображение номера текущего вопроса
         questionNumberTextView.text = getString(
-                R.string.question, correctAnswers + 1, FLAGS_IN_QUIZ
+                R.string.question, correctAnswers + 1, flagsInQuiz
         )
 
         flagImageView?.setImageDrawable(nextImage.image)

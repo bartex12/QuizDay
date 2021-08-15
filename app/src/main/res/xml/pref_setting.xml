@@ -1,16 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <PreferenceCategory
+        app:title="Вопросы">
+
     <ListPreference
+        android:key="pref_numberOfFlags"
+        android:entries="@array/flagNumber_list"
+        android:entryValues="@array/flagNumber_list"
+        android:title="@string/number_of_flags"
+        android:summary="@string/number_of_flags_description"
+        android:persistent="true"
+        android:defaultValue="5" />
+
+</PreferenceCategory>
+
+    <PreferenceCategory
+        app:title = "Ответы">
+
+    <ListPreference
+        android:key="pref_numberOfChoices"
         android:entries="@array/guesses_list"
         android:entryValues="@array/guesses_list"
-        android:key="pref_numberOfChoices"
         android:title="@string/number_of_choices"
         android:summary="@string/number_of_choices_description"
         android:persistent="true"
         android:defaultValue="4" />
+</PreferenceCategory>
 
     <PreferenceCategory
         android:title="@string/sound">
@@ -23,4 +42,5 @@
         android:summaryOff="@string/cbSortOff">
     </CheckBoxPreference>
     </PreferenceCategory>
+
 </androidx.preference.PreferenceScreen>
