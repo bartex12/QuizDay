@@ -2,12 +2,10 @@ package com.bartex.quizday.ui.flags
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.drawable.Drawable
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,17 +18,12 @@ import androidx.preference.PreferenceManager
 import com.bartex.quizday.MainActivity
 import com.bartex.quizday.R
 import com.bartex.quizday.model.TestFlagClass
-import com.bartex.quizday.ui.textquiz.TextQuizViewModel
-import java.io.IOException
+import com.bartex.quizday.model.entity.State
 import java.security.SecureRandom
 import java.util.*
 import kotlin.collections.ArrayList
 
 class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
-
-    //todo
-    // Количество флагов - для разработки - 2 , а вообще - 10 или задавать в настройках
-   // private val FLAGS_IN_QUIZ = 2
 
     private var flagsInQuiz = 2
     // Имена файлов с флагами-
@@ -56,6 +49,8 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     private lateinit var answerTextView : TextView
     //ImageView  Для вывода флага
     private var flagImageView  : ImageView? = null
+    //прогресс бар на время загрузки
+    private var progressBarFlags:ProgressBar? = null
     // Строки с кнопками
     private var guessLinearLayouts : Array<LinearLayout?> = arrayOfNulls(3)
     // Правильная страна для текущего флага
@@ -76,9 +71,13 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
     private var mToneGenerator: ToneGenerator? = null
 
+    var listStates: List<State> = listOf()
+        set(value){
+            field = value
+        }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view: View = inflater.inflate(R.layout.fragment_flags, container, false)
-        return view
+        return inflater.inflate(R.layout.fragment_flags, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -89,6 +88,12 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         flagsViewModel =
                 ViewModelProvider(this).get(FlagsViewModel::class.java)
 
+        flagsViewModel.loadDataSealed()
+        flagsViewModel.getStatesSealed()
+            .observe(viewLifecycleOwner, Observer<StatesSealed> {
+                renderData(it)
+            })
+
         handler  = Handler(requireActivity().mainLooper)
 
         // Получение ссылок на компоненты графического интерфейса
@@ -96,6 +101,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         questionNumberTextView = view.findViewById<View>(R.id.questionNumberTextView) as TextView
         answerTextView = view.findViewById<View>(R.id.answerTextView) as TextView
         flagImageView = view.findViewById<View>(R.id.flagImageView) as ImageView
+        progressBarFlags = view.findViewById<View>(R.id.progressBarFlags) as ProgressBar
 
         //guessLinearLayouts = arrayOfNulls(3)
         guessLinearLayouts[0] = view.findViewById<View>(R.id.row1LinearLayout) as LinearLayout
@@ -122,14 +128,35 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         requireActivity().invalidateOptionsMenu()
     }
 
+    private fun renderData(data: StatesSealed?) {
+
+        when(data){
+            is StatesSealed.Success -> {
+                quizLinearLayout?.visibility = View.VISIBLE
+                progressBarFlags?.visibility = View.GONE
+                updateGuessRows(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
+                resetQuiz()
+
+                listStates = data.state
+                Toast.makeText(requireActivity(), "Количество стран = ${listStates.size}", Toast.LENGTH_SHORT).show()
+            }
+            is StatesSealed.Error ->{
+                Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT).show()
+            }
+            is StatesSealed.Loading ->{
+                quizLinearLayout?.visibility = View.GONE
+                progressBarFlags?.visibility = View.VISIBLE
+            }
+        }
+    }
+
     // метод onStart вызывается после onViewCreated.
     override fun onStart() {
         super.onStart()
-
         updateSoundOnOff(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
-        updateFlagsInQuiz(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
-        updateGuessRows(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
-        resetQuiz()
+        updateNumberFlagsInQuiz(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
+        //updateGuessRows(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
+        //resetQuiz()
     }
 
 
@@ -196,7 +223,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         .setStreamMute(AudioManager.STREAM_MUSIC, !soung)
     }
 
-    private fun updateFlagsInQuiz(sharedPreferences: SharedPreferences) {
+    private fun updateNumberFlagsInQuiz(sharedPreferences: SharedPreferences) {
      val flagsNumber: String?  = sharedPreferences.getString(MainActivity.FLAGS_IN_QUIZ, 10.toString())
         flagsNumber?. let{
             flagsInQuiz =flagsNumber.toInt()
@@ -278,7 +305,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
             for (column in 0 until guessLinearLayouts[row]!!.childCount) {
                 // Получение ссылки на Button
                 val newGuessButton = guessLinearLayouts[row]!!.getChildAt(column) as Button
-                newGuessButton.isEnabled = true
+                newGuessButton.isEnabled = true //так как при правильном ответе было false
 
                 // Назначение названия страны текстом newGuessButton
                 val filename = fileNameList[row * 2 + column].name
