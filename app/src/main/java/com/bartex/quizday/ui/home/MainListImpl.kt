@@ -11,7 +11,7 @@ class MainListImpl(val application:Application):IMainList {
         //получаем две строки
       return listOf(
               MainList(application.resources.getString(R.string.textQuizMain),
-                      ContextCompat.getDrawable(application, R.drawable.text )!!),
+                      ContextCompat.getDrawable(application, R.drawable.text_x )!!),
               MainList(application.resources.getString(R.string.imageQuizMain),
                               ContextCompat.getDrawable(application, R.drawable.sm )!!)
       )

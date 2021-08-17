@@ -27,5 +27,32 @@
     <string name="textQuizMain">Текстовая викторина</string>
     <string name="imageQuizMain">Викторина в картинках</string>
 
+    <string name="dialog_title_device_is_offline">Нет соединения с Интернетом</string>
+    <string name="dialog_message_device_is_offline">Вы не сможете эффективно использовать приложение
+        без подключения к Интернету. Пожалуйста, проверьте интернет-соединение</string>
+    <string name="dialog_title_stub">Неизвестная ошибка</string>
+    <string name="dialog_button_cancel">Понятно</string>
+    <string name="flags_of_states">Флаги стран мира</string>
+    <string name="capitals">Столицы государств</string>
+    <string name="anything">Что-то ещё</string>
+    <string name="state_fake">Страна</string>
+    <string name="dogs">Породы собак</string>
+    <string name="flags">Флаги</string>
+
+    <string name="question">Вопрос %1$d из %2$d</string>
+    <string name="image_description">Изображнние текущего флага викторины</string>
+    <string name="guess_country">Угадайте страну</string>
+    <string name="incorrect_answer">Неправильно!</string>
+    <string name="number_of_choices">Количество вариантов ответов</string>
+    <string name="number_of_flags">Количество вопросов в викторине</string>
+    <string name="number_of_choices_description">Отображаются 2, 4 или 6 кнопок с вариантами ответов</string>
+    <string name="number_of_flags_description">Нужно угадать 5, 10, 15 или 20 флагов</string>
+    <string name="restarting_quiz">Викторина перезапустится с новыми настройками</string>
+    <string name="restarting_new_block">Загружаем новый блок вопросов викторины</string>
+
+    <string name="results">Вопросов: %1$d\nПопыток: %2$d\n%3$.01f%% правильных ответов</string>
+    <string name="reset_quiz">Новые вопросы</string>
+    <string name="no_now">Не сегодня!</string>
+
 
 </resources>
