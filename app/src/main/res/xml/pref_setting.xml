@@ -28,7 +28,7 @@
         android:title="@string/number_of_choices"
         android:summary="@string/number_of_choices_description"
         android:persistent="true"
-        android:defaultValue="4" />
+        android:defaultValue="6" />
 </PreferenceCategory>
 
     <PreferenceCategory
@@ -37,7 +37,7 @@
     <CheckBoxPreference
         android:key="pref_cbSound"
         android:title="@string/is_sound"
-        app:defaultValue="false"
+        app:defaultValue="true"
         android:summaryOn="@string/cbSortOn"
         android:summaryOff="@string/cbSortOff">
     </CheckBoxPreference>

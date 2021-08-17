@@ -11,7 +11,8 @@ class RepoImpl(val application: Application): IRepo {
     override fun getFlags(): MutableList<TestFlagClass> {
         val flags = mutableListOf<TestFlagClass>()
         for (i in 0 until 30){
-          val test =   TestFlagClass("Image$i", (ContextCompat.getDrawable(application, R.drawable.sun_smail2)  as Drawable ))
+          val name = application.resources.getString(R.string.state_fake)
+          val test =   TestFlagClass("$name $i", (ContextCompat.getDrawable(application, R.drawable.fun_rojer)  as Drawable ))
             flags.add(test)
         }
         return flags

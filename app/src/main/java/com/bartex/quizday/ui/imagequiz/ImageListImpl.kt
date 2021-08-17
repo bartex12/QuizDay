@@ -10,12 +10,12 @@ class ImageListImpl(val application: Application):IImageList {
     override fun getImageList(): List<MainList> {
         //получаем две строки
         return listOf(
-                MainList(application.resources.getString(R.string.flafs),
+                MainList(application.resources.getString(R.string.flags_of_states),
                         ContextCompat.getDrawable(application, R.drawable.flags )!!),
-                MainList(application.resources.getString(R.string.capitals),
-                        ContextCompat.getDrawable(application, R.drawable.ukazatel2 )!!),
-                MainList(application.resources.getString(R.string.dogs),
-                        ContextCompat.getDrawable(application, R.drawable.dogs )!!)
+                MainList(application.resources.getString(R.string.anything),
+                        ContextCompat.getDrawable(application, R.drawable.text_x )!!),
+                MainList(application.resources.getString(R.string.anything),
+                        ContextCompat.getDrawable(application, R.drawable.text_x )!!)
         )
     }
 }

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -72,8 +73,10 @@ class ImageQuizFragment : Fragment() {
                 override fun onItemClick(position: Int) {
                     when(position){
                         0 -> navController.navigate(R.id.action_imagequizFragment_to_flagsFragment)
-                        1 -> navController.navigate(R.id.action_imagequizFragment_to_flagsFragment)
-                        2 -> navController.navigate(R.id.action_imagequizFragment_to_flagsFragment)
+                        1 -> Toast.makeText(requireActivity(),
+                                requireActivity().resources.getString(R.string.no_now), Toast.LENGTH_SHORT).show()
+                        2 -> Toast.makeText(requireActivity(),
+                                requireActivity().resources.getString(R.string.no_now), Toast.LENGTH_SHORT).show()
                     }
                 }
             }

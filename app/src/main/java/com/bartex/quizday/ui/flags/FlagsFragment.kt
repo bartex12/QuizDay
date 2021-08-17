@@ -203,7 +203,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
             // Сообщение "Неправильно!" выводится красным шрифтом
             answerTextView.setText(R.string.incorrect_answer)
             answerTextView.setTextColor(
-                    ContextCompat.getColor(requireActivity(), R.color.correct_answer))
+                    ContextCompat.getColor(requireActivity(), R.color.incorrect_answer))
             guessButton.isEnabled = false  // Блокировка неправильного ответа
         }
     }
