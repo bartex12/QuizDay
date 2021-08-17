@@ -12,13 +12,19 @@ class StatesRepo(val api: IDataSourceState): IStatesRepo{
 
     override fun getStates(): Single<List<State>> =
        api.getStates()
-           .flatMap {
-               it.map { state ->
+           .flatMap {states->
+               //отбираем только те, где значения не равны null
+               val statesFiltered = states.filter { st->
+                   st.name!=null && st.capital!=null && st.flag!=null &&
+                   st.name.isNotBlank() && st.capital.isNotBlank() && st.flag.isNotBlank()
+               }
+               //добавляем русские названия из Map
+               states.map { state ->
                    state.nameRus = MapOfState .mapStates[state.name]?:"Unknown"
                    state.capitalRus = MapOfCapital.mapCapital[state.capital] ?:"Unknown"
                    state.regionRus = MapOfRegion.mapRegion[state.region] ?:"Unknown"
                }
-               Single.fromCallable {it}
+               Single.fromCallable {statesFiltered}
            }
            .subscribeOn(Schedulers.io())
 }

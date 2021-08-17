@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.media.AudioManager
 import android.media.ToneGenerator
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -17,8 +18,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import com.bartex.quizday.MainActivity
 import com.bartex.quizday.R
-import com.bartex.quizday.model.TestFlagClass
 import com.bartex.quizday.model.entity.State
+import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import java.security.SecureRandom
 import java.util.*
 import kotlin.collections.ArrayList
@@ -29,16 +30,19 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     // Имена файлов с флагами-
     //это имена файлов с изображениями флагов для текущего набора выбранных регионов
     //todo заменить Drawable на картинки svg из базы данных
-    private var fileNameList  : MutableList<TestFlagClass> = ArrayList()
+    //private var fileNameList  : MutableList<TestFlagClass> = ArrayList()
     // Страны текущей викторины -
     // переменная содержит имена файлов с флагами для стран, используемых в текущей игре
     //todo заменить на String или на State с потрохами
-    private var quizCountriesList : MutableList<TestFlagClass> = ArrayList()
+   // private var quizCountriesList : MutableList<TestFlagClass> = ArrayList()
+    private var quizCountriesList : MutableList<State> = ArrayList()
     // Регионы текущей викторины
     private var regionsSet  : Set<String>? = null
 
     //ViewModel фрагмента
-    private lateinit var flagsViewModel: FlagsViewModel
+    private val flagsViewModel by lazy{
+        ViewModelProvider(this).get(FlagsViewModel::class.java)
+    }
     // Для задержки загрузки следующего флага
     private lateinit var handler : Handler
     // Макет с викториной
@@ -66,15 +70,12 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     // Генератор случайных чисел
     private var random : SecureRandom = SecureRandom()
 
-    // Настройки изменились? При первом включении это вызывает запуск викторины
-    private var preferencesChanged = true
+    private val  mToneGenerator: ToneGenerator by lazy{
+        ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+    }
 
-    private var mToneGenerator: ToneGenerator? = null
-
-    var listStates: List<State> = listOf()
-        set(value){
-            field = value
-        }
+    //список стран из сети с именами, столицами, флагами
+    private var listStates: MutableList<State> = mutableListOf()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_flags, container, false)
@@ -83,12 +84,9 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mToneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-
-        flagsViewModel =
-                ViewModelProvider(this).get(FlagsViewModel::class.java)
-
+        //загрузка стран - название, столица, флаг
         flagsViewModel.loadDataSealed()
+        //наблюдаем за классом StatesSealed, в которам нас интересует class Success(val state:List<State>)
         flagsViewModel.getStatesSealed()
             .observe(viewLifecycleOwner, Observer<StatesSealed> {
                 renderData(it)
@@ -132,18 +130,22 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
         when(data){
             is StatesSealed.Success -> {
+                //показываем макет викторины, скрываем прогресс
                 quizLinearLayout?.visibility = View.VISIBLE
                 progressBarFlags?.visibility = View.GONE
-                updateGuessRows(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
-                resetQuiz()
-
-                listStates = data.state
+                //список стран с именами, столицами, флагами
+                listStates = data.state as MutableList<State>
                 Toast.makeText(requireActivity(), "Количество стран = ${listStates.size}", Toast.LENGTH_SHORT).show()
+                //обновляем количество кнопок с ответами
+                updateGuessRows(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
+                //Настройка и запуск следующей серии вопросов
+                resetQuiz()
             }
             is StatesSealed.Error ->{
                 Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT).show()
             }
             is StatesSealed.Loading ->{
+                //показываем прогресс, скрываем макет викторины
                 quizLinearLayout?.visibility = View.GONE
                 progressBarFlags?.visibility = View.VISIBLE
             }
@@ -155,6 +157,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         super.onStart()
         updateSoundOnOff(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
         updateNumberFlagsInQuiz(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
+        //две строчки ниже делаем после получения данных из сети
         //updateGuessRows(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
         //resetQuiz()
     }
@@ -176,7 +179,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
             disableButtons()  // Блокировка всех кнопок ответов
             if (correctAnswers == flagsInQuiz) {
                 //в новом потоке чтобы не было задержек времени
-                Thread { mToneGenerator?.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
+                Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
                 // DialogFragment для вывода статистики и перезапуска
                 //в отдельном файле сделан, а не внутри фрагмента
                 ResultDialog(flagsInQuiz, totalGuesses, this )
@@ -185,7 +188,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
             }else { // Ответ правильный, но викторина не закончена
                     // Загрузка следующего флага после двухсекундной задержки
                 //в новом потоке чтобы не было задержек времени
-                Thread { mToneGenerator?.startTone(ToneGenerator.TONE_DTMF_0, 50) }.start()
+                Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 50) }.start()
                     handler.postDelayed(
                         {
                         //todo сделать
@@ -196,7 +199,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                 }
             }else { // Неправильный ответ
             //в новом потоке чтобы не было задержек времени
-            Thread { mToneGenerator?.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
+            Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
                 //todo Встряхивание сделать
             //flagImageView!!.startAnimation(shakeAnimation)  // Встряхивание
 
@@ -251,22 +254,26 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     override fun resetQuiz() {
         //todo потом заменить на список с изображениями флагов
         //получаем список из 10 одинаковых картинок с разными именами
-        fileNameList = flagsViewModel.getFlags()
+        //fileNameList = flagsViewModel.getFlags()
 
         correctAnswers = 0  // Сброс количества правильных ответов
         totalGuesses = 0 //  Сброс общего количества попыток
         quizCountriesList.clear()  // Очистка предыдущего списка стран
 
         var flagCounter = 1
-        val numberOfFlags = fileNameList.size
+        //listStates - список с названиями стран, столицами, флагами
+        val numberOfFlags = listStates.size
         // Добавление FLAGS_IN_QUIZ штук  случайных файлов в quizCountriesList
         while (flagCounter <= flagsInQuiz) {
             val randomIndex = random.nextInt(numberOfFlags)
             // Получение случайного имени файла
-            val filename: TestFlagClass = fileNameList[randomIndex]
-            // Если файл еще не был выбран, добавляем его в список файлов для викторины
+            //val filename: TestFlagClass = fileNameList[randomIndex]
+            // Получение случайного элемента списка - экземпляра класса State
+            val filename:State = listStates[randomIndex]
+            // Если элемент списка еще не был выбран, добавляем его в список  для текущей викторины
             if (!quizCountriesList.contains(filename)) {
-                quizCountriesList.add(filename)  // Добавить файл в список файлов для викторины
+                if (filename.nameRus == "Unknown")return //чтобы не попадали такие названия
+                quizCountriesList.add(filename)  // Добавить элемент в список для викторины
                 ++flagCounter
             }
         }
@@ -276,8 +283,9 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     // Загрузка следующего флага после правильного ответа
     private fun loadNextFlag() {
         // Получение имени файла следующего флага и удаление его из списка
-        val nextImage: TestFlagClass = quizCountriesList.removeAt(0)
-        correctAnswer = nextImage.name // Обновление правильного ответа
+        //val nextImage: TestFlagClass = quizCountriesList.removeAt(0)
+        val nextImage: State = quizCountriesList.removeAt(0)
+        correctAnswer = nextImage.nameRus // Обновление правильного ответа
         answerTextView.text = "" // Очистка answerTextView
 
         // Отображение номера текущего вопроса
@@ -285,19 +293,24 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                 R.string.question, correctAnswers + 1, flagsInQuiz
         )
 
-        flagImageView?.setImageDrawable(nextImage.image)
+        //загружаем svg изображение флага
+        nextImage.flag?. let{flag->
+            GlideToVectorYou.justLoadImage(requireActivity(), Uri.parse(flag), flagImageView)
+        }
+       // flagImageView?.setImageDrawable(nextImage.image)
 
-        Collections.shuffle(fileNameList) // Перестановка имен файлов
+        // Перестановка имен файлов - метод Котлин для коллекций
+        listStates.shuffle()
 
-        // Помещение правильного ответа в конец fileNameList - зачем?
+        // Помещение правильного ответа в конец listStates - зачем?
         var correctIndex = 0
-        for (i in 0 until fileNameList.size ){
-          if(fileNameList[i].name == correctAnswer){
+        for (i in 0 until listStates.size ){
+          if(listStates[i].nameRus == correctAnswer){
               correctIndex = i
           }
         }
-        // Помещение правильного ответа в конец fileNameList
-        fileNameList.add(fileNameList.removeAt(correctIndex))
+        // Помещение правильного ответа в конец listStates
+        listStates.add(listStates.removeAt(correctIndex))
 
         // Добавление 2, 4, 6 кнопок в зависимости от значения guessRows
         for (row in 0 until guessRows) {
@@ -308,7 +321,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                 newGuessButton.isEnabled = true //так как при правильном ответе было false
 
                 // Назначение названия страны текстом newGuessButton
-                val filename = fileNameList[row * 2 + column].name
+                val filename = listStates[row * 2 + column].nameRus
                 newGuessButton.text = filename
             }
         }

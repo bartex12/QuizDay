@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorFone">
 
     <ProgressBar
         android:id="@+id/progressBarFlags"
@@ -70,7 +71,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:lines="2"
+            android:lines="3"
+            android:textSize="10sp"
             android:text="New Button"
            />
 
@@ -81,7 +83,8 @@
             android:id="@+id/button2"
             android:background="@drawable/draw"
             android:layout_weight="1"
-            android:lines="2"
+            android:lines="3"
+            android:textSize="10sp"
             />
     </LinearLayout>
 
@@ -98,7 +101,8 @@
             android:id="@+id/button3"
             android:background="@drawable/draw"
             android:layout_weight="1"
-            android:lines="2"
+            android:lines="3"
+            android:textSize="10sp"
             />
 
         <Button
@@ -108,7 +112,8 @@
             android:id="@+id/button4"
             android:background="@drawable/draw"
             android:layout_weight="1"
-            android:lines="2"
+            android:lines="3"
+            android:textSize="10sp"
            />
     </LinearLayout>
 
@@ -125,7 +130,8 @@
             android:id="@+id/button5"
             android:background="@drawable/draw"
             android:layout_weight="1"
-            android:lines="2"
+            android:lines="3"
+            android:textSize="10sp"
             />
 
         <Button
@@ -135,7 +141,8 @@
             android:id="@+id/button6"
             android:background="@drawable/draw"
             android:layout_weight="1"
-            android:lines="2"
+            android:lines="3"
+            android:textSize="10sp"
            />
     </LinearLayout>
 
