@@ -126,6 +126,16 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         requireActivity().invalidateOptionsMenu()
     }
 
+    // метод onStart вызывается после onViewCreated.
+    override fun onStart() {
+        super.onStart()
+        updateSoundOnOff(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
+        updateNumberFlagsInQuiz(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
+        //две строчки ниже делаем после получения данных из сети
+        //updateGuessRows(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
+        //resetQuiz()
+    }
+
     private fun renderData(data: StatesSealed?) {
 
         when(data){
@@ -151,18 +161,6 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
             }
         }
     }
-
-    // метод onStart вызывается после onViewCreated.
-    override fun onStart() {
-        super.onStart()
-        updateSoundOnOff(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
-        updateNumberFlagsInQuiz(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
-        //две строчки ниже делаем после получения данных из сети
-        //updateGuessRows(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
-        //resetQuiz()
-    }
-
-
 
     val guessButtonListener:   View.OnClickListener =   View.OnClickListener { v ->
         val guessButton = v as Button //нажатая кнопка ответа
