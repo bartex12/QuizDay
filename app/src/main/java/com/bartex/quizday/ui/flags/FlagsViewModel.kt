@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bartex.quizday.App
 import com.bartex.quizday.model.api.IDataSourceState
+import com.bartex.quizday.model.common.Constants.baseUrl
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.Action
 import com.bartex.quizday.model.fsm.IFlagState
@@ -39,38 +40,33 @@ class FlagsViewModel(
     )
 ) : ViewModel()  {
 
-    companion object{
-        const val TAG = "33333"
-        const val baseUrl =  "https://restcountries.eu/rest/v2/"
-    }
-
     private val listStates = MutableLiveData<StatesSealed>()
-
-    fun getStatesSealed() : LiveData<StatesSealed> {
-        return listStates
-    }
-
-    fun loadDataSealed(){
-        //начинаем загрузку данных
-        listStates.value = StatesSealed.Loading(null)
-
-        statesRepo.getStates()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({states->
-                // если данные загружены - выставляем value в MutableLiveData
-                listStates.value = StatesSealed.Success(state = states)
-            },{error ->
-                //если произошла ошибка - выставляем value в MutableLiveData в ошибку
-                listStates.value = StatesSealed.Error(error = error)
-            })
-    }
-
-    //=================================================
 
     private val quizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
     private var storage: IFlagQuiz = FlagQuiz(App.instance)
     var dataflags:DataFlags = DataFlags()
 
+    fun getStatesSealed() : LiveData<StatesSealed> {
+        loadDataSealed()
+        return listStates
+    }
+
+    private fun loadDataSealed(){
+        listStates.value = StatesSealed.Loading(100)
+
+        statesRepo.getStates()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({states->
+                listStates.value = StatesSealed.Success(state = states)
+            },{error ->
+                listStates.value = StatesSealed.Error(error = error)
+            })
+    }
+
+    //получить состояние конечного автомата
+    fun getCurrentState(): LiveData<IFlagState> {
+        return quizState
+    }
 
     //начальное состояние не имеет предыдущего
     fun resetQuiz(listStates: MutableList<State>){
@@ -78,26 +74,26 @@ class FlagsViewModel(
         dataflags =  storage.resetQuiz(dataflags) //подготовка переменных и списков
         quizState.value =  ReadyState(dataflags) //передаём полученные данные в состояние
     }
+    //загрузить следующий флаг
+    fun loadFirstFlag(currentState: IFlagState, dataFlags:DataFlags){
+        dataflags =  storage.loadNextFlag(dataFlags)
+        quizState.value =  currentState.consumAction(Action.OnNextFlagClicked(dataflags))
+    }
 
+    //по типу ответа при щелчке по кнопке задаём состояние
     fun answer(currentState: IFlagState, guess:String){
-
         dataflags = storage.getTypeAnswer(guess, dataflags)
-
         when(dataflags.typeAnswer){
-          Answer.NotWell ->  quizState.value = currentState.consumAction(Action.OnNotWellClicked(dataflags))
-          Answer.WellNotLast ->  quizState.value = currentState.consumAction(Action.OnWellNotLastClicked(dataflags))
-          Answer.WellAndLast ->  quizState.value =  currentState.consumAction(Action.OnWellAndLastClicked(dataflags))
+            Answer.NotWell ->  quizState.value = currentState.consumAction(Action.OnNotWellClicked(dataflags))
+            Answer.WellNotLast ->  quizState.value = currentState.consumAction(Action.OnWellNotLastClicked(dataflags))
+            Answer.WellAndLast ->  quizState.value =  currentState.consumAction(Action.OnWellAndLastClicked(dataflags))
         }
     }
 
-    fun loadNextFlag(dataFlags:DataFlags){
+    //загрузить следующий флаг
+    fun loadNextFlag(currentState: IFlagState, dataFlags:DataFlags){
         dataflags =  storage.loadNextFlag(dataFlags)
-        quizState.value =  ReadyState(dataflags)//todo
-    }
-
-
-    fun getCurrentState(): LiveData<IFlagState> {
-        return quizState
+        quizState.value =  currentState.consumAction(Action.OnNextFlagClicked(dataflags))
     }
 
     fun updateSoundOnOff(){

@@ -7,6 +7,7 @@ import com.bartex.quizday.model.fsm.model.DataFlags
 class WellNotLastState(val data: DataFlags):IFlagState {
     override fun consumAction(action: Action): IFlagState {
         return when(action){
+            is Action.OnNextFlagClicked -> NextFlagState(data)
             is Action.OnNotWellClicked -> NotWellState(data)
             is Action.OnWellNotLastClicked -> WellNotLastState(data)
             is Action.OnWellAndLastClicked -> WellAndLastState(data)

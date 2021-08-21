@@ -10,6 +10,6 @@ data class DataFlags(
         var totalGuesses:Int = 0 , // общее количество попыток
         var typeAnswer:Answer? = null, //тип ответа
         var listStates: MutableList<State> = mutableListOf(), //список всех стран
-        val quizCountriesList: MutableList<State> = ArrayList(),  //странs текущей викторины
-        var nextCountry:State? = null
+        val quizCountriesList: MutableList<State> = ArrayList(),  //страны текущей викторины
+        var nextCountry:State? = null //
 )
