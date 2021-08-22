@@ -116,7 +116,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         val column = random.nextInt(2) // Выбор случайного столбца
         val randomRow = guessLinearLayouts[row] // Получение строки
 
-        (randomRow!!.getChildAt(column) as Button).text = data.correctAnswer
+        (randomRow?.getChildAt(column) as Button).text = data.correctAnswer
     }
 
     //ответ неправильный
