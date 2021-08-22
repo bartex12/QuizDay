@@ -52,12 +52,12 @@ class FlagsViewModel(
     }
 
     private fun loadDataSealed(){
-        listStates.value = StatesSealed.Loading(100)
+        listStates.value = StatesSealed.Loading(0)
 
         statesRepo.getStates()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({states->
-                listStates.value = StatesSealed.Success(state = states)
+                listStates.value = StatesSealed.Success(states = states)
             },{error ->
                 listStates.value = StatesSealed.Error(error = error)
             })
@@ -107,5 +107,10 @@ class FlagsViewModel(
     fun getGuessRows():Int{
         dataflags = storage.getGuessRows(dataflags)
         return dataflags.guessRows
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        dataflags
     }
 }

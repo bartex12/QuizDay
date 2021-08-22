@@ -50,7 +50,7 @@ class FlagQuiz(val app:Application):IFlagQuiz {
             }
         }
         // Помещение правильного ответа в конец listStates
-        //dataFlags.listStates.add(dataFlags.listStates.removeAt(correctIndex))
+        dataFlags.listStates.add(dataFlags.listStates.removeAt(correctIndex))
 
         ++dataFlags.correctAnswers //увеличиваем номер ответа
 

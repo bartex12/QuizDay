@@ -5,6 +5,8 @@ import android.media.ToneGenerator
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.provider.SyncStateContract
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bartex.quizday.R
+import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.IFlagState
 import com.bartex.quizday.model.fsm.entity.DataFlags
@@ -35,8 +38,8 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     private lateinit var answerTextView : TextView  //для правильного ответа
     private lateinit var flagImageView  : ImageView  //Для вывода флага
     private lateinit var guessButton:Button  //кнопка ответа
-    private var progressBarFlags:ProgressBar? = null
-    private var guessLinearLayouts : Array<LinearLayout?> = arrayOfNulls(3) // Строки с кнопками
+    private lateinit var progressBarFlags:ProgressBar
+    private var guessLinearLayouts : Array<LinearLayout?> = arrayOfNulls(3) //кнопки ответов
     private var random : SecureRandom = SecureRandom()
     private var currentState: IFlagState = ReadyState(DataFlags())
     private var listStates:MutableList<State> = mutableListOf()
@@ -121,7 +124,6 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
     //ответ неправильный
     private fun showNotWellState() {
-
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
         //todo анимацию встряхивания сделать
         answerTextView.setText(R.string.incorrect_answer)
@@ -161,14 +163,13 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     }
 
     private fun initViews(view: View) {
-        // Получение ссылок на компоненты графического интерфейса
+
         quizLinearLayout = view.findViewById<View>(R.id.quizLinearLayout) as LinearLayout
         questionNumberTextView = view.findViewById<View>(R.id.questionNumberTextView) as TextView
         answerTextView = view.findViewById<View>(R.id.answerTextView) as TextView
         flagImageView = view.findViewById<View>(R.id.flagImageView) as ImageView
         progressBarFlags = view.findViewById<View>(R.id.progressBarFlags) as ProgressBar
 
-        //guessLinearLayouts = arrayOfNulls(3)
         guessLinearLayouts[0] = view.findViewById<View>(R.id.row1LinearLayout) as LinearLayout
         guessLinearLayouts[1] = view.findViewById<View>(R.id.row2LinearLayout) as LinearLayout
         guessLinearLayouts[2] = view.findViewById<View>(R.id.row3LinearLayout) as LinearLayout
@@ -188,7 +189,6 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
     private fun initMenu() {
         setHasOptionsMenu(true)
-        //приводим меню тулбара в соответствии с onPrepareOptionsMenu в MainActivity
         requireActivity().invalidateOptionsMenu()
     }
 
@@ -197,26 +197,33 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
             is StatesSealed.Success -> {
                 //показываем макет викторины, скрываем прогресс
                 quizLinearLayout.visibility = View.VISIBLE
-                progressBarFlags?.visibility = View.GONE
-                //список стран с именами, столицами, флагами
-                listStates = data.state as MutableList<State>
+                progressBarFlags.visibility = View.GONE
+                //список стран с названиями, столицами, флагами
+                listStates = data.states as MutableList<State>
                 flagsViewModel.resetQuiz(listStates)
             }
             is StatesSealed.Error ->{
                 Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT).show()
             }
             is StatesSealed.Loading ->{
-                //показываем прогресс, скрываем макет викторины
                 quizLinearLayout.visibility = View.GONE
-                progressBarFlags?.visibility = View.VISIBLE
+                progressBarFlags.visibility = View.VISIBLE
             }
         }
     }
 
     private val guessButtonListener:   View.OnClickListener =   View.OnClickListener { v ->
-        guessButton = v as Button //нажатая кнопка ответа
+       // guessButton = v as Button //нажатая кнопка ответа
+        guessButton = when(v.id){
+            R.id.button -> v.findViewById(R.id.button)
+            R.id.button2 -> v.findViewById(R.id.button2)
+            R.id.button3 -> v.findViewById(R.id.button3)
+            R.id.button4 -> v.findViewById(R.id.button4)
+            R.id.button5 -> v.findViewById(R.id.button5)
+            R.id.button6 -> v.findViewById(R.id.button6)
+            else -> v.findViewById(R.id.button)
+        }
         val guess = guessButton.text.toString() //ответ как текст на кнопке
-
         flagsViewModel.answer(currentState, guess) //определить тип ответа
     }
 
@@ -241,7 +248,9 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         }
     }
 
+    //прилетает из ResultDialog
     override fun resetQuiz() {
         flagsViewModel.resetQuiz(listStates)
     }
+
 }
