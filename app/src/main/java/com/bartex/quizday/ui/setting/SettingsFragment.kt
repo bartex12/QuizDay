@@ -13,8 +13,7 @@ class SettingsFragment: PreferenceFragmentCompat() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //приводим меню тулбара в соответствии с onPrepareOptionsMenu в MainActivity
-        //без этой строки меню в тулбаре ведёт себя неправильно
+
         setHasOptionsMenu(true)
         requireActivity().invalidateOptionsMenu()
     }

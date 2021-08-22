@@ -1,7 +1,6 @@
 package com.bartex.quizday.model.fsm.repo
 
-import com.bartex.quizday.model.fsm.model.Answer
-import com.bartex.quizday.model.fsm.model.DataFlags
+import com.bartex.quizday.model.fsm.entity.DataFlags
 
 interface IFlagQuiz {
     fun resetQuiz(dataFlags:DataFlags):DataFlags

@@ -1,4 +1,4 @@
-package com.bartex.quizday.model.fsm.model
+package com.bartex.quizday.model.fsm.entity
 
 import com.bartex.quizday.model.entity.State
 

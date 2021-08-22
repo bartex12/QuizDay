@@ -9,8 +9,8 @@ import com.bartex.quizday.model.common.Constants.baseUrl
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.Action
 import com.bartex.quizday.model.fsm.IFlagState
-import com.bartex.quizday.model.fsm.model.Answer
-import com.bartex.quizday.model.fsm.model.DataFlags
+import com.bartex.quizday.model.fsm.entity.Answer
+import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.repo.FlagQuiz
 import com.bartex.quizday.model.fsm.repo.IFlagQuiz
 import com.bartex.quizday.model.fsm.substates.ReadyState
@@ -77,23 +77,23 @@ class FlagsViewModel(
     //загрузить следующий флаг
     fun loadFirstFlag(currentState: IFlagState, dataFlags:DataFlags){
         dataflags =  storage.loadNextFlag(dataFlags)
-        quizState.value =  currentState.consumAction(Action.OnNextFlagClicked(dataflags))
+        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(dataflags))
     }
 
     //по типу ответа при щелчке по кнопке задаём состояние
     fun answer(currentState: IFlagState, guess:String){
         dataflags = storage.getTypeAnswer(guess, dataflags)
         when(dataflags.typeAnswer){
-            Answer.NotWell ->  quizState.value = currentState.consumAction(Action.OnNotWellClicked(dataflags))
-            Answer.WellNotLast ->  quizState.value = currentState.consumAction(Action.OnWellNotLastClicked(dataflags))
-            Answer.WellAndLast ->  quizState.value =  currentState.consumAction(Action.OnWellAndLastClicked(dataflags))
+            Answer.NotWell ->  quizState.value = currentState.executeAction(Action.OnNotWellClicked(dataflags))
+            Answer.WellNotLast ->  quizState.value = currentState.executeAction(Action.OnWellNotLastClicked(dataflags))
+            Answer.WellAndLast ->  quizState.value =  currentState.executeAction(Action.OnWellAndLastClicked(dataflags))
         }
     }
 
     //загрузить следующий флаг
     fun loadNextFlag(currentState: IFlagState, dataFlags:DataFlags){
         dataflags =  storage.loadNextFlag(dataFlags)
-        quizState.value =  currentState.consumAction(Action.OnNextFlagClicked(dataflags))
+        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(dataflags))
     }
 
     fun updateSoundOnOff(){

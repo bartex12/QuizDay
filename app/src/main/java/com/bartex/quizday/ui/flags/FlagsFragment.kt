@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.bartex.quizday.R
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.IFlagState
-import com.bartex.quizday.model.fsm.model.DataFlags
+import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.substates.*
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import java.security.SecureRandom
@@ -80,9 +80,9 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         when (newQuizState) {
             is ReadyState -> showReadyState(newQuizState.data)
             is NextFlagState -> showNextFlagState(newQuizState.data)
-            is NotWellState -> showNotWellState()
-            is WellNotLastState -> showWellNotLastState(newQuizState.data)
-            is WellAndLastState -> showWellAndLastState(newQuizState.data)
+            is NotWellAnswerState -> showNotWellState()
+            is WellNotLastAnswerState -> showWellNotLastState(newQuizState.data)
+            is WellAndLastAnswerState -> showWellAndLastState(newQuizState.data)
         }
     }
 

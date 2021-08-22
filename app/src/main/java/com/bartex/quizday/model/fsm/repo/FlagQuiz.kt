@@ -6,8 +6,8 @@ import android.media.AudioManager
 import androidx.preference.PreferenceManager
 import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
-import com.bartex.quizday.model.fsm.model.Answer
-import com.bartex.quizday.model.fsm.model.DataFlags
+import com.bartex.quizday.model.fsm.entity.Answer
+import com.bartex.quizday.model.fsm.entity.DataFlags
 import java.security.SecureRandom
 
 class FlagQuiz(val app:Application):IFlagQuiz {
@@ -50,7 +50,7 @@ class FlagQuiz(val app:Application):IFlagQuiz {
             }
         }
         // Помещение правильного ответа в конец listStates
-        dataFlags.listStates.add(dataFlags.listStates.removeAt(correctIndex))
+        //dataFlags.listStates.add(dataFlags.listStates.removeAt(correctIndex))
 
         ++dataFlags.correctAnswers //увеличиваем номер ответа
 
