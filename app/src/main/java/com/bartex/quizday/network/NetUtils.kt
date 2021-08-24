@@ -1,4 +1,4 @@
-package com.bartex.quizday.net
+package com.bartex.quizday.network
 
 import android.content.Context
 import android.net.ConnectivityManager

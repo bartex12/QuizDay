@@ -1,5 +1,6 @@
 package com.bartex.quizday.ui.flags
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,8 +15,10 @@ import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.repo.FlagQuiz
 import com.bartex.quizday.model.fsm.repo.IFlagQuiz
 import com.bartex.quizday.model.fsm.substates.ReadyState
-import com.bartex.quizday.model.repositories.IStatesRepo
-import com.bartex.quizday.model.repositories.StatesRepo
+import com.bartex.quizday.model.repositories.state.IStatesRepo
+import com.bartex.quizday.model.repositories.state.StatesRepo
+import com.bartex.quizday.model.repositories.state.roomcash.RoomStateCash
+import com.bartex.quizday.room.Database
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -36,8 +39,8 @@ class FlagsViewModel(
                 .create()
             ))
             .build()
-            .create(IDataSourceState::class.java)
-    )
+            .create(IDataSourceState::class.java),
+    RoomStateCash(Database.getInstance() as Database))
 ) : ViewModel()  {
 
     private val listStates = MutableLiveData<StatesSealed>()
@@ -46,15 +49,15 @@ class FlagsViewModel(
     private var storage: IFlagQuiz = FlagQuiz(App.instance)
     var dataflags:DataFlags = DataFlags()
 
-    fun getStatesSealed() : LiveData<StatesSealed> {
-        loadDataSealed()
+    fun getStatesSealed(isNetworkAvailable:Boolean) : LiveData<StatesSealed> {
+        loadDataSealed(isNetworkAvailable)
         return listStates
     }
 
-    private fun loadDataSealed(){
+    private fun loadDataSealed(isNetworkAvailable:Boolean){
         listStates.value = StatesSealed.Loading(0)
 
-        statesRepo.getStates()
+        statesRepo.getStates(isNetworkAvailable)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({states->
                 listStates.value = StatesSealed.Success(states = states)
@@ -74,7 +77,7 @@ class FlagsViewModel(
         dataflags =  storage.resetQuiz(dataflags) //подготовка переменных и списков
         quizState.value =  ReadyState(dataflags) //передаём полученные данные в состояние
     }
-    //загрузить следующий флаг
+    //загрузить первый флаг
     fun loadFirstFlag(currentState: IFlagState, dataFlags:DataFlags){
         dataflags =  storage.loadNextFlag(dataFlags)
         quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(dataflags))
@@ -107,10 +110,5 @@ class FlagsViewModel(
     fun getGuessRows():Int{
         dataflags = storage.getGuessRows(dataflags)
         return dataflags.guessRows
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        dataflags
     }
 }

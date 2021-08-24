@@ -2,6 +2,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 
 android {
@@ -60,6 +61,11 @@ dependencies {
 
     //GlideToVectorYou
     implementation 'com.github.corouteam:GlideToVectorYou:v2.0.0'
+
+    //room - не забыть добавить плагин  apply plugin: 'kotlin-kapt'
+    implementation 'androidx.room:room-runtime:2.3.0'
+    kapt 'androidx.room:room-compiler:2.3.0'
+
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
