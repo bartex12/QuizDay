@@ -12,7 +12,7 @@ import com.bartex.quizday.ui.home.MainListImpl
 class ImageQuizViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _imageList =  MutableLiveData<List<MainList>>()
-    val imageRepo: IImageList = ImageListImpl(application)
+    private val imageRepo: IImageList = ImageListImpl(application)
 
     fun getImageList():LiveData<List<MainList>>{
         return _imageList

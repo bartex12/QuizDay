@@ -13,9 +13,6 @@ data class State(
     @Expose val flag :String? = null,
     @Expose val name :String? = null,
     @Expose var region :String? = null,
-    @Expose val population :Int? = null,
-    @Expose var area :Float? = null,
-    @Expose val latlng:Array<Float>? = null,
     var nameRus:String? = null,
     var capitalRus:String? = null,
     var regionRus:String? = null

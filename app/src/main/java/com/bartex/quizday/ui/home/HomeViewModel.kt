@@ -10,7 +10,7 @@ import com.bartex.quizday.model.MainList
 class HomeViewModel(application: Application) :AndroidViewModel(application) {
 
     private val _mainList =  MutableLiveData<List<MainList>>()
-    val mainRepo:IMainList = MainListImpl(application)
+    private val mainRepo:IMainList = MainListImpl(application)
 
     fun getMainList():LiveData<List<MainList>>{
         return _mainList
