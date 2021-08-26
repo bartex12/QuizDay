@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QuizDay">
         <activity
-            android:name=".MainActivity"
+            android:name=".SplashActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@style/Theme.QuizDay.NoActionBar">
@@ -24,6 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity"/>
     </application>
 
 </manifest>
