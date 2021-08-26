@@ -38,18 +38,19 @@
     <!--так как layout_height="0dp" а layout_weight="1"-->
     <!--картинка изменяется в размерах при изменении  -->
     <!-- количества кнопок с ответами-->
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:id="@+id/flagImageView"
-        android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/spacing"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_weight="1"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/image_description"
-        android:scaleType="fitCenter"/>
+        <ImageView
+            android:id="@+id/flagImageView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="@dimen/spacing"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/image_description"
+            android:scaleType="fitCenter"
+            tools:src="@tools:sample/avatars" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -67,25 +68,11 @@
 
         <Button
             android:id="@+id/button"
-            android:background="@drawable/draw"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:lines="3"
-            android:textSize="10sp"
-            android:text="New Button"
-           />
+            style="@style/ButtonAnswerStyle"/>
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="New Button"
             android:id="@+id/button2"
-            android:background="@drawable/draw"
-            android:layout_weight="1"
-            android:lines="3"
-            android:textSize="10sp"
-            />
+            style="@style/ButtonAnswerStyle"/>
     </LinearLayout>
 
     <LinearLayout
@@ -95,26 +82,12 @@
         android:id="@+id/row2LinearLayout">
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="New Button"
             android:id="@+id/button3"
-            android:background="@drawable/draw"
-            android:layout_weight="1"
-            android:lines="3"
-            android:textSize="10sp"
-            />
+            style="@style/ButtonAnswerStyle"/>
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="New Button"
             android:id="@+id/button4"
-            android:background="@drawable/draw"
-            android:layout_weight="1"
-            android:lines="3"
-            android:textSize="10sp"
-           />
+            style="@style/ButtonAnswerStyle"/>
     </LinearLayout>
 
     <LinearLayout
@@ -124,26 +97,12 @@
         android:id="@+id/row3LinearLayout">
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="New Button"
             android:id="@+id/button5"
-            android:background="@drawable/draw"
-            android:layout_weight="1"
-            android:lines="3"
-            android:textSize="10sp"
-            />
+            style="@style/ButtonAnswerStyle"/>
 
         <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="New Button"
             android:id="@+id/button6"
-            android:background="@drawable/draw"
-            android:layout_weight="1"
-            android:lines="3"
-            android:textSize="10sp"
-           />
+            style="@style/ButtonAnswerStyle"/>
     </LinearLayout>
 
     <TextView

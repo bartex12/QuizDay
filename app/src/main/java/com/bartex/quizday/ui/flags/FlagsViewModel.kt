@@ -1,17 +1,27 @@
 package com.bartex.quizday.ui.flags
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bartex.quizday.App
-import com.bartex.quizday.model.TestFlagClass
 import com.bartex.quizday.model.api.IDataSourceState
-import com.bartex.quizday.model.repositories.IStatesRepo
-import com.bartex.quizday.model.repositories.StatesRepo
+import com.bartex.quizday.model.common.Constants.baseUrl
+import com.bartex.quizday.model.entity.State
+import com.bartex.quizday.model.fsm.Action
+import com.bartex.quizday.model.fsm.IFlagState
+import com.bartex.quizday.model.fsm.entity.Answer
+import com.bartex.quizday.model.fsm.entity.DataFlags
+import com.bartex.quizday.model.fsm.repo.FlagQuiz
+import com.bartex.quizday.model.fsm.repo.IFlagQuiz
+import com.bartex.quizday.model.fsm.substates.ReadyState
+import com.bartex.quizday.model.repositories.state.IStatesRepo
+import com.bartex.quizday.model.repositories.state.StatesRepo
+import com.bartex.quizday.model.repositories.state.roomcash.RoomStateCash
+import com.bartex.quizday.room.Database
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -29,40 +39,76 @@ class FlagsViewModel(
                 .create()
             ))
             .build()
-            .create(IDataSourceState::class.java)
-    )
+            .create(IDataSourceState::class.java),
+    RoomStateCash(Database.getInstance() as Database))
 ) : ViewModel()  {
-
-    companion object{
-        const val TAG = "33333"
-        const val baseUrl =  "https://restcountries.eu/rest/v2/"
-    }
-
-    val repo:IRepo = RepoImpl(App.instance)
-
-  fun   getFlags(): MutableList<TestFlagClass>{
-      return repo.getFlags()
-  }
-   //_______________________________________________________________
 
     private val listStates = MutableLiveData<StatesSealed>()
 
-    fun getStatesSealed() : LiveData<StatesSealed> {
+    private val quizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
+    private var storage: IFlagQuiz = FlagQuiz(App.instance)
+    var dataflags:DataFlags = DataFlags()
+
+    fun getStatesSealed(isNetworkAvailable:Boolean) : LiveData<StatesSealed> {
+        loadDataSealed(isNetworkAvailable)
         return listStates
     }
 
-    fun loadDataSealed(){
-        //начинаем загрузку данных
-        listStates.value = StatesSealed.Loading(null)
+    private fun loadDataSealed(isNetworkAvailable:Boolean){
+        listStates.value = StatesSealed.Loading(0)
 
-        statesRepo.getStates()
+        statesRepo.getStates(isNetworkAvailable)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({states->
-                // если данные загружены - выставляем value в MutableLiveData
-                listStates.value = StatesSealed.Success(state = states)
+                listStates.value = StatesSealed.Success(states = states)
             },{error ->
-                //если произошла ошибка - выставляем value в MutableLiveData в ошибку
                 listStates.value = StatesSealed.Error(error = error)
             })
+    }
+
+    //получить состояние конечного автомата
+    fun getCurrentState(): LiveData<IFlagState> {
+        return quizState
+    }
+
+    //начальное состояние не имеет предыдущего
+    fun resetQuiz(listStates: MutableList<State>){
+        dataflags.listStates = listStates //передаём список в класс данных
+        dataflags =  storage.resetQuiz(dataflags) //подготовка переменных и списков
+        quizState.value =  ReadyState(dataflags) //передаём полученные данные в состояние
+    }
+    //загрузить первый флаг
+    fun loadFirstFlag(currentState: IFlagState, dataFlags:DataFlags){
+        dataflags =  storage.loadNextFlag(dataFlags)
+        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(dataflags))
+    }
+
+    //по типу ответа при щелчке по кнопке задаём состояние
+    fun answer(currentState: IFlagState, guess:String){
+        dataflags = storage.getTypeAnswer(guess, dataflags)
+        when(dataflags.typeAnswer){
+            Answer.NotWell ->  quizState.value = currentState.executeAction(Action.OnNotWellClicked(dataflags))
+            Answer.WellNotLast ->  quizState.value = currentState.executeAction(Action.OnWellNotLastClicked(dataflags))
+            Answer.WellAndLast ->  quizState.value =  currentState.executeAction(Action.OnWellAndLastClicked(dataflags))
+        }
+    }
+
+    //загрузить следующий флаг
+    fun loadNextFlag(currentState: IFlagState, dataFlags:DataFlags){
+        dataflags =  storage.loadNextFlag(dataFlags)
+        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(dataflags))
+    }
+
+    fun updateSoundOnOff(){
+        storage.updateSoundOnOff()
+    }
+
+    fun updateNumberFlagsInQuiz(){
+        dataflags = storage.updateNumberFlagsInQuiz(dataflags)
+    }
+
+    fun getGuessRows():Int{
+        dataflags = storage.getGuessRows(dataflags)
+        return dataflags.guessRows
     }
 }

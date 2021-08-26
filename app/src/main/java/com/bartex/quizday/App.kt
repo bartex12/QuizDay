@@ -1,6 +1,7 @@
 package com.bartex.quizday
 
 import android.app.Application
+import com.bartex.quizday.room.Database
 
 class App: Application() {
 
@@ -11,5 +12,8 @@ class App: Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+
+        //создаём базу данных
+        Database.create(this)
     }
 }

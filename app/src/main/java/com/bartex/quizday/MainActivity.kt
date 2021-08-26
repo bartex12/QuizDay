@@ -1,40 +1,32 @@
 package com.bartex.quizday
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.media.AudioManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
-import com.bartex.quizday.net.NoInternetDialogFragment
-import com.bartex.quizday.net.isInternetAvailable
-import com.bartex.quizday.ui.flags.FlagsFragment
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.bartex.quizday.model.common.Constants
+import com.bartex.quizday.network.OnlineLiveData
+import com.bartex.quizday.network.NoInternetDialogFragment
+import com.bartex.quizday.network.isInternetAvailable
+import com.bartex.quizday.ui.flags.FlagsViewModel
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
-    companion object{
-        // Ключи для чтения данных из SharedPreferences
-        val CHOICES = "pref_numberOfChoices"
-        val FLAGS_IN_QUIZ = "pref_numberOfFlags"
-        val SOUND = "pref_cbSound"
-        const val DIALOG_FRAGMENT = "DIALOG_FRAGMENT_TAG"
-    }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navController:NavController
@@ -43,8 +35,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var audioManager: AudioManager
 
     private var isNetworkAvailable: Boolean = true //Доступна ли сеть
-    // Настройки изменились? При первом включении это вызывает запуск викторины в onStart
-    private var preferencesChanged = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,43 +48,36 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
+        //следим за сетью через LiveData
+        OnlineLiveData(this).observe(
+            this@MainActivity,
+            Observer<Boolean> {
+                isNetworkAvailable = it
+                if (!isNetworkAvailable) {
+                    showNoInternetConnectionDialog()
+                }
+            })
+        Log.d(TAG, "*** MainActivity onCreate  isNetworkAvailable = $isNetworkAvailable")
+
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // Задание значений по умолчанию в файле SharedPreferences
-        //Логический признак, определяющий, должны ли значения по умолчанию
-        //сбрасываться при каждом вызове метода setDefaultValues, — значение false
-        //указывает, что значения настроек по умолчанию должны задаваться только
-        //при первом вызове этого метода.
+        // Задание значений по умолчанию для SharedPreferences
         PreferenceManager.setDefaultValues(this, R.xml.pref_setting, false)
+
         audioManager=  getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         drawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
-        val fab: FloatingActionButton = findViewById(R.id.fab)
-        fab.visibility = View.GONE //скроем пока
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
-
         navController = findNavController(R.id.nav_host_fragment)
         //читаем из графа конфигурацию - так работает правильно!!!
         appBarConfiguration = AppBarConfiguration.Builder(navController.graph)
             //Отображать кнопку навигации как гамбургер , когда она не отображается как кнопка вверх
             .setOpenableLayout(drawerLayout)
             .build()
-        // если делать так, то стрелка вверх не отобржается, кроме того в back stak скапливаются
-        // все фрагменты, к которым обращались !!!
-        //        appBarConfiguration =   AppBarConfiguration(setOf(
-        //                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow), drawerLayout)
         //работа гамбургера и стрелки вверх в toolbar
         setupActionBarWithNavController(navController, appBarConfiguration)
-        //работа меню шторки без внешних слушателей - если все пункты меню могут через navigate
-       // navView.setupWithNavController(navController)
-        //слушатель меню шторки -для обработки пунктов шторки - если нужно как-то хитро делать переходы
-        //то есть если бы все пункты были через navigate, то было бы не нужно, справлялся бы NavController
-         navView.setNavigationItemSelectedListener(this)
+        navView.setNavigationItemSelectedListener(this)
     }
 
     //щелчки по стрелке вверх - как appBarConfiguration и по гамбургеру - как super.onSupportNavigateUp()
@@ -102,8 +85,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
-
-    fun getNetworkAvailable(): Boolean = isNetworkAvailable
 
     private fun showNoInternetConnectionDialog() {
         showAlertDialog(
@@ -113,7 +94,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun showAlertDialog(title: String?, message: String?) {
-        NoInternetDialogFragment.newInstance(title, message).show(supportFragmentManager, DIALOG_FRAGMENT)
+        NoInternetDialogFragment.newInstance(title, message)
+                .show(supportFragmentManager, Constants.DIALOG_FRAGMENT)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -219,7 +201,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
         // Выделяем выбранный пункт меню в шторке
-        //item.isChecked = true
+        item.isChecked = true
         drawerLayout.closeDrawer(GravityCompat.START)
         return false
     }
@@ -228,4 +210,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onStop()
         audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false)
     }
+
+    fun getNetworkAvailable(): Boolean = isNetworkAvailable
+
+    companion object{
+        const val TAG = "33333"
+    }
+
 }
