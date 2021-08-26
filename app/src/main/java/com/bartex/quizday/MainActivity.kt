@@ -3,6 +3,7 @@ package com.bartex.quizday
 import android.content.Context
 import android.media.AudioManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -10,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -17,8 +20,10 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
 import com.bartex.quizday.model.common.Constants
-import com.bartex.quizday.net.NoInternetDialogFragment
-import com.bartex.quizday.net.isInternetAvailable
+import com.bartex.quizday.network.OnlineLiveData
+import com.bartex.quizday.network.NoInternetDialogFragment
+import com.bartex.quizday.network.isInternetAvailable
+import com.bartex.quizday.ui.flags.FlagsViewModel
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -36,13 +41,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(R.layout.activity_main)
 
         //при первом включении проверяем наличие интернета вручную - без LiveData
-        //todo сделать проверку с LiveData
         if (savedInstanceState == null) {
             isNetworkAvailable = isInternetAvailable(this)
             if (!isNetworkAvailable) {
                 showNoInternetConnectionDialog()
             }
         }
+
+        //следим за сетью через LiveData
+        OnlineLiveData(this).observe(
+            this@MainActivity,
+            Observer<Boolean> {
+                isNetworkAvailable = it
+                if (!isNetworkAvailable) {
+                    showNoInternetConnectionDialog()
+                }
+            })
+        Log.d(TAG, "*** MainActivity onCreate  isNetworkAvailable = $isNetworkAvailable")
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -195,4 +210,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onStop()
         audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false)
     }
+
+    fun getNetworkAvailable(): Boolean = isNetworkAvailable
+
+    companion object{
+        const val TAG = "33333"
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.bartex.quizday.ui.flags
 
+import android.content.res.Configuration
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.net.Uri
@@ -14,12 +15,15 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import com.bartex.quizday.MainActivity
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.IFlagState
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.substates.*
+import com.bartex.quizday.room.Database
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import java.security.SecureRandom
 
@@ -43,10 +47,13 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     private var random : SecureRandom = SecureRandom()
     private var currentState: IFlagState = ReadyState(DataFlags())
     private var listStates:MutableList<State> = mutableListOf()
+    //для доступа к полю MainActivity isNetworkAvailable, где проверяется доступ к интернету
+    lateinit var main:MainActivity
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_flags, container, false)
+        main = requireActivity() as MainActivity
+            return inflater.inflate(R.layout.fragment_flags, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -57,8 +64,9 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         initButtonsListeners()
         initMenu()
 
+        val  isNetworkAvailable = main.getNetworkAvailable()
         //получаем страны из сети и после этого запускаем викторину
-        flagsViewModel.getStatesSealed()
+        flagsViewModel.getStatesSealed(isNetworkAvailable)
             .observe(viewLifecycleOwner,  {
                 renderData(it)
             })

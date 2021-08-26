@@ -2,6 +2,7 @@ package com.bartex.quizday.model.fsm.entity
 
 import com.bartex.quizday.model.entity.State
 
+
 data class DataFlags(
         var flagsInQuiz:Int = 2, //количество вопросов в викторите
         var guessRows:Int = 0, // Количество строк с кнопками вариантов
