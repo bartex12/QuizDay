@@ -13,12 +13,14 @@ import com.bartex.quizday.model.fsm.entity.Answer
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.repo.FlagQuiz
 import com.bartex.quizday.model.fsm.repo.IFlagQuiz
+import com.bartex.quizday.model.fsm.repo.settings.ISettingsProvider
 import com.bartex.quizday.model.fsm.repo.settings.SettingsProvider
 import com.bartex.quizday.model.fsm.substates.ReadyState
 import com.bartex.quizday.model.repositories.state.IStatesRepo
 import com.bartex.quizday.model.repositories.state.StatesRepo
 import com.bartex.quizday.model.repositories.state.roomcash.RoomStateCash
 import com.bartex.quizday.room.Database
+import com.bartex.quizday.ui.adapters.ItemList
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -27,7 +29,7 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class FlagsViewModel(
-    var statesRepo: IStatesRepo = StatesRepo(
+        var statesRepo: IStatesRepo = StatesRepo(
         Retrofit.Builder()
             .baseUrl(baseUrl)
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
@@ -40,9 +42,9 @@ class FlagsViewModel(
             ))
             .build()
             .create(IDataSourceState::class.java),
-    roomCash = RoomStateCash(Database.getInstance() as Database)),
-    private val storage: IFlagQuiz = FlagQuiz(),
-    private val settingProvider: SettingsProvider = SettingsProvider(App.instance),
+        roomCash = RoomStateCash(Database.getInstance() as Database)),
+        private val storage: IFlagQuiz = FlagQuiz(),
+        private val settingProvider: ISettingsProvider = SettingsProvider(App.instance),
 ) : ViewModel()  {
 
     private val listStates = MutableLiveData<StatesSealed>()
@@ -79,8 +81,8 @@ class FlagsViewModel(
    }
 
     //начальное состояние не имеет предыдущего
-    fun resetQuiz(){
-        dataFlags =  storage.resetQuiz(listOfStates, dataFlags) //подготовка переменных и списков
+    fun resetQuiz(region:String){
+        dataFlags =  storage.resetQuiz(listOfStates, dataFlags, region) //подготовка переменных и списков
         quizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
     }
     //загрузить первый флаг
@@ -119,5 +121,9 @@ class FlagsViewModel(
     fun getGuessRows():Int{
         dataFlags = settingProvider.getGuessRows(dataFlags)
         return dataFlags.guessRows
+    }
+
+    fun  getRegionList():List<ItemList> {
+        return settingProvider.updateRegionList()
     }
 }

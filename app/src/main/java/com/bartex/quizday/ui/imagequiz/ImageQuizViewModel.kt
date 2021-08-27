@@ -4,17 +4,14 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.bartex.quizday.model.MainList
-import com.bartex.quizday.ui.home.IMainList
-import com.bartex.quizday.ui.home.MainListImpl
+import com.bartex.quizday.ui.adapters.ItemList
 
 class ImageQuizViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _imageList =  MutableLiveData<List<MainList>>()
+    private val _imageList =  MutableLiveData<List<ItemList>>()
     private val imageRepo: IImageList = ImageListImpl(application)
 
-    fun getImageList():LiveData<List<MainList>>{
+    fun getImageList():LiveData<List<ItemList>>{
         return _imageList
     }
 

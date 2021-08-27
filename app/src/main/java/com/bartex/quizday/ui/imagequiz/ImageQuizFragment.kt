@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -13,10 +12,9 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bartex.quizday.MainActivity
 import com.bartex.quizday.R
-import com.bartex.quizday.model.MainList
-import com.bartex.quizday.ui.home.HomeAdapter
+import com.bartex.quizday.ui.adapters.ItemList
+import com.bartex.quizday.ui.adapters.HomeAdapter
 
 class ImageQuizFragment : Fragment() {
 
@@ -63,13 +61,13 @@ class ImageQuizFragment : Fragment() {
         rv_image.adapter = adapter
     }
 
-    private fun renderData(list: List<MainList>) {
+    private fun renderData(list: List<ItemList>) {
         adapter?.listOfTypes = list
     }
 
     //todo
     private fun getOnClickListener(): HomeAdapter.OnitemClickListener =
-            object :HomeAdapter.OnitemClickListener{
+            object : HomeAdapter.OnitemClickListener{
                 override fun onItemClick(position: Int) {
                     when(position){
                         0 -> navController.navigate(R.id.action_imagequizFragment_to_flagsFragment)

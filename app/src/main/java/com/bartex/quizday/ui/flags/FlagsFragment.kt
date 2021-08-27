@@ -13,12 +13,16 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bartex.quizday.MainActivity
 import com.bartex.quizday.R
+import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.IFlagState
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.substates.*
+import com.bartex.quizday.ui.adapters.RegionAdapter
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import java.security.SecureRandom
 
@@ -34,7 +38,11 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     private val  mToneGenerator: ToneGenerator by lazy{
         ToneGenerator(AudioManager.STREAM_MUSIC, 100)
     }
-    private var regionsSet  : Set<String>? = null   // Регионы текущей викторины
+
+    lateinit var rv_region: RecyclerView
+    private var adapter: RegionAdapter? = null
+
+    private var region  : String   = Constants.REGION_ALL  // Регион текущей викторины
     private lateinit var handler : Handler   // Для задержки загрузки следующего флага
     private lateinit var quizLinearLayout  : LinearLayout // root макета фрагмента
     private lateinit var questionNumberTextView  : TextView   //для номера текущего вопроса
@@ -60,6 +68,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
         initHandler()
         initViews(view)
+        initAdapter(view)
         initButtonsListeners()
         initMenu()
 
@@ -204,6 +213,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     }
 
     private fun initViews(view: View) {
+
         quizLinearLayout = view.findViewById<View>(R.id.quizLinearLayout) as LinearLayout
         questionNumberTextView = view.findViewById<View>(R.id.questionNumberTextView) as TextView
         answerTextView = view.findViewById<View>(R.id.answerTextView) as TextView
@@ -244,7 +254,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                 //сохраняем список стран во ViewModel на время жизни фрагмента
                 flagsViewModel.saveListOfStates(listStates)
                 //переводим конечный автомат в состояние ReadyState
-                flagsViewModel.resetQuiz()
+                flagsViewModel.resetQuiz(region)
             }
             is StatesSealed.Error ->{
                 Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT).show()
@@ -285,6 +295,31 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
     //прилетает из ResultDialog
     override fun resetQuiz() {
-        flagsViewModel.resetQuiz()
+        flagsViewModel.resetQuiz(region)
     }
+
+    private fun initAdapter(view:View) {
+        rv_region = view.findViewById(R.id.rv_region_image)
+        rv_region.layoutManager = GridLayoutManager(requireActivity(), 6)
+        adapter = RegionAdapter(getOnClickListener())
+        rv_region.adapter = adapter
+        adapter?.listOfRegion = flagsViewModel.getRegionList()
+    }
+
+    private fun getOnClickListener(): RegionAdapter.OnItemClickListener =
+            object : RegionAdapter.OnItemClickListener{
+                override fun onItemClick(position: Int) {
+                    when(position){
+                        0 -> region = getString(R.string.all)
+                        1 -> region =  getString(R.string.Europa)
+                        2 -> region =  getString(R.string.Asia)
+                        3 -> region =  getString(R.string.America)
+                        4 -> region =  getString(R.string.Oceania)
+                        else -> region =  getString(R.string.all)
+                    }
+                    flagsViewModel.resetQuiz(region)
+                }
+            }
+
+
 }

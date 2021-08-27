@@ -2,10 +2,13 @@ package com.bartex.quizday.model.fsm.repo.settings
 
 import android.content.Context
 import android.media.AudioManager
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.bartex.quizday.App
+import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.fsm.entity.DataFlags
+import com.bartex.quizday.ui.adapters.ItemList
 
 class SettingsProvider(val app: App) :ISettingsProvider{
 
@@ -34,6 +37,23 @@ class SettingsProvider(val app: App) :ISettingsProvider{
             dataFlags.guessRows = it.toInt() / 2
         }
         return dataFlags
+    }
+
+    override fun updateRegionList(): List<ItemList> {
+        return listOf(
+                ItemList(app.resources.getString(R.string.all),
+                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
+                ItemList(app.resources.getString(R.string.Europa),
+                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
+                ItemList(app.resources.getString(R.string.Asia),
+                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
+                ItemList(app.resources.getString(R.string.America),
+                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
+                ItemList(app.resources.getString(R.string.Oceania),
+                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
+                ItemList(app.resources.getString(R.string.Africa),
+                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
+        )
     }
 
 }

@@ -11,4 +11,12 @@ object Constants {
     const val  CURRENT_STATE = "CURRENT_STATE"
     const val  LIST_OF_STATES = "LIST_STATES"
 
+
+    const val  REGION_EUROPE = "Европа"
+    const val  REGION_ASIA = "Азия"
+    const val  REGION_AMERICAS = "Америка"
+    const val  REGION_AFRICA = "Африка"
+    const val  REGION_OCEANIA = "Океания"
+    const val  REGION_ALL= "Все"
+
 }

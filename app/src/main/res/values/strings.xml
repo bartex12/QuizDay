@@ -54,6 +54,13 @@
     <string name="results">Вопросов: %1$d\nПопыток: %2$d\n%3$.01f%% правильных ответов</string>
     <string name="reset_quiz">Новые вопросы</string>
     <string name="no_now">Не сегодня!</string>
+    <string name="all">Все</string>
+    <string name="Europa">Европа</string>
+    <string name="Asia">Азия</string>
+    <string name="America">Америка</string>
+    <string name="Oceania">Океания</string>
+    <string name="Africa">Африка</string>
+    <string name="region">Регион</string>
 
 
 </resources>

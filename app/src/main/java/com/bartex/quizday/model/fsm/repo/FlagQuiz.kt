@@ -1,5 +1,6 @@
 package com.bartex.quizday.model.fsm.repo
 
+import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.entity.Answer
 import com.bartex.quizday.model.fsm.entity.DataFlags
@@ -9,9 +10,16 @@ class FlagQuiz:IFlagQuiz {
 
     //здесь сбрасываем переменные и очищаем списки а также формируем список с необходимым
     // числом флагов для новой викторины
-    override fun resetQuiz(listStates: MutableList<State>, dataFlags:DataFlags):DataFlags {
-
-        dataFlags.listStates = listStates //передаём список в класс данных
+    override fun resetQuiz(listStates: MutableList<State>, dataFlags:DataFlags, region:String):DataFlags {
+        //фильтруем список по региону
+        if (region == Constants.REGION_ALL){
+            dataFlags.listStates = listStates
+        }else{
+            val filteredList =   listStates.filter { state->
+                state.regionRus == region
+            } as MutableList<State>
+            dataFlags.listStates = filteredList //передаём список в класс данных
+        }
         //сбрасываем все остальные данные
         dataFlags.correctAnswer = null //правильный ответ
         dataFlags.typeAnswer = null //тип ответа
