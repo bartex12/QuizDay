@@ -1,28 +1,32 @@
 package com.bartex.quizday.model.fsm.repo
 
-import android.app.Application
-import android.content.Context
-import android.media.AudioManager
-import androidx.preference.PreferenceManager
-import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.entity.Answer
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import java.security.SecureRandom
 
-class FlagQuiz(val app:Application):IFlagQuiz {
+class FlagQuiz:IFlagQuiz {
 
     //здесь сбрасываем переменные и очищаем списки а также формируем список с необходимым
     // числом флагов для новой викторины
-    override fun resetQuiz(dataFlags:DataFlags):DataFlags {
+    override fun resetQuiz(listStates: MutableList<State>, dataFlags:DataFlags):DataFlags {
+
+        dataFlags.listStates = listStates //передаём список в класс данных
+        //сбрасываем все остальные данные
+        dataFlags.correctAnswer = null //правильный ответ
+        dataFlags.typeAnswer = null //тип ответа
+        dataFlags.nextCountry = null //следующая страна для угадывания флага
+        dataFlags.row = 0  //номер строки кнопки ответа
+        dataFlags.column = 0 //номер столбца кнопки ответа
         dataFlags.correctAnswers = 0  // Сброс количества правильных ответов
         dataFlags.totalGuesses = 0 //  Сброс общего количества попыток
-        dataFlags.quizCountriesList.clear()  // Очистка предыдущего списка стран
+        dataFlags.quizCountriesList.clear()  // Очистка списка стран текущей викторины
+        dataFlags.buttonNotWellAnswerList.clear() //очистка списка кнопок с неправильными ответами
 
         var flagCounter = 1
         //dataFlags.listStates - список с названиями стран, столицами, флагами
         val numberOfFlags = dataFlags.listStates.size
-        // Добавление FLAGS_IN_QUIZ штук  случайных файлов в quizCountriesList
+        // Добавление FLAGS_IN_QUIZ штук  случайных стран в quizCountriesList
         while (flagCounter <= dataFlags.flagsInQuiz) {
             val randomIndex = SecureRandom().nextInt(numberOfFlags)
             // Получение случайного элемента списка - экземпляра класса State
@@ -38,9 +42,12 @@ class FlagQuiz(val app:Application):IFlagQuiz {
 
     //загрузка новых данных для викторины
     override fun loadNextFlag(dataFlags:DataFlags):DataFlags {
-        // Получение  следующей страны
+        //очистка списка кнопок с неправильными ответами
+        dataFlags.buttonNotWellAnswerList.clear()
+        // Получение  следующей страны для угадывания флага
         dataFlags.nextCountry = dataFlags.quizCountriesList.removeAt(0)
-        dataFlags.correctAnswer = dataFlags.nextCountry?.nameRus // Обновление правильного ответа
+        // Обновление правильного ответа
+        dataFlags.correctAnswer = dataFlags.nextCountry?.nameRus
         dataFlags.listStates.shuffle()  // Перестановка стран в списке
 
         var correctIndex = 0
@@ -51,54 +58,27 @@ class FlagQuiz(val app:Application):IFlagQuiz {
         }
         // Помещение правильного ответа в конец listStates
         dataFlags.listStates.add(dataFlags.listStates.removeAt(correctIndex))
-
         ++dataFlags.correctAnswers //увеличиваем номер ответа
-
         return dataFlags
     }
 
-    override fun updateSoundOnOff() {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
-        val sound = sharedPreferences.getBoolean(Constants.SOUND, true)
-
-        (app.getSystemService(Context.AUDIO_SERVICE) as AudioManager)
-                .setStreamMute(AudioManager.STREAM_MUSIC, !sound)
-    }
-
-    override fun updateNumberFlagsInQuiz(dataFlags:DataFlags):DataFlags {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
-        val flagsNumber: String?  = sharedPreferences.getString(Constants.FLAGS_IN_QUIZ, 10.toString())
-        flagsNumber?. let{
-            dataFlags.flagsInQuiz =flagsNumber.toInt()
-        }
-        return dataFlags
-    }
-
-    override fun getGuessRows(dataFlags:DataFlags):DataFlags {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
-        // Получение количества отображаемых вариантов ответа
-        val choices: String? = sharedPreferences.getString(Constants.CHOICES, 2.toString())
-        choices?. let{
-            dataFlags.guessRows = it.toInt() / 2
-        }
-            return dataFlags
-    }
-
-    override fun getTypeAnswer(guess:String, dataflags:DataFlags) :DataFlags {
-        ++dataflags.totalGuesses  // Увеличение количества попыток пользователя
+    override fun getTypeAnswer(guess:String, dataFlags:DataFlags) :DataFlags {
+        ++dataFlags.totalGuesses  // Увеличение количества попыток пользователя
         // Если ответ правилен
-        if (guess == dataflags.correctAnswer) {
+        if (guess == dataFlags.correctAnswer) {
             //если ответ правильный и последний
-            if (dataflags.correctAnswers == dataflags.flagsInQuiz) {
-                dataflags.typeAnswer =Answer.WellAndLast
+            if (dataFlags.correctAnswers == dataFlags.flagsInQuiz) {
+                dataFlags.typeAnswer =Answer.WellAndLast
             }else {
                 // Ответ правильный, но викторина не закончена
-                dataflags.typeAnswer = Answer.WellNotLast
+                dataFlags.typeAnswer = Answer.WellNotLast
             }
         }else {
             // Неправильный ответ
-            dataflags.typeAnswer =  Answer.NotWell
+            dataFlags.typeAnswer =  Answer.NotWell
+            //добавляем в список неправильных ответов чтобы задавать свойство isEnable кнопок
+            dataFlags.buttonNotWellAnswerList.add(guess)
         }
-        return dataflags
+        return dataFlags
     }
 }

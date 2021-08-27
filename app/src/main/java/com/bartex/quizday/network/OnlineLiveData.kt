@@ -55,7 +55,7 @@ companion object{
 
     // Уведомляем подписчиков о наличии/отсутствии связи с сетью
     private fun update(online: Boolean) {
-        Log.d(TAG, "*** OnlineLiveData update online = $online")
+       // Log.d(TAG, "*** OnlineLiveData update online = $online")
         //postValue(online)
         if (online != value) {
             postValue(online)

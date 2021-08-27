@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     showNoInternetConnectionDialog()
                 }
             })
-        Log.d(TAG, "*** MainActivity onCreate  isNetworkAvailable = $isNetworkAvailable")
+        //Log.d(TAG, "*** MainActivity onCreate  isNetworkAvailable = $isNetworkAvailable")
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)

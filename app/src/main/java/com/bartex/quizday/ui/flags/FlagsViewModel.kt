@@ -1,6 +1,5 @@
 package com.bartex.quizday.ui.flags
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +13,7 @@ import com.bartex.quizday.model.fsm.entity.Answer
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.repo.FlagQuiz
 import com.bartex.quizday.model.fsm.repo.IFlagQuiz
+import com.bartex.quizday.model.fsm.repo.settings.SettingsProvider
 import com.bartex.quizday.model.fsm.substates.ReadyState
 import com.bartex.quizday.model.repositories.state.IStatesRepo
 import com.bartex.quizday.model.repositories.state.StatesRepo
@@ -40,14 +40,16 @@ class FlagsViewModel(
             ))
             .build()
             .create(IDataSourceState::class.java),
-    RoomStateCash(Database.getInstance() as Database))
+    roomCash = RoomStateCash(Database.getInstance() as Database)),
+    private val storage: IFlagQuiz = FlagQuiz(),
+    private val settingProvider: SettingsProvider = SettingsProvider(App.instance),
 ) : ViewModel()  {
 
     private val listStates = MutableLiveData<StatesSealed>()
-
     private val quizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
-    private var storage: IFlagQuiz = FlagQuiz(App.instance)
-    var dataflags:DataFlags = DataFlags()
+
+    var dataFlags:DataFlags = DataFlags() // здесь храним данные состояний конечного автомата
+    private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
 
     fun getStatesSealed(isNetworkAvailable:Boolean) : LiveData<StatesSealed> {
         loadDataSealed(isNetworkAvailable)
@@ -71,44 +73,51 @@ class FlagsViewModel(
         return quizState
     }
 
+    //сохраняем список стран чтобы не пропадал при поворотах экрана
+   fun saveListOfStates( listStates:MutableList<State>){
+       listOfStates = listStates
+   }
+
     //начальное состояние не имеет предыдущего
-    fun resetQuiz(listStates: MutableList<State>){
-        dataflags.listStates = listStates //передаём список в класс данных
-        dataflags =  storage.resetQuiz(dataflags) //подготовка переменных и списков
-        quizState.value =  ReadyState(dataflags) //передаём полученные данные в состояние
+    fun resetQuiz(){
+        dataFlags =  storage.resetQuiz(listOfStates, dataFlags) //подготовка переменных и списков
+        quizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
     }
     //загрузить первый флаг
     fun loadFirstFlag(currentState: IFlagState, dataFlags:DataFlags){
-        dataflags =  storage.loadNextFlag(dataFlags)
-        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(dataflags))
+        this.dataFlags =  storage.loadNextFlag(dataFlags)
+        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(this.dataFlags))
     }
 
     //по типу ответа при щелчке по кнопке задаём состояние
     fun answer(currentState: IFlagState, guess:String){
-        dataflags = storage.getTypeAnswer(guess, dataflags)
-        when(dataflags.typeAnswer){
-            Answer.NotWell ->  quizState.value = currentState.executeAction(Action.OnNotWellClicked(dataflags))
-            Answer.WellNotLast ->  quizState.value = currentState.executeAction(Action.OnWellNotLastClicked(dataflags))
-            Answer.WellAndLast ->  quizState.value =  currentState.executeAction(Action.OnWellAndLastClicked(dataflags))
+        dataFlags = storage.getTypeAnswer(guess, dataFlags)
+        when(dataFlags.typeAnswer){
+            Answer.NotWell ->  quizState.value = currentState.executeAction(Action.OnNotWellClicked(dataFlags))
+            Answer.WellNotLast ->  quizState.value = currentState.executeAction(Action.OnWellNotLastClicked(dataFlags))
+            Answer.WellAndLast ->  quizState.value =  currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
         }
     }
 
     //загрузить следующий флаг
     fun loadNextFlag(currentState: IFlagState, dataFlags:DataFlags){
-        dataflags =  storage.loadNextFlag(dataFlags)
-        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(dataflags))
+        this.dataFlags =  storage.loadNextFlag(dataFlags)
+        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(this.dataFlags))
     }
 
+    //обновить настройки звука
     fun updateSoundOnOff(){
-        storage.updateSoundOnOff()
+        settingProvider.updateSoundOnOff()
     }
 
+    //обновить количество вопросов в викторине
     fun updateNumberFlagsInQuiz(){
-        dataflags = storage.updateNumberFlagsInQuiz(dataflags)
+        dataFlags = settingProvider.updateNumberFlagsInQuiz(dataFlags)
     }
 
+    //получить количество рядов кнопок с ответами
     fun getGuessRows():Int{
-        dataflags = storage.getGuessRows(dataflags)
-        return dataflags.guessRows
+        dataFlags = settingProvider.getGuessRows(dataFlags)
+        return dataFlags.guessRows
     }
 }

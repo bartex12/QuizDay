@@ -9,5 +9,6 @@ object Constants {
 
     const val  GUESS_BUTTON = "GUESS_BUTTON"
     const val  CURRENT_STATE = "CURRENT_STATE"
+    const val  LIST_OF_STATES = "LIST_STATES"
 
 }
