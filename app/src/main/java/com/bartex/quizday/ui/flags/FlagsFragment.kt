@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
 import com.bartex.quizday.MainActivity
 import com.bartex.quizday.R
@@ -187,6 +188,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
        val dialog = ResultDialog.newInstance(data.flagsInQuiz, data.totalGuesses)
         dialog.setOnResultListener(this@FlagsFragment)
         dialog.show(requireActivity().supportFragmentManager, "ResultDialog")
+        requireActivity().supportFragmentManager.popBackStack(R.id.flagsFragment, POP_BACK_STACK_INCLUSIVE)
     }
 
     private fun showCurrentQuestionNumber(data: DataFlags) {
