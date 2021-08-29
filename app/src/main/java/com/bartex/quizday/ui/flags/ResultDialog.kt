@@ -51,7 +51,7 @@ class ResultDialog: DialogFragment() {
                 getString(R.string.results, total, totalGuesses, total*100/totalGuesses.toDouble())
         )
 
-        builder.setPositiveButton(R.string.reset_quiz) { dialog, id ->
+        builder.setPositiveButton(R.string.reset_quiz) { _, _ ->
             onResultListener?.resetQuiz()
         }
 

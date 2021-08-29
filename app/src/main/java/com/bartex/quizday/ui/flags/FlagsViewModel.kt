@@ -48,11 +48,13 @@ class FlagsViewModel(
 ) : ViewModel()  {
 
     private val listQuizStates = MutableLiveData<StatesSealed>()
-    private val quizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
+    private val currentQuizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
 
     private var dataFlags:DataFlags = DataFlags() // здесь храним данные состояний конечного автомата
     private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
     private var region:String = Constants.REGION_EUROPE //Здесь храним текущий регион
+    private var currentState:IFlagState = ReadyState(DataFlags()) //Здесь храним текущее состояние
+
 
 
     fun getStatesSealed(isNetworkAvailable:Boolean) : LiveData<StatesSealed> {
@@ -74,7 +76,7 @@ class FlagsViewModel(
 
     //получить состояние конечного автомата
     fun getCurrentState(): LiveData<IFlagState> {
-        return quizState
+        return currentQuizState
     }
 
     //сохраняем список стран чтобы не пропадал при поворотах экрана
@@ -85,22 +87,22 @@ class FlagsViewModel(
     //начальное состояние не имеет предыдущего
     fun resetQuiz(){
         dataFlags =  storage.resetQuiz(listOfStates, dataFlags, region) //подготовка переменных и списков
-        quizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
+        currentQuizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
     }
 
     //загрузить следующий флаг
-    fun loadNextFlag(currentState: IFlagState, dataFlags:DataFlags){
+    fun loadNextFlag(dataFlags:DataFlags){
         this.dataFlags =  storage.loadNextFlag(dataFlags)
-        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(this.dataFlags))
+        currentQuizState.value =  currentState.executeAction(Action.OnNextFlagClicked(this.dataFlags))
     }
 
     //по типу ответа при щелчке по кнопке задаём состояние
-    fun answer(currentState: IFlagState, guess:String){
+    fun answer(guess:String){
         dataFlags = storage.getTypeAnswer(guess, dataFlags)
         when(dataFlags.typeAnswer){
-            Answer.NotWell ->  quizState.value = currentState.executeAction(Action.OnNotWellClicked(dataFlags))
-            Answer.WellNotLast ->  quizState.value = currentState.executeAction(Action.OnWellNotLastClicked(dataFlags))
-            Answer.WellAndLast ->  quizState.value =  currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
+            Answer.NotWell ->  currentQuizState.value = currentState.executeAction(Action.OnNotWellClicked(dataFlags))
+            Answer.WellNotLast ->  currentQuizState.value = currentState.executeAction(Action.OnWellNotLastClicked(dataFlags))
+            Answer.WellAndLast ->  currentQuizState.value =  currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
         }
     }
 
@@ -126,5 +128,13 @@ class FlagsViewModel(
     }
     fun getRegion( ):String{
       return  region
+    }
+
+    //сохраняем текущее состояние
+    fun saveCurrentState( newState:IFlagState){
+        currentState = newState
+    }
+    fun getState( ):IFlagState{
+        return  currentState
     }
 }

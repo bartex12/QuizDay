@@ -11,6 +11,7 @@ class FlagQuiz:IFlagQuiz {
     //здесь сбрасываем переменные и очищаем списки а также формируем список с необходимым
     // числом флагов для новой викторины
     override fun resetQuiz(listStates: MutableList<State>, dataFlags:DataFlags, region:String):DataFlags {
+        listStates.shuffle()
         //фильтруем список по региону
         if (region == Constants.REGION_ALL){
             dataFlags.listStates = listStates

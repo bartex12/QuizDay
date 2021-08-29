@@ -9,8 +9,11 @@ import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.ui.adapters.ItemList
+import java.security.SecureRandom
 
 class SettingsProvider(val app: App) :ISettingsProvider{
+
+    private var random : SecureRandom = SecureRandom()
 
     override fun updateSoundOnOff() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
@@ -36,6 +39,11 @@ class SettingsProvider(val app: App) :ISettingsProvider{
         choices?. let{
             dataFlags.guessRows = it.toInt() / 2
         }
+//        //выбираем случайную строку и запоминаем её  в классе данных, чтобы не потерять при повороте
+//        dataFlags.row = random.nextInt(dataFlags.guessRows)
+//        //выбираем случайный столбец и запоминаем его  в классе данных, чтобы не потерять при повороте
+//        dataFlags.column = random.nextInt(2)
+
         return dataFlags
     }
 }

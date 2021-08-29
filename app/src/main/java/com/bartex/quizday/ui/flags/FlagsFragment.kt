@@ -39,8 +39,6 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         ToneGenerator(AudioManager.STREAM_MUSIC, 100)
     }
 
-    private var currentState: IFlagState = ReadyState(DataFlags()) //текущее состояние
-
     private lateinit var handler : Handler   // Для задержки загрузки следующего флага
     private lateinit var quizLinearLayout  : LinearLayout // root макета фрагмента
     private lateinit var questionNumberTextView  : TextView   //для номера текущего вопроса
@@ -52,12 +50,8 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     private var random : SecureRandom = SecureRandom()
     private lateinit var chipGroup:ChipGroup
 
-    //для доступа к полю MainActivity isNetworkAvailable, где проверяется доступ к интернету
-    lateinit var main:MainActivity
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        main = requireActivity() as MainActivity
             return inflater.inflate(R.layout.fragment_flags, container, false)
     }
 
@@ -70,7 +64,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         initButtonsListeners()
         initMenu()
 
-        val  isNetworkAvailable = main.getNetworkAvailable()
+        val  isNetworkAvailable = (requireActivity() as MainActivity).getNetworkAvailable()
 
         //при первом обращении получаем список стран из сети , при поворотах экрана - из ViewModel
         if (savedInstanceState == null){
@@ -86,9 +80,9 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         //следим за состоянием конечного автомата
         flagsViewModel.getCurrentState()
                 .observe(viewLifecycleOwner, { newQuizState ->
-                    currentState = newQuizState
+                    flagsViewModel.saveCurrentState(newQuizState)
                     renderViewState(newQuizState)
-                    Log.d(TAG, "FlagsFragment onViewCreated: currentState = $currentState")
+                    Log.d(TAG, "FlagsFragment onViewCreated: newQuizState = $newQuizState")
                 })
     }
 
@@ -131,7 +125,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
     //состояние готовности к викторине - показываем первый флаг
     private fun showReadyState(data: DataFlags) {
-        flagsViewModel.loadNextFlag(currentState, data)
+        flagsViewModel.loadNextFlag(data)
     }
 
     //следующий вопрос
@@ -169,11 +163,12 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     // Ответ правильный, но викторина не закончена
     private fun showWellNotLastState(data: DataFlags) {
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 50) }.start()
+        showCurrentQuestionNumber(data) //показать номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons()  // Блокировка всех кнопок ответов
         handler.postDelayed(
                 { //todo сделать анимацию исчезновения флага
-                    flagsViewModel.loadNextFlag(currentState, data)
+                    flagsViewModel.loadNextFlag(data)
                 }, 1000
         )
     }
@@ -181,8 +176,13 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     // Ответ правильный и викторина закончена
     private fun showWellAndLastState(data: DataFlags) {
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
+        showCurrentQuestionNumber(data) //показать номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons() //сделать иконки недоступными
+
+        showNextCountryFlag(data)  //svg изображение флага
+        showAnswerButtonsNumberAndNames(data) // Добавление кнопок
+
         //для вывода статистики и перезапуска показываем диалог
        val dialog = ResultDialog.newInstance(data.flagsInQuiz, data.totalGuesses)
         dialog.setOnResultListener(this@FlagsFragment)
@@ -291,7 +291,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     private val guessButtonListener:   View.OnClickListener =   View.OnClickListener { v ->
        guessButton = v as Button //нажатая кнопка ответа
         val guess = guessButton.text.toString() //ответ как текст на кнопке
-        flagsViewModel.answer(currentState, guess) //определить тип ответа
+        flagsViewModel.answer(guess) //определить тип ответа
     }
 
     private fun disableButtons(){
