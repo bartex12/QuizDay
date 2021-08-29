@@ -11,9 +11,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.bartex.quizday.MainActivity
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
@@ -27,7 +30,7 @@ import kotlinx.android.synthetic.main.fragment_flags.*
 import java.security.SecureRandom
 import java.util.*
 
-class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
+class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
 
     companion object{
         const val TAG = "33333"
@@ -50,7 +53,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     private var guessLinearLayouts : Array<LinearLayout?> = arrayOfNulls(3) //кнопки ответов
     private var random : SecureRandom = SecureRandom()
     private lateinit var chipGroup:ChipGroup
-
+    private lateinit var navController:NavController
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             return inflater.inflate(R.layout.fragment_flags, container, false)
@@ -58,6 +61,8 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        navController = Navigation.findNavController(view)
 
         initHandler()
         initViews(view)
@@ -85,6 +90,12 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                     renderViewState(newQuizState)
                     Log.d(TAG, "FlagsFragment onViewCreated: newQuizState = $newQuizState")
                 })
+
+//        navController.currentBackStackEntry?.savedStateHandle
+//                ?.getLiveData<Boolean>(Constants.RESET_KEY)?.observe(
+//                viewLifecycleOwner) { result ->
+//                  if(result){ flagsViewModel.resetQuiz()}
+//        }
     }
 
     private fun initChipGroupListener() {
@@ -182,13 +193,11 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         disableButtons() //сделать иконки недоступными
 
         showNextCountryFlag(data)  //svg изображение флага
-        showAnswerButtonsNumberAndNames(data) // Добавление кнопок
 
-        //для вывода статистики и перезапуска показываем диалог
-       val dialog = ResultDialog.newInstance(data.flagsInQuiz, data.totalGuesses)
-        dialog.setOnResultListener(this@FlagsFragment)
-        dialog.show(requireActivity().supportFragmentManager, "ResultDialog")
-       
+        val bundle = Bundle()
+        bundle. putInt(Constants.TOTAL_QUESTIONS, data.flagsInQuiz )
+        bundle. putInt(Constants.TOTAL_GUESSES, data.totalGuesses )
+        navController.navigate(R.id.resultDialog, bundle)
     }
 
     private fun showCurrentQuestionNumber(data: DataFlags) {
@@ -317,9 +326,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         }
     }
 
-    //прилетает из ResultDialog
     override fun resetQuiz() {
         flagsViewModel.resetQuiz()
     }
-
 }

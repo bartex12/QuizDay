@@ -76,5 +76,17 @@
         <action
             android:id="@+id/action_flagsFragment_to_helpFragment"
             app:destination="@id/helpFragment" />
+        <action
+            android:id="@+id/action_flagsFragment_to_resultDialog"
+            app:destination="@id/resultDialog"
+            app:popUpTo="@id/flagsFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/resultDialog"
+        android:name="com.bartex.quizday.ui.flags.ResultDialog"
+        android:label="ResultDialog" >
+        <action
+            android:id="@+id/action_resultDialog_to_flagsFragment"
+            app:destination="@id/flagsFragment" />
+    </dialog>
 </navigation>

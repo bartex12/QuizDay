@@ -5,7 +5,9 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.Navigation
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
 
@@ -13,26 +15,9 @@ class ResultDialog: DialogFragment() {
 
     private var total:Int = 0
     private var totalGuesses:Int = 0
-    private var onResultListener:OnResultListener? = null
-
-    companion object{
-        fun  newInstance( total: Int,totalGuesses :Int):ResultDialog{
-            val frag = ResultDialog()
-            val bundle = Bundle()
-            bundle. putInt(Constants.TOTAL_QUESTIONS,total )
-            bundle. putInt(Constants.TOTAL_GUESSES, totalGuesses )
-            frag.arguments = bundle
-            return frag
-        }
-    }
 
     interface OnResultListener{
         fun resetQuiz()
-    }
-
-    @JvmName("setOnResultListener1")
-    fun setOnResultListener(onResultListener:OnResultListener){
-        this.onResultListener = onResultListener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,11 +35,12 @@ class ResultDialog: DialogFragment() {
         builder.setMessage(
                 getString(R.string.results, total, totalGuesses, total*100/totalGuesses.toDouble())
         )
-
         builder.setPositiveButton(R.string.reset_quiz) { _, _ ->
-            onResultListener?.resetQuiz()
+            val navController = Navigation.findNavController(requireParentFragment().requireView())
+            //navController.previousBackStackEntry?.savedStateHandle?.set(Constants.RESET_KEY, true)
+            navController.navigate(R.id.action_resultDialog_to_flagsFragment)
+            //dismiss()
         }
-
         return builder.create().apply {
             setCanceledOnTouchOutside(false)
         }

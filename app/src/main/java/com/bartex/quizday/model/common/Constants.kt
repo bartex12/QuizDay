@@ -21,4 +21,6 @@ object Constants {
     const val TOTAL_QUESTIONS = "TOTAL_QUESTIONS"
     const val TOTAL_GUESSES = "TOTAL_GUESSES"
 
+    const val RESET_KEY = "RESET_KEY"
+
 }
