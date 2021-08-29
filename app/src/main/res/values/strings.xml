@@ -61,6 +61,7 @@
     <string name="Oceania">Океания</string>
     <string name="Africa">Африка</string>
     <string name="region">Регион</string>
+    <string name="chooseRegion">Выберите регион</string>
 
 
 </resources>

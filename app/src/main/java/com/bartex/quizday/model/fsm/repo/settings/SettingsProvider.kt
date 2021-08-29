@@ -38,22 +38,4 @@ class SettingsProvider(val app: App) :ISettingsProvider{
         }
         return dataFlags
     }
-
-    override fun updateRegionList(): List<ItemList> {
-        return listOf(
-                ItemList(app.resources.getString(R.string.all),
-                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
-                ItemList(app.resources.getString(R.string.Europa),
-                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
-                ItemList(app.resources.getString(R.string.Asia),
-                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
-                ItemList(app.resources.getString(R.string.America),
-                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
-                ItemList(app.resources.getString(R.string.Oceania),
-                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
-                ItemList(app.resources.getString(R.string.Africa),
-                        ContextCompat.getDrawable(app, R.drawable.flags )!!),
-        )
-    }
-
 }

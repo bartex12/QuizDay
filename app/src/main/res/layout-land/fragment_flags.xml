@@ -2,10 +2,71 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:background="@color/colorFone">
 
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin_middle">
 
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_region"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:chipSpacingHorizontal="5dp"
+            app:singleLine="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_all"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/all" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_Europa"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/Europa" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_Asia"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/Asia"  />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_America"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/America" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_Oceania"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/Oceania"  />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_Africa"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/Africa"  />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -61,22 +122,17 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             android:layout_gravity="center"
-            tools:visibility="visible"/>
+            tools:visibility="gone"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_region_image"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:clipToPadding="false"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/guess_country"
-            android:id="@+id/guessCountryTextView"
-            android:layout_gravity="center_horizontal"/>
+
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textAppearance="?android:attr/textAppearanceMedium"-->
+<!--            android:text="@string/guess_country"-->
+<!--            android:id="@+id/guessCountryTextView"-->
+<!--            android:layout_gravity="center_horizontal"/>-->
 
     <LinearLayout
         android:orientation="horizontal"
@@ -132,6 +188,8 @@
         android:layout_gravity="bottom|center_horizontal"
         android:textSize="@dimen/answer_size"
         android:textStyle="bold"/>
-        </LinearLayout>
 
+
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

@@ -13,8 +13,6 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bartex.quizday.MainActivity
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
@@ -22,9 +20,11 @@ import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.IFlagState
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.substates.*
-import com.bartex.quizday.ui.adapters.RegionAdapter
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
+import com.google.android.material.chip.ChipGroup
+import kotlinx.android.synthetic.main.fragment_flags.*
 import java.security.SecureRandom
+import java.util.*
 
 class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
@@ -39,10 +39,9 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         ToneGenerator(AudioManager.STREAM_MUSIC, 100)
     }
 
-    lateinit var rv_region: RecyclerView
-    private var adapter: RegionAdapter? = null
+    private var currentState: IFlagState = ReadyState(DataFlags()) //текущее состояние
+    private var region  : String   = Constants.REGION_EUROPE  // Регион текущей викторины
 
-    private var region  : String   = Constants.REGION_ALL  // Регион текущей викторины
     private lateinit var handler : Handler   // Для задержки загрузки следующего флага
     private lateinit var quizLinearLayout  : LinearLayout // root макета фрагмента
     private lateinit var questionNumberTextView  : TextView   //для номера текущего вопроса
@@ -52,7 +51,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     private lateinit var progressBarFlags:ProgressBar
     private var guessLinearLayouts : Array<LinearLayout?> = arrayOfNulls(3) //кнопки ответов
     private var random : SecureRandom = SecureRandom()
-    private var currentState: IFlagState = ReadyState(DataFlags())
+    private lateinit var chipGroup:ChipGroup
 
     //для доступа к полю MainActivity isNetworkAvailable, где проверяется доступ к интернету
     lateinit var main:MainActivity
@@ -68,7 +67,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
         initHandler()
         initViews(view)
-        initAdapter(view)
+        initChipGroupListener()
         initButtonsListeners()
         initMenu()
 
@@ -81,7 +80,12 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                     .observe(viewLifecycleOwner,  {
                         renderData(it)
                     })
+            //выделение на Европу при перврй загрузке
+            chipGroup.check(R.id.chip_Europa)
+        }else{
+           region =  savedInstanceState.getString(Constants.CURRENT_REGION) as String
         }
+
         //следим за состоянием конечного автомата
         flagsViewModel.getCurrentState()
                 .observe(viewLifecycleOwner, { newQuizState ->
@@ -89,6 +93,25 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                     renderViewState(newQuizState)
                     Log.d(TAG, "FlagsFragment onViewCreated: currentState = $currentState")
                 })
+    }
+
+    private fun initChipGroupListener() {
+
+        chipGroup.setOnCheckedChangeListener { _, id ->
+            val newRegion:String = when (id) {
+                R.id.chip_all-> Constants.REGION_ALL
+                R.id.chip_Europa -> Constants.REGION_EUROPE
+                R.id.chip_Asia -> Constants.REGION_ASIA
+                R.id.chip_America-> Constants.REGION_AMERICAS
+                R.id.chip_Oceania -> Constants.REGION_OCEANIA
+                R.id.chip_Africa -> Constants.REGION_AFRICA
+                else -> Constants.REGION_EUROPE
+            }
+            if (newRegion != region){
+                region = newRegion
+                flagsViewModel.resetQuiz(region)
+            }
+        }
     }
 
     // метод onStart вызывается после onViewCreated.
@@ -111,7 +134,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
     //состояние готовности к викторине - показываем первый флаг
     private fun showReadyState(data: DataFlags) {
-        flagsViewModel.loadFirstFlag(currentState, data)
+        flagsViewModel.loadNextFlag(currentState, data)
     }
 
     //следующий вопрос
@@ -163,9 +186,10 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons() //сделать иконки недоступными
-        //для вывода статистики и перезапуска
-        ResultDialog(data.flagsInQuiz, data.totalGuesses, this )
-                .show(requireActivity().supportFragmentManager, "ResultDialog")
+        //для вывода статистики и перезапуска показываем диалог
+       val dialog = ResultDialog.newInstance(data.flagsInQuiz, data.totalGuesses)
+        dialog.setOnResultListener(this@FlagsFragment)
+        dialog.show(requireActivity().supportFragmentManager, "ResultDialog")
     }
 
     private fun showCurrentQuestionNumber(data: DataFlags) {
@@ -213,6 +237,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     }
 
     private fun initViews(view: View) {
+        chipGroup =view.findViewById<ChipGroup>(R.id.chip_region)
 
         quizLinearLayout = view.findViewById<View>(R.id.quizLinearLayout) as LinearLayout
         questionNumberTextView = view.findViewById<View>(R.id.questionNumberTextView) as TextView
@@ -298,28 +323,9 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
         flagsViewModel.resetQuiz(region)
     }
 
-    private fun initAdapter(view:View) {
-        rv_region = view.findViewById(R.id.rv_region_image)
-        rv_region.layoutManager = GridLayoutManager(requireActivity(), 6)
-        adapter = RegionAdapter(getOnClickListener())
-        rv_region.adapter = adapter
-        adapter?.listOfRegion = flagsViewModel.getRegionList()
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString(Constants.CURRENT_REGION, region)
     }
-
-    private fun getOnClickListener(): RegionAdapter.OnItemClickListener =
-            object : RegionAdapter.OnItemClickListener{
-                override fun onItemClick(position: Int) {
-                    when(position){
-                        0 -> region = getString(R.string.all)
-                        1 -> region =  getString(R.string.Europa)
-                        2 -> region =  getString(R.string.Asia)
-                        3 -> region =  getString(R.string.America)
-                        4 -> region =  getString(R.string.Oceania)
-                        else -> region =  getString(R.string.all)
-                    }
-                    flagsViewModel.resetQuiz(region)
-                }
-            }
-
-
 }

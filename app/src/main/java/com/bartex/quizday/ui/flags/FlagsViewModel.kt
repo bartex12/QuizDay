@@ -50,7 +50,7 @@ class FlagsViewModel(
     private val listStates = MutableLiveData<StatesSealed>()
     private val quizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
 
-    var dataFlags:DataFlags = DataFlags() // здесь храним данные состояний конечного автомата
+    private var dataFlags:DataFlags = DataFlags() // здесь храним данные состояний конечного автомата
     private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
 
     fun getStatesSealed(isNetworkAvailable:Boolean) : LiveData<StatesSealed> {
@@ -85,8 +85,9 @@ class FlagsViewModel(
         dataFlags =  storage.resetQuiz(listOfStates, dataFlags, region) //подготовка переменных и списков
         quizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
     }
-    //загрузить первый флаг
-    fun loadFirstFlag(currentState: IFlagState, dataFlags:DataFlags){
+
+    //загрузить следующий флаг
+    fun loadNextFlag(currentState: IFlagState, dataFlags:DataFlags){
         this.dataFlags =  storage.loadNextFlag(dataFlags)
         quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(this.dataFlags))
     }
@@ -99,12 +100,6 @@ class FlagsViewModel(
             Answer.WellNotLast ->  quizState.value = currentState.executeAction(Action.OnWellNotLastClicked(dataFlags))
             Answer.WellAndLast ->  quizState.value =  currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
         }
-    }
-
-    //загрузить следующий флаг
-    fun loadNextFlag(currentState: IFlagState, dataFlags:DataFlags){
-        this.dataFlags =  storage.loadNextFlag(dataFlags)
-        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(this.dataFlags))
     }
 
     //обновить настройки звука
@@ -123,7 +118,4 @@ class FlagsViewModel(
         return dataFlags.guessRows
     }
 
-    fun  getRegionList():List<ItemList> {
-        return settingProvider.updateRegionList()
-    }
 }
