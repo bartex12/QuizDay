@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bartex.quizday.App
 import com.bartex.quizday.model.api.IDataSourceState
+import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.common.Constants.baseUrl
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.Action
@@ -20,7 +21,6 @@ import com.bartex.quizday.model.repositories.state.IStatesRepo
 import com.bartex.quizday.model.repositories.state.StatesRepo
 import com.bartex.quizday.model.repositories.state.roomcash.RoomStateCash
 import com.bartex.quizday.room.Database
-import com.bartex.quizday.ui.adapters.ItemList
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -47,26 +47,28 @@ class FlagsViewModel(
         private val settingProvider: ISettingsProvider = SettingsProvider(App.instance),
 ) : ViewModel()  {
 
-    private val listStates = MutableLiveData<StatesSealed>()
+    private val listQuizStates = MutableLiveData<StatesSealed>()
     private val quizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
 
     private var dataFlags:DataFlags = DataFlags() // здесь храним данные состояний конечного автомата
     private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
+    private var region:String = Constants.REGION_EUROPE //Здесь храним текущий регион
+
 
     fun getStatesSealed(isNetworkAvailable:Boolean) : LiveData<StatesSealed> {
         loadDataSealed(isNetworkAvailable)
-        return listStates
+        return listQuizStates
     }
 
     private fun loadDataSealed(isNetworkAvailable:Boolean){
-        listStates.value = StatesSealed.Loading(0)
+        listQuizStates.value = StatesSealed.Loading(0)
 
         statesRepo.getStates(isNetworkAvailable)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({states->
-                listStates.value = StatesSealed.Success(states = states)
+                listQuizStates.value = StatesSealed.Success(states = states)
             },{error ->
-                listStates.value = StatesSealed.Error(error = error)
+                listQuizStates.value = StatesSealed.Error(error = error)
             })
     }
 
@@ -81,7 +83,7 @@ class FlagsViewModel(
    }
 
     //начальное состояние не имеет предыдущего
-    fun resetQuiz(region:String){
+    fun resetQuiz(){
         dataFlags =  storage.resetQuiz(listOfStates, dataFlags, region) //подготовка переменных и списков
         quizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
     }
@@ -118,4 +120,11 @@ class FlagsViewModel(
         return dataFlags.guessRows
     }
 
+    //сохраняем список регионов чтобы не пропадал при поворотах экрана
+    fun saveRegion( newRegion:String){
+        region = newRegion
+    }
+    fun getRegion( ):String{
+      return  region
+    }
 }

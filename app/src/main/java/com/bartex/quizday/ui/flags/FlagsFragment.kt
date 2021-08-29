@@ -40,7 +40,6 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
     }
 
     private var currentState: IFlagState = ReadyState(DataFlags()) //текущее состояние
-    private var region  : String   = Constants.REGION_EUROPE  // Регион текущей викторины
 
     private lateinit var handler : Handler   // Для задержки загрузки следующего флага
     private lateinit var quizLinearLayout  : LinearLayout // root макета фрагмента
@@ -82,8 +81,6 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                     })
             //выделение на Европу при перврй загрузке
             chipGroup.check(R.id.chip_Europa)
-        }else{
-           region =  savedInstanceState.getString(Constants.CURRENT_REGION) as String
         }
 
         //следим за состоянием конечного автомата
@@ -107,9 +104,9 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                 R.id.chip_Africa -> Constants.REGION_AFRICA
                 else -> Constants.REGION_EUROPE
             }
-            if (newRegion != region){
-                region = newRegion
-                flagsViewModel.resetQuiz(region)
+            if (newRegion != flagsViewModel.getRegion()){
+                flagsViewModel.saveRegion(newRegion)
+                flagsViewModel.resetQuiz()
             }
         }
     }
@@ -279,7 +276,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
                 //сохраняем список стран во ViewModel на время жизни фрагмента
                 flagsViewModel.saveListOfStates(listStates)
                 //переводим конечный автомат в состояние ReadyState
-                flagsViewModel.resetQuiz(region)
+                flagsViewModel.resetQuiz()
             }
             is StatesSealed.Error ->{
                 Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT).show()
@@ -320,12 +317,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
 
     //прилетает из ResultDialog
     override fun resetQuiz() {
-        flagsViewModel.resetQuiz(region)
+        flagsViewModel.resetQuiz()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putString(Constants.CURRENT_REGION, region)
-    }
 }
