@@ -188,7 +188,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener {
        val dialog = ResultDialog.newInstance(data.flagsInQuiz, data.totalGuesses)
         dialog.setOnResultListener(this@FlagsFragment)
         dialog.show(requireActivity().supportFragmentManager, "ResultDialog")
-        requireActivity().supportFragmentManager.popBackStack(R.id.flagsFragment, POP_BACK_STACK_INCLUSIVE)
+       
     }
 
     private fun showCurrentQuestionNumber(data: DataFlags) {
