@@ -37,7 +37,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
     }
 
     private val flagsViewModel by lazy{
-        ViewModelProvider(this).get(FlagsViewModel::class.java)
+        ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
     }
     private val  mToneGenerator: ToneGenerator by lazy{
         ToneGenerator(AudioManager.STREAM_MUSIC, 100)
@@ -98,6 +98,14 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
 //        }
     }
 
+    // метод onStart вызывается после onViewCreated.
+    override fun onStart() {
+        super.onStart()
+        flagsViewModel.updateSoundOnOff() //обновляем звук
+        flagsViewModel.updateNumberFlagsInQuiz() //обновляем число вопросов в викторине
+        updateGuessRows(flagsViewModel.getGuessRows()) //обновляем число выриантов ответов в викторине
+    }
+
     private fun initChipGroupListener() {
 
         chipGroup.setOnCheckedChangeListener { _, id ->
@@ -115,14 +123,6 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
                 flagsViewModel.resetQuiz()
             }
         }
-    }
-
-    // метод onStart вызывается после onViewCreated.
-    override fun onStart() {
-        super.onStart()
-        flagsViewModel.updateSoundOnOff() //обновляем звук
-        flagsViewModel.updateNumberFlagsInQuiz() //обновляем число вопросов в викторине
-        updateGuessRows(flagsViewModel.getGuessRows()) //обновляем число выриантов ответов в викторине
     }
 
     private fun renderViewState(newQuizState: IFlagState) {
@@ -191,13 +191,15 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
         showCurrentQuestionNumber(data) //показать номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons() //сделать иконки недоступными
-
         showNextCountryFlag(data)  //svg изображение флага
 
-        val bundle = Bundle()
-        bundle. putInt(Constants.TOTAL_QUESTIONS, data.flagsInQuiz )
-        bundle. putInt(Constants.TOTAL_GUESSES, data.totalGuesses )
-        navController.navigate(R.id.resultDialog, bundle)
+        //если диалог не создан - создаём и передаём данные
+        if(flagsViewModel.isNeedToCreateDialog()){
+            val bundle = Bundle()
+            bundle. putInt(Constants.TOTAL_QUESTIONS, data.flagsInQuiz )
+            bundle. putInt(Constants.TOTAL_GUESSES, data.totalGuesses )
+            navController.navigate(R.id.resultDialog, bundle)
+        }
     }
 
     private fun showCurrentQuestionNumber(data: DataFlags) {

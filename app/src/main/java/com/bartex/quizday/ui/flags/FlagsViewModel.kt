@@ -54,8 +54,16 @@ class FlagsViewModel(
     private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
     private var region:String = Constants.REGION_EUROPE //Здесь храним текущий регион
     private var currentState:IFlagState = ReadyState(DataFlags()) //Здесь храним текущее состояние
+    private var isNeedToCreateDialog:Boolean = true//Здесь храним флаг необходимости создания диалога
 
 
+    fun isNeedToCreateDialog():Boolean{
+        return isNeedToCreateDialog
+    }
+
+    fun setNeedToCreateDialog(isNeed:Boolean){
+       isNeedToCreateDialog = isNeed
+    }
 
     fun getStatesSealed(isNetworkAvailable:Boolean) : LiveData<StatesSealed> {
         loadDataSealed(isNetworkAvailable)
