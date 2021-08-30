@@ -94,6 +94,7 @@ class FlagsViewModel(
 
     //начальное состояние не имеет предыдущего
     fun resetQuiz(){
+        setNeedToCreateDialog(true) //возвращаем флаг разрешения создания диалога
         dataFlags =  storage.resetQuiz(listOfStates, dataFlags, region) //подготовка переменных и списков
         currentQuizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
     }
