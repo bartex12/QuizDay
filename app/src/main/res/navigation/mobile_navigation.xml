@@ -89,4 +89,8 @@
             android:id="@+id/action_tabsFragment_to_helpFragment"
             app:destination="@id/helpFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/regionFragment"
+        android:name="com.bartex.quizday.ui.flags.regions.RegionFragment"
+        android:label="RegionFragment" />
 </navigation>

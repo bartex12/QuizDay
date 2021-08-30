@@ -39,9 +39,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:textSize="18sp"
+        android:textSize="20sp"
+        android:textStyle="bold"
         android:visibility="gone"
-        android:text="@string/no_data_state"
+        android:text="@string/no_data_state_test"
         tools:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

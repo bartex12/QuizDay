@@ -49,8 +49,10 @@ class FlagsViewModel(
 
     private val listQuizStates = MutableLiveData<StatesSealed>()
     private val currentQuizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
+    //страны с учетом выбранного региона
+    private var listOfRegionFlags:MutableLiveData<DataFlags> = MutableLiveData<DataFlags>()
 
-    private var dataFlags:DataFlags = DataFlags() // здесь храним данные состояний конечного автомата
+    private var dataFlags:DataFlags = DataFlags() // здесь храним данные для состояний конечного автомата
     private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
     private var region:String = Constants.REGION_EUROPE //Здесь храним текущий регион
     private var currentState:IFlagState = ReadyState(DataFlags()) //Здесь храним текущее состояние
@@ -96,6 +98,7 @@ class FlagsViewModel(
     fun resetQuiz(){
         setNeedToCreateDialog(true) //возвращаем флаг разрешения создания диалога
         dataFlags =  storage.resetQuiz(listOfStates, dataFlags, region) //подготовка переменных и списков
+        listOfRegionFlags.value = dataFlags //для передачи в RegionFragment
         currentQuizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
     }
 
@@ -113,6 +116,10 @@ class FlagsViewModel(
             Answer.WellNotLast ->  currentQuizState.value = currentState.executeAction(Action.OnWellNotLastClicked(dataFlags))
             Answer.WellAndLast ->  currentQuizState.value =  currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
         }
+    }
+
+    fun getCurrentLostOfFlags(): LiveData<DataFlags>{
+        return listOfRegionFlags
     }
 
     //обновить настройки звука

@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -14,12 +15,11 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bartex.quizday.R
-import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.RegionAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
+import com.bartex.quizday.ui.flags.FlagsViewModel
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class RegionFragment : Fragment(),
@@ -31,7 +31,7 @@ class RegionFragment : Fragment(),
     private val regionViewModel by lazy{
         ViewModelProvider(requireActivity()).get(RegionViewModel::class.java)
     }
-    private var listOfStates = arrayListOf<State>()
+    private var listOfStates = mutableListOf<State>()
     private lateinit var rvStatesRegion: RecyclerView
     private lateinit var emptyViewRegion: TextView
 
@@ -39,17 +39,8 @@ class RegionFragment : Fragment(),
         const val TAG = "33333"
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        listOfStates =
-                arguments?. let {
-                    it. getParcelableArrayList<State>(Constants.LIST_OF_STATES_REGION)
-                            as ArrayList<State>
-                }?:arrayListOf()
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_states, container, false)
+        return inflater.inflate(R.layout.fragment_regions, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,7 +59,13 @@ class RegionFragment : Fragment(),
         setHasOptionsMenu(true)
         requireActivity().invalidateOptionsMenu()
 
-        renderState(listOfStates)
+        val flagsViewModel = ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
+       flagsViewModel.getCurrentLostOfFlags()
+               .observe(viewLifecycleOwner, {
+                   listOfStates = it.listStates
+                   Toast.makeText(requireActivity(), "${listOfStates.size}", Toast.LENGTH_SHORT).show()
+                   renderData(listOfStates)
+               })
     }
 
     private fun initViews(view: View) {
@@ -95,16 +92,17 @@ class RegionFragment : Fragment(),
         rvStatesRegion.adapter = adapter
     }
 
-    private fun renderState(states: ArrayList<State>) {
-        if(states.isEmpty()){
+    private fun renderData(listOfStates:MutableList<State>) {
+        if(listOfStates.isEmpty()){
             rvStatesRegion.visibility = View.GONE
             emptyViewRegion.visibility = View.VISIBLE
         }else{
             rvStatesRegion.visibility =  View.VISIBLE
             emptyViewRegion.visibility = View.GONE
-
-            adapter?.listOfRegion = states
-            listOfStates = states
+            listOfStates
+            listOfStates.sortBy { it.nameRus }
+            listOfStates
+            adapter?.listOfRegion = listOfStates
             rvStatesRegion.layoutManager?.scrollToPosition(position) //крутим в запомненную позицию списка
             Log.d(TAG, "StatesFragment renderState scrollToPosition = $position")
         }
@@ -123,6 +121,8 @@ class RegionFragment : Fragment(),
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
+
+        menu.findItem(R.id.search)?.isVisible = true
 
         val searchItem: MenuItem = menu.findItem(R.id.search)
         val searchView =searchItem.actionView as SearchView

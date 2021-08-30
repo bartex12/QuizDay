@@ -111,6 +111,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         id?. let {
             menu?.findItem(R.id.action_settings)?.isVisible = it != R.id.settingsFragment
             menu?.findItem(R.id.action_help)?.isVisible = it!= R.id.helpFragment
+            menu?.findItem(R.id.search)?.isVisible = it== R.id.regionFragment
 
             //заголовки тулбара в зависимости от фрагмента
             toolbar.title = when(it){

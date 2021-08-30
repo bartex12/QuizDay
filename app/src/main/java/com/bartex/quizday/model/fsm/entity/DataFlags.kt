@@ -11,7 +11,7 @@ data class DataFlags(
         var correctAnswers:Int = 0,  //количество правильных ответов
         var totalGuesses:Int = 0 , // общее количество попыток
         var typeAnswer:Answer? = null, //тип ответа
-        var listStates: MutableList<State> = mutableListOf(), //список всех стран
+        var listStates: MutableList<State> = mutableListOf(), //список стран с учётом выбранного региона
         val quizCountriesList: MutableList<State> = ArrayList(),  //страны текущей викторины
         var nextCountry:State? = null, //следующая страна для угадывания флага
         var row:Int = 0,  //строка кнопок ответов

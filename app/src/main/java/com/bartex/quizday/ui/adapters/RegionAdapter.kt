@@ -14,7 +14,7 @@ class RegionAdapter(
         val imageLoader: IImageLoader<ImageView>)
     :RecyclerView.Adapter<RegionAdapter.ViewHolder>() {
 
-    var listOfRegion : List<State> = listOf()
+    var listOfRegion : MutableList<State> = mutableListOf()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -30,8 +30,14 @@ class RegionAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(listOfRegion[position])
 
+        holder.bind(sort(listOfRegion)[position])
+    }
+
+    private fun sort(listOfRegion: MutableList<State>):List<State>{
+        return listOfRegion.sortedBy {
+            it.nameRus
+        }
     }
 
     override fun getItemCount(): Int {
