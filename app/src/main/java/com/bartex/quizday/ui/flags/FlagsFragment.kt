@@ -11,9 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -26,9 +24,7 @@ import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.substates.*
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import com.google.android.material.chip.ChipGroup
-import kotlinx.android.synthetic.main.fragment_flags.*
 import java.security.SecureRandom
-import java.util.*
 
 class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
 
@@ -90,12 +86,6 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
                     renderViewState(newQuizState)
                     Log.d(TAG, "FlagsFragment onViewCreated: newQuizState = $newQuizState")
                 })
-
-//        navController.currentBackStackEntry?.savedStateHandle
-//                ?.getLiveData<Boolean>(Constants.RESET_KEY)?.observe(
-//                viewLifecycleOwner) { result ->
-//                  if(result){ flagsViewModel.resetQuiz()}
-//        }
     }
 
     // метод onStart вызывается после onViewCreated.
@@ -153,7 +143,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
         showAnswerButtonsNumberAndNames(data)// Добавление кнопок
         showCorrectAnswerButtom(data)
     }
-    
+
     //неправильный ответ
     private fun showNotWellState(data: DataFlags) {
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
