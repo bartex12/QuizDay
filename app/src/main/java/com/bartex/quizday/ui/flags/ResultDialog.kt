@@ -17,10 +17,6 @@ class ResultDialog: DialogFragment() {
         ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
     }
 
-    interface OnResultListener{
-        fun resetQuiz()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?. let{

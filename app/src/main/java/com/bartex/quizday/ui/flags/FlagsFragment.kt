@@ -26,7 +26,7 @@ import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import com.google.android.material.chip.ChipGroup
 import java.security.SecureRandom
 
-class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
+class FlagsFragment: Fragment(){
 
     companion object{
         const val TAG = "33333"
@@ -316,9 +316,5 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
         for (row in 0 until guessRows) {
             guessLinearLayouts[row]?.visibility = View.VISIBLE
         }
-    }
-
-    override fun resetQuiz() {
-        flagsViewModel.resetQuiz()
     }
 }
