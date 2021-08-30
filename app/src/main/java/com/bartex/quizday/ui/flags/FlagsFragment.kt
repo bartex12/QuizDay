@@ -137,6 +137,11 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
 
     //состояние готовности к викторине - показываем первый флаг
     private fun showReadyState(data: DataFlags) {
+        //выбираем случайную строку и запоминаем её  в классе данных, чтобы не потерять при повороте
+        data.row = random.nextInt(data.guessRows)
+        //выбираем случайный столбец и запоминаем его  в классе данных, чтобы не потерять при повороте
+        data.column = random.nextInt(2)
+
         flagsViewModel.loadNextFlag(data)
     }
 
@@ -144,20 +149,11 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
     private fun showNextFlagState(data: DataFlags) {
         showCurrentQuestionNumber(data) //показать номер текущего вопроса
         answerTextView.text = "" //не показывать пока ответ
-
         showNextCountryFlag(data)  //svg изображение флага
         showAnswerButtonsNumberAndNames(data)// Добавление кнопок
-
-        //выбираем случайную строку и запоминаем её  в классе данных, чтобы не потерять при повороте
-        data.row = random.nextInt(data.guessRows)
-        //выбираем случайный столбец и запоминаем его  в классе данных, чтобы не потерять при повороте
-        data.column = random.nextInt(2)
-        // Получение строки LinearLayouts
-        val randomRow = guessLinearLayouts[data.row]
-        // Случайная замена одной кнопки правильным ответом
-        (randomRow?.getChildAt(data.column) as Button).text = data.correctAnswer
+        showCorrectAnswerButtom(data)
     }
-
+    
     //неправильный ответ
     private fun showNotWellState(data: DataFlags) {
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
@@ -166,10 +162,7 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
         //todo анимацию встряхивания сделать
         showNextCountryFlag(data) //svg изображение флага
         showAnswerButtonsNumberAndNames(data) // Добавление кнопок
-        // Получение строки LinearLayouts
-        val randomRow = guessLinearLayouts[data.row]
-        // Случайная замена одной кнопки правильным ответом
-        (randomRow?.getChildAt(data.column) as Button).text = data.correctAnswer
+        showCorrectAnswerButtom(data)
     }
 
     // Ответ правильный, но викторина не закончена
@@ -212,6 +205,13 @@ class FlagsFragment: Fragment(), ResultDialog.OnResultListener{
         data.nextCountry?.flag?.let { flag ->
             GlideToVectorYou.justLoadImage(requireActivity(), Uri.parse(flag), flagImageView)
         }
+    }
+
+    private fun showCorrectAnswerButtom(data: DataFlags) {
+        // Получение строки LinearLayouts
+        val randomRow = guessLinearLayouts[data.row]
+        // Случайная замена одной кнопки правильным ответом
+        (randomRow?.getChildAt(data.column) as Button).text = data.correctAnswer
     }
 
     // Добавление 2, 4, 6 кнопок в зависимости от значения guessRows
