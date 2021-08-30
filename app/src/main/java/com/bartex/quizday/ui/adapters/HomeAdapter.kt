@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bartex.quizday.R
 
-class HomeAdapter(val onItemClickListener: OnitemClickListener,):RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
+class HomeAdapter(private val onItemClickListener: OnitemClickListener,):RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
 
     var listOfTypes : List<ItemList> = listOf()
     set(value) {

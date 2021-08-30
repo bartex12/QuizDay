@@ -70,7 +70,7 @@ class ImageQuizFragment : Fragment() {
             object : HomeAdapter.OnitemClickListener{
                 override fun onItemClick(position: Int) {
                     when(position){
-                        0 -> navController.navigate(R.id.action_imagequizFragment_to_flagsFragment)
+                        0 -> navController.navigate(R.id.tabsFragment)
                         1 -> Toast.makeText(requireActivity(),
                                 requireActivity().resources.getString(R.string.no_now), Toast.LENGTH_SHORT).show()
                         2 -> Toast.makeText(requireActivity(),

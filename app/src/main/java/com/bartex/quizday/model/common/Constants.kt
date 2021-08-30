@@ -7,10 +7,6 @@ object Constants {
     const val FLAGS_IN_QUIZ = "pref_numberOfFlags"
     const val DIALOG_FRAGMENT = "DIALOG_FRAGMENT_TAG"
 
-    const val  GUESS_BUTTON = "GUESS_BUTTON"
-    const val  LIST_OF_STATES = "LIST_STATES"
-
-    const val  CURRENT_REGION = "CURRENT_REGION"
     const val  REGION_EUROPE = "Европа"
     const val  REGION_ASIA = "Азия"
     const val  REGION_AMERICAS = "Америка"
@@ -21,6 +17,7 @@ object Constants {
     const val TOTAL_QUESTIONS = "TOTAL_QUESTIONS"
     const val TOTAL_GUESSES = "TOTAL_GUESSES"
 
-    const val RESET_KEY = "RESET_KEY"
-
+    const val PAGER_POSITION = "PAGER_POSITION"
+    const val  FIRST_POSITION_STATE = "FIRST_POSITION_STATE"
+    const val  LIST_OF_STATES_REGION = "LIST_OF_STATES_REGION"
 }

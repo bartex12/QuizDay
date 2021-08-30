@@ -120,6 +120,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.settingsFragment -> getString(R.string.action_settings)
                 R.id.helpFragment -> getString(R.string.action_help)
                 R.id.flagsFragment -> getString(R.string.flags)
+                R.id.tabsFragment -> getString(R.string.flags)
                 else -> getString(R.string.app_name)
             }
         }
@@ -153,10 +154,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
 
-            R.id.flagsFragment -> {
+            R.id.tabsFragment -> {
                 when (item.itemId) {
-                    R.id.action_help -> navController.navigate(R.id.action_flagsFragment_to_helpFragment)
-                    R.id.action_settings -> navController.navigate(R.id.action_flagsFragment_to_settingsFragment)
+                    R.id.action_help -> navController.navigate(R.id.action_tabsFragment_to_helpFragment)
+                    R.id.action_settings -> navController.navigate(R.id.action_tabsFragment_to_settingsFragment)
                 }
             }
 
