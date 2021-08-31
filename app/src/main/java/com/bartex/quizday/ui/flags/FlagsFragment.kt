@@ -75,6 +75,7 @@ class FlagsFragment: Fragment(){
                     .observe(viewLifecycleOwner,  {
                         renderData(it)
                     })
+
             //выделение на Европу при перврй загрузке
             chipGroup.check(R.id.chip_Europa)
         }
@@ -237,6 +238,7 @@ class FlagsFragment: Fragment(){
     }
 
     private fun initViews(view: View) {
+
         chipGroup =view.findViewById<ChipGroup>(R.id.chip_region)
 
         quizLinearLayout = view.findViewById<View>(R.id.quizLinearLayout) as LinearLayout

@@ -12,6 +12,7 @@ import com.bartex.quizday.model.fsm.Action
 import com.bartex.quizday.model.fsm.IFlagState
 import com.bartex.quizday.model.fsm.entity.Answer
 import com.bartex.quizday.model.fsm.entity.DataFlags
+import com.bartex.quizday.model.fsm.entity.DataForRegion
 import com.bartex.quizday.model.fsm.repo.FlagQuiz
 import com.bartex.quizday.model.fsm.repo.IFlagQuiz
 import com.bartex.quizday.model.fsm.repo.settings.ISettingsProvider
@@ -29,7 +30,7 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class FlagsViewModel(
-        var statesRepo: IStatesRepo = StatesRepo(
+        private var statesRepo: IStatesRepo = StatesRepo(
         Retrofit.Builder()
             .baseUrl(baseUrl)
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
@@ -47,10 +48,12 @@ class FlagsViewModel(
         private val settingProvider: ISettingsProvider = SettingsProvider(App.instance),
 ) : ViewModel()  {
 
-    private val listQuizStates = MutableLiveData<StatesSealed>()
+    //список стран из сети
+    private val listStatesFromNet = MutableLiveData<StatesSealed>()
+    //состояние конечного автомата
     private val currentQuizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
-    //страны с учетом выбранного региона
-    private var listOfRegionFlags:MutableLiveData<DataFlags> = MutableLiveData<DataFlags>()
+    //данные для RegionFragment - есть список из сети и регион, так как формируется в resetQuiz()
+    private var dataFlagsToRegionFragment:MutableLiveData<DataFlags> = MutableLiveData<DataFlags>()
 
     private var dataFlags:DataFlags = DataFlags() // здесь храним данные для состояний конечного автомата
     private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
@@ -69,18 +72,18 @@ class FlagsViewModel(
 
     fun getStatesSealed(isNetworkAvailable:Boolean) : LiveData<StatesSealed> {
         loadDataSealed(isNetworkAvailable)
-        return listQuizStates
+        return listStatesFromNet
     }
 
     private fun loadDataSealed(isNetworkAvailable:Boolean){
-        listQuizStates.value = StatesSealed.Loading(0)
+        listStatesFromNet.value = StatesSealed.Loading(0)
 
         statesRepo.getStates(isNetworkAvailable)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({states->
-                listQuizStates.value = StatesSealed.Success(states = states)
+                listStatesFromNet.value = StatesSealed.Success(states = states)
             },{error ->
-                listQuizStates.value = StatesSealed.Error(error = error)
+                listStatesFromNet.value = StatesSealed.Error(error = error)
             })
     }
 
@@ -91,14 +94,16 @@ class FlagsViewModel(
 
     //сохраняем список стран чтобы не пропадал при поворотах экрана
    fun saveListOfStates( listStates:MutableList<State>){
-       listOfStates = listStates
+        dataFlags.listStatesFromNet = listStates //для удобства храним в данных
+       listOfStates = listStates //а также храним во ViewModel
    }
 
     //начальное состояние не имеет предыдущего
     fun resetQuiz(){
         setNeedToCreateDialog(true) //возвращаем флаг разрешения создания диалога
+        dataFlagsToRegionFragment.value = dataFlags //для передачи в RegionFragment
+
         dataFlags =  storage.resetQuiz(listOfStates, dataFlags, region) //подготовка переменных и списков
-        listOfRegionFlags.value = dataFlags //для передачи в RegionFragment
         currentQuizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
     }
 
@@ -118,10 +123,6 @@ class FlagsViewModel(
         }
     }
 
-    fun getCurrentLostOfFlags(): LiveData<DataFlags>{
-        return listOfRegionFlags
-    }
-
     //обновить настройки звука
     fun updateSoundOnOff(){
         settingProvider.updateSoundOnOff()
@@ -138,9 +139,11 @@ class FlagsViewModel(
         return dataFlags.guessRows
     }
 
-    //сохраняем список регионов чтобы не пропадал при поворотах экрана
+    //сохраняем регион в классе данных
     fun saveRegion( newRegion:String){
-        region = newRegion
+        dataFlags.region = newRegion // в dataFlags
+        region = newRegion  // в переменную ViewModel
+        dataFlagsToRegionFragment.value = dataFlags //для передачи в RegionFragment
     }
     fun getRegion( ):String{
       return  region
@@ -150,7 +153,17 @@ class FlagsViewModel(
     fun saveCurrentState( newState:IFlagState){
         currentState = newState
     }
-    fun getState( ):IFlagState{
-        return  currentState
+
+    fun getListOfStatesFromNet():MutableList<State>{
+        return  listOfStates
     }
+
+    fun getDataFlagsToRegionFragment():LiveData<DataFlags>{
+        return dataFlagsToRegionFragment
+    }
+
+    fun getDataToRegionFragment():DataForRegion{
+        return DataForRegion(listOfStates, region)
+    }
+
 }

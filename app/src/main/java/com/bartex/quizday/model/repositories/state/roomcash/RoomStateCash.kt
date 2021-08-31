@@ -10,6 +10,7 @@ import io.reactivex.rxjava3.core.Single
 
 class RoomStateCash(val db:Database):IRoomStateCash {
 
+    //запись в базу данных и возвращение исходного списка
     override fun doStatesCash(listStates: List<State>): Single<List<State>> {
        return Single.fromCallable {
            val roomState  = listStates.map {
@@ -28,6 +29,7 @@ class RoomStateCash(val db:Database):IRoomStateCash {
        }
     }
 
+    //получение списка всех стран (кроме отфильтрованных из-за неполных данных)
     override fun getStatesFromCash(): Single<List<State>> {
         return Single.fromCallable {
             db.stateDao.getAll().map{
@@ -37,4 +39,15 @@ class RoomStateCash(val db:Database):IRoomStateCash {
             }
         }
     }
+
+    //получение списка стран с учётом региона (кроме отфильтрованных из-за неполных данных)
+    override fun getRegionStatesFromCash(region: String): Single<List<State>>  {
+        return Single.fromCallable {
+            db.stateDao.getRegionStates(region).map{
+                State(it.capital,it.flag, it.name, it.region,
+                        it.nameRus, it.capitalRus, it.regionRus )
+            }
+        }
+    }
+
 }

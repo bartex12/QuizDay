@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
@@ -15,10 +16,13 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bartex.quizday.R
+import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.RegionAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
 import com.bartex.quizday.ui.flags.FlagsViewModel
+import com.bartex.quizday.ui.flags.StatesSealed
+import com.google.android.material.chip.ChipGroup
 import java.util.*
 
 
@@ -31,122 +35,194 @@ class RegionFragment : Fragment(),
     private val regionViewModel by lazy{
         ViewModelProvider(requireActivity()).get(RegionViewModel::class.java)
     }
-    private var listOfStates = mutableListOf<State>()
-    private lateinit var rvStatesRegion: RecyclerView
-    private lateinit var emptyViewRegion: TextView
 
-    companion object {
+    private val flagsViewModel by lazy {
+        ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
+    }
+        private var listOfRegionStates  = mutableListOf<State>() //список стран региона
+        private lateinit var rvStatesRegion: RecyclerView
+        private lateinit  var emptyViewRegion: TextView
+        private lateinit var chipGroupRegion: ChipGroup
+        private lateinit var progressBarRegion: ProgressBar
+        private var region:String = ""
+
+        companion object {
         const val TAG = "33333"
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_regions, container, false)
-    }
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+            return inflater.inflate(R.layout.fragment_regions, container, false)
+        }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
 
-        navController = Navigation.findNavController(view)
+            navController = Navigation.findNavController(view)
 
-        //восстанавливаем позицию списка после поворота или возвращения на экран
-        position =  regionViewModel.getPositionState()
+            //восстанавливаем позицию списка после поворота или возвращения на экран
+            position =  regionViewModel.getPositionState()
 
-        initViews(view)
-        initAdapter()
+            initViews(view)
+            initAdapter()
+            initChipGroupListener()
 
-        //приводим меню тулбара в соответствии с onPrepareOptionsMenu в MainActivity
-        //без этой строки меню в тулбаре ведёт себя неправильно
-        setHasOptionsMenu(true)
-        requireActivity().invalidateOptionsMenu()
+            //приводим меню тулбара в соответствии с onPrepareOptionsMenu в MainActivity
+            //без этой строки меню в тулбаре ведёт себя неправильно
+            setHasOptionsMenu(true)
+            requireActivity().invalidateOptionsMenu()
 
-        val flagsViewModel = ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
-       flagsViewModel.getCurrentLostOfFlags()
-               .observe(viewLifecycleOwner, {
-                   listOfStates = it.listStates
-                   Toast.makeText(requireActivity(), "${listOfStates.size}", Toast.LENGTH_SHORT).show()
-                   renderData(listOfStates)
-               })
-    }
+            flagsViewModel.getDataFlagsToRegionFragment()
+                    .observe(viewLifecycleOwner, {data->
+                        listOfRegionStates = data.listStatesFromNet  // полный список стран
+                        region = data.region //текущий регион
+                        chipGroupRegion.check(getRegionId(region))
+
+                        renderDataWithRegion(region)
+                    })
+        }
+
 
     private fun initViews(view: View) {
-        rvStatesRegion =  view.findViewById(R.id.rv_states_region)
-        emptyViewRegion =  view.findViewById(R.id.empty_view_region)
-    }
+            progressBarRegion =view.findViewById<ProgressBar>(R.id.progress_bar_region)
+            rvStatesRegion =  view.findViewById(R.id.rv_states_region)
+            emptyViewRegion =  view.findViewById(R.id.empty_view_region)
+            chipGroupRegion =  view.findViewById(R.id.chip_region_region)
+        }
 
-    //запоминаем  позицию списка, на которой сделан клик - на случай поворота экрана
-    override fun onPause() {
-        super.onPause()
-        //определяем первую видимую позицию
-        val manager = rvStatesRegion.layoutManager as LinearLayoutManager
-        val firstPosition = manager.findFirstVisibleItemPosition()
-        regionViewModel.savePositionState(firstPosition)
-        Log.d(TAG, "StatesFragment onPause firstPosition = $firstPosition")
-    }
+        private fun initChipGroupListener() {
+            chipGroupRegion.setOnCheckedChangeListener { _, id ->
+                chipGroupRegion.check(id)
+                val newRegion: String = getRegionName(id)
 
-    private fun initAdapter() {
-        rvStatesRegion.layoutManager = LinearLayoutManager(requireActivity())
-        adapter = RegionAdapter(
-                getOnClickListener(),
-                SvgImageLoader(requireActivity())
-        )
-        rvStatesRegion.adapter = adapter
-    }
+                renderDataWithRegion(newRegion)
+            }
+        }
 
-    private fun renderData(listOfStates:MutableList<State>) {
-        if(listOfStates.isEmpty()){
-            rvStatesRegion.visibility = View.GONE
-            emptyViewRegion.visibility = View.VISIBLE
-        }else{
-            rvStatesRegion.visibility =  View.VISIBLE
-            emptyViewRegion.visibility = View.GONE
-            listOfStates
-            listOfStates.sortBy { it.nameRus }
-            listOfStates
-            adapter?.listOfRegion = listOfStates
-            rvStatesRegion.layoutManager?.scrollToPosition(position) //крутим в запомненную позицию списка
-            Log.d(TAG, "StatesFragment renderState scrollToPosition = $position")
+    private fun renderDataWithRegion(newRegion: String) {
+        when (newRegion) {
+            Constants.REGION_ALL -> {
+                renderData(listOfRegionStates)
+            }
+            else -> {
+                val filteredList = listOfRegionStates.filter { state ->
+                    state.regionRus == newRegion
+                } as MutableList<State>
+                renderData(filteredList)
+            }
         }
     }
 
-    private fun getOnClickListener(): RegionAdapter.OnItemClickListener =
-            object : RegionAdapter.OnItemClickListener{
-                override fun onItemClick(state: State) {
-                    //чтобы сразу исчезала клавиатура а не после перехода в детали
-                    val inputManager: InputMethodManager =
-                            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    inputManager.hideSoftInputFromWindow(
-                            requireActivity().currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
-                }
+    private fun getRegionName(id: Int): String {
+        return when (id) {
+            R.id.chip_all_region -> Constants.REGION_ALL
+            R.id.chip_Europa_region -> Constants.REGION_EUROPE
+            R.id.chip_Asia_region -> Constants.REGION_ASIA
+            R.id.chip_America_region -> Constants.REGION_AMERICAS
+            R.id.chip_Oceania_region -> Constants.REGION_OCEANIA
+            R.id.chip_Africa_region -> Constants.REGION_AFRICA
+            else -> Constants.REGION_EUROPE
+        }
+    }
+
+    private fun getRegionId(region: String): Int {
+        return when (region) {
+            Constants.REGION_ALL -> R.id.chip_all_region
+            Constants.REGION_EUROPE -> R.id.chip_Europa_region
+            Constants.REGION_ASIA -> R.id.chip_Asia_region
+            Constants.REGION_AMERICAS -> R.id.chip_America_region
+            Constants.REGION_OCEANIA -> R.id.chip_Oceania_region
+            Constants.REGION_AFRICA -> R.id.chip_Africa_region
+            else -> R.id.chip_Europa_region
+        }
+    }
+
+//    private fun renderDataFromRoom(data: StatesSealed?) {
+//            when(data){
+//                is StatesSealed.Success -> {
+//                    rvStatesRegion.visibility =  View.VISIBLE
+//                    progressBarRegion.visibility = View.GONE
+//
+//                    listOfRegionStates = data.states as MutableList<State>
+//                    renderData(listOfRegionStates)
+//                }
+//                is StatesSealed.Error -> {
+//                    Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT).show()
+//                }
+//                is StatesSealed.Loading -> {
+//                    rvStatesRegion.visibility = View.GONE
+//                    progressBarRegion.visibility = View.VISIBLE
+//                }
+//            }
+//        }
+
+        //запоминаем  позицию списка, на которой сделан клик - на случай поворота экрана
+        override fun onPause() {
+            super.onPause()
+            //определяем первую видимую позицию
+            val manager = rvStatesRegion.layoutManager as LinearLayoutManager
+            val firstPosition = manager.findFirstVisibleItemPosition()
+            regionViewModel.savePositionState(firstPosition)
+            Log.d(TAG, "StatesFragment onPause firstPosition = $firstPosition")
+        }
+
+        private fun initAdapter() {
+            rvStatesRegion.layoutManager = LinearLayoutManager(requireActivity())
+            adapter = RegionAdapter(
+                    getOnClickListener(),
+                    SvgImageLoader(requireActivity())
+            )
+            rvStatesRegion.adapter = adapter
+        }
+
+        private fun renderData(listOfStates:MutableList<State>) {
+            if(listOfStates.isEmpty()){
+                rvStatesRegion.visibility = View.GONE
+                emptyViewRegion.visibility = View.VISIBLE
+            }else{
+                rvStatesRegion.visibility =  View.VISIBLE
+                emptyViewRegion.visibility = View.GONE
+
+                listOfStates.sortBy { it.nameRus }
+
+                adapter?.listOfRegion = listOfStates
+                rvStatesRegion.layoutManager?.scrollToPosition(position) //крутим в запомненную позицию списка
+                Log.d(TAG, "StatesFragment renderState scrollToPosition = $position")
             }
+        }
 
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
+        private fun getOnClickListener(): RegionAdapter.OnItemClickListener =
+                object : RegionAdapter.OnItemClickListener{
+                    override fun onItemClick(state: State) {
+                        //чтобы сразу исчезала клавиатура а не после перехода в детали
+                        val inputManager: InputMethodManager =
+                                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        inputManager.hideSoftInputFromWindow(
+                                requireActivity().currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                    }
+                }
 
-        menu.findItem(R.id.search)?.isVisible = true
+        override fun onPrepareOptionsMenu(menu: Menu) {
+            super.onPrepareOptionsMenu(menu)
 
-        val searchItem: MenuItem = menu.findItem(R.id.search)
-        val searchView =searchItem.actionView as SearchView
-        //значок лупы слева в развёрнутом сост и сворачиваем строку поиска (true)
-        //searchView.setIconifiedByDefault(true)
-        //пишем подсказку в строке поиска
-        searchView.queryHint = getString(R.string.search_country)
-        //устанавливаем в панели действий кнопку ( > )для отправки поискового запроса
-        // searchView.isSubmitButtonEnabled = true
-        //устанавливаем слушатель
-        searchView.setOnQueryTextListener(this)
-    }
+            menu.findItem(R.id.search)?.isVisible = true
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        //ничего не делаем - не будет фрагмента поиска, так как при вводе символов
-        //изменяется список внутри StatesFragment
-        return false
-    }
+            val searchItem: MenuItem = menu.findItem(R.id.search)
+            val searchView =searchItem.actionView as SearchView
+            searchView.queryHint = getString(R.string.search_country) //пишем подсказку в строке поиска
+            searchView.setOnQueryTextListener(this)//устанавливаем слушатель
+        }
 
-    override fun onQueryTextChange(newText: String?): Boolean {
-        newText?. let {
-            if (it.isNotBlank()) {
-                val listSearched = mutableListOf<State>()
-                    for (state in listOfStates) {
+        override fun onQueryTextSubmit(query: String?): Boolean {
+            //ничего не делаем - не будет фрагмента поиска, так как при вводе символов
+            //изменяется список внутри StatesFragment
+            return false
+        }
+
+        override fun onQueryTextChange(newText: String?): Boolean {
+            newText?. let {
+                if (it.isNotBlank()) {
+                    val listSearched = mutableListOf<State>()
+                    for (state in listOfRegionStates ) {
                         state.nameRus?. let{ nameRus->
                             if((nameRus.toUpperCase(Locale.ROOT)
                                             .startsWith(it.toUpperCase(Locale.ROOT)))){
@@ -154,11 +230,11 @@ class RegionFragment : Fragment(),
                             }
                         }
                     }
-                adapter?.listOfRegion = listSearched
-            }else{
-                adapter?.listOfRegion = listOfStates
+                    adapter?.listOfRegion = listSearched
+                }else{
+                    adapter?.listOfRegion = listOfRegionStates
+                }
             }
+            return false
         }
-        return false
-    }
 }
