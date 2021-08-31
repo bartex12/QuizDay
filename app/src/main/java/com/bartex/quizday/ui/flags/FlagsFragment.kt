@@ -138,11 +138,6 @@ class FlagsFragment: Fragment(){
 
     //состояние готовности к викторине - показываем первый флаг
     private fun showReadyState(data: DataFlags) {
-        //выбираем случайную строку и запоминаем её  в классе данных, чтобы не потерять при повороте
-        data.row = random.nextInt(data.guessRows)
-        //выбираем случайный столбец и запоминаем его  в классе данных, чтобы не потерять при повороте
-        data.column = random.nextInt(2)
-
         flagsViewModel.loadNextFlag(data)
     }
 
@@ -150,8 +145,12 @@ class FlagsFragment: Fragment(){
     private fun showNextFlagState(data: DataFlags) {
         listener?.onChangeToolbarTitle(getCurrentQuestion(data))//показать номер текущего вопроса
         answerTextView.text = "" //не показывать пока ответ
-        showNextCountryFlag(data)  //svg изображение флагаdata
+        showNextCountryFlag(data)  //svg изображение флага data
         showAnswerButtonsNumberAndNames(data)// Добавление кнопок
+        //выбираем случайную строку и запоминаем её  в классе данных, чтобы не потерять при повороте
+        data.row = random.nextInt(data.guessRows)
+        //выбираем случайный столбец и запоминаем его  в классе данных, чтобы не потерять при повороте
+        data.column = random.nextInt(2)
         showCorrectAnswerButtom(data)
     }
 
