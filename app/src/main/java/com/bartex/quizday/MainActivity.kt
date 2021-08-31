@@ -120,7 +120,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.imagequizFragment -> getString(R.string.image_quiz)
                 R.id.settingsFragment -> getString(R.string.action_settings)
                 R.id.helpFragment -> getString(R.string.action_help)
-                R.id.flagsFragment -> getString(R.string.flags)
                 R.id.tabsFragment -> getString(R.string.flags)
                 else -> getString(R.string.app_name)
             }
