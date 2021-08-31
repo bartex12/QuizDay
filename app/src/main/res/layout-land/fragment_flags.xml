@@ -82,6 +82,15 @@
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/question"
+            android:id="@+id/questionNumberTextView"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/spacing"/>
+
     <!--так как layout_height="0dp" а layout_weight="1"-->
     <!--картинка изменяется в размерах при изменении  -->
     <!-- количества кнопок с ответами-->
