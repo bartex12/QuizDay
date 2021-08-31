@@ -1,5 +1,6 @@
 package com.bartex.quizday.ui.flags
 
+import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.net.Uri
@@ -41,7 +42,6 @@ class FlagsFragment: Fragment(){
 
     private lateinit var handler : Handler   // Для задержки загрузки следующего флага
     private lateinit var quizLinearLayout  : LinearLayout // root макета фрагмента
-    private lateinit var questionNumberTextView  : TextView   //для номера текущего вопроса
     private lateinit var answerTextView : TextView  //для правильного ответа
     private lateinit var flagImageView  : ImageView  //Для вывода флага
     private lateinit var guessButton:Button  // текущая кнопка ответа
@@ -50,6 +50,16 @@ class FlagsFragment: Fragment(){
     private var random : SecureRandom = SecureRandom()
     private lateinit var chipGroup:ChipGroup
     private lateinit var navController:NavController
+    private var listener:OnChangeToolbarTitleListener? = null
+
+    interface OnChangeToolbarTitleListener{
+        fun onChangeToolbarTitle(title:String)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener  =  context as OnChangeToolbarTitleListener
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             return inflater.inflate(R.layout.fragment_flags, container, false)
@@ -138,9 +148,9 @@ class FlagsFragment: Fragment(){
 
     //следующий вопрос
     private fun showNextFlagState(data: DataFlags) {
-        showCurrentQuestionNumber(data) //показать номер текущего вопроса
+        listener?.onChangeToolbarTitle(getCurrentQuestion(data))//показать номер текущего вопроса
         answerTextView.text = "" //не показывать пока ответ
-        showNextCountryFlag(data)  //svg изображение флага
+        showNextCountryFlag(data)  //svg изображение флагаdata
         showAnswerButtonsNumberAndNames(data)// Добавление кнопок
         showCorrectAnswerButtom(data)
     }
@@ -148,7 +158,7 @@ class FlagsFragment: Fragment(){
     //неправильный ответ
     private fun showNotWellState(data: DataFlags) {
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
-        showCurrentQuestionNumber(data) //показать номер текущего вопроса
+        listener?.onChangeToolbarTitle(getCurrentQuestion(data))//показать номер текущего вопроса
         showIncorrectAnswer()//показать неправильный ответ
         //todo анимацию встряхивания сделать
         showNextCountryFlag(data) //svg изображение флага
@@ -159,7 +169,7 @@ class FlagsFragment: Fragment(){
     // Ответ правильный, но викторина не закончена
     private fun showWellNotLastState(data: DataFlags) {
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 50) }.start()
-        showCurrentQuestionNumber(data) //показать номер текущего вопроса
+        listener?.onChangeToolbarTitle(getCurrentQuestion(data)) //показать номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons()  // Блокировка всех кнопок ответов
         handler.postDelayed(
@@ -172,7 +182,7 @@ class FlagsFragment: Fragment(){
     // Ответ правильный и викторина закончена
     private fun showWellAndLastState(data: DataFlags) {
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
-        showCurrentQuestionNumber(data) //показать номер текущего вопроса
+        listener?.onChangeToolbarTitle(getCurrentQuestion(data)) //показать номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons() //сделать иконки недоступными
         showNextCountryFlag(data)  //svg изображение флага
@@ -186,10 +196,8 @@ class FlagsFragment: Fragment(){
         }
     }
 
-    private fun showCurrentQuestionNumber(data: DataFlags) {
-        questionNumberTextView.text = getString(
-                R.string.question, data.correctAnswers, data.flagsInQuiz
-        )
+    private fun getCurrentQuestion(data: DataFlags):String {
+        return getString( R.string.question, data.correctAnswers, data.flagsInQuiz)
     }
 
     private fun showNextCountryFlag(data: DataFlags) {
@@ -242,7 +250,6 @@ class FlagsFragment: Fragment(){
         chipGroup =view.findViewById<ChipGroup>(R.id.chip_region)
 
         quizLinearLayout = view.findViewById<View>(R.id.quizLinearLayout) as LinearLayout
-        questionNumberTextView = view.findViewById<View>(R.id.questionNumberTextView) as TextView
         answerTextView = view.findViewById<View>(R.id.answerTextView) as TextView
         flagImageView = view.findViewById<View>(R.id.flagImageView) as ImageView
         progressBarFlags = view.findViewById<View>(R.id.progressBarFlags) as ProgressBar
