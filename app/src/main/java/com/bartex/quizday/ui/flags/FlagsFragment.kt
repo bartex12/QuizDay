@@ -138,6 +138,7 @@ class FlagsFragment: Fragment(){
 
     //состояние готовности к викторине - показываем первый флаг
     private fun showReadyState(data: DataFlags) {
+        listener?.onChangeToolbarTitle(getCurrentQuestion(data))//показать номер текущего вопроса
         flagsViewModel.loadNextFlag(data)
     }
 

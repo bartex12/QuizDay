@@ -19,5 +19,5 @@ object Constants {
 
     const val PAGER_POSITION = "PAGER_POSITION"
     const val  FIRST_POSITION_STATE = "FIRST_POSITION_STATE"
-    const val  LIST_OF_STATES_REGION = "LIST_OF_STATES_REGION"
+    const val  TOOLBAR_TITLE_TEXT = "TOOLBAR_TITLE_TEXT"
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.media.AudioManager
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -37,6 +38,8 @@ FlagsFragment.OnChangeToolbarTitleListener{
     private lateinit var navController:NavController
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toolbar: Toolbar
+    private lateinit var toolbarTitle: TextView  //TextView на тулбаре
+    private var toolbarTitleText: String = ""//текст в TextView на тулбаре
     private lateinit var audioManager: AudioManager
 
     private var isNetworkAvailable: Boolean = true //Доступна ли сеть
@@ -51,6 +54,9 @@ FlagsFragment.OnChangeToolbarTitleListener{
             if (!isNetworkAvailable) {
                 showNoInternetConnectionDialog()
             }
+        }else{
+            toolbarTitleText =
+                    savedInstanceState.getString(Constants.TOOLBAR_TITLE_TEXT,getString(R.string.app_name) )
         }
 
         //следим за сетью через LiveData
@@ -62,18 +68,18 @@ FlagsFragment.OnChangeToolbarTitleListener{
                     showNoInternetConnectionDialog()
                 }
             })
-        //Log.d(TAG, "*** MainActivity onCreate  isNetworkAvailable = $isNetworkAvailable")
 
         toolbar = findViewById(R.id.toolbar)
+        toolbarTitle =   toolbar.findViewById<TextView>(R.id.main_title)
         setSupportActionBar(toolbar)
 
         //отключаем показ заголовка тулбара, так как там свой макет с main_title
         supportActionBar?.setDisplayShowTitleEnabled(false)
         //текстовое поле в тулбаре
-        with(toolbar.findViewById<TextView>(R.id.main_title)){
+        with(toolbarTitle){
             textSize = 16f
             setTextColor(Color.WHITE)
-            text = context.getString(R.string.app_name)
+            text = toolbarTitleText
         }
 
         // Задание значений по умолчанию для SharedPreferences
@@ -127,17 +133,18 @@ FlagsFragment.OnChangeToolbarTitleListener{
             menu?.findItem(R.id.action_help)?.isVisible = it!= R.id.helpFragment
             menu?.findItem(R.id.search)?.isVisible = it== R.id.regionFragment
 
-//            //заголовки тулбара в зависимости от фрагмента
-//            toolbar.title = when(it){
-//                R.id.homeFragment -> getString(R.string.app_name)
-//                R.id.textquizFragment -> getString(R.string.text_quiz)
-//                R.id.imagequizFragment -> getString(R.string.image_quiz)
-//                R.id.settingsFragment -> getString(R.string.action_settings)
-//                R.id.helpFragment -> getString(R.string.action_help)
-//                R.id.flagsFragment -> getString(R.string.flags)
-//                R.id.tabsFragment -> getString(R.string.flags)
-//                else -> getString(R.string.app_name)
-//            }
+            //заголовки тулбара в зависимости от фрагмента
+            toolbarTitle.text = when(it){
+                R.id.homeFragment -> getString(R.string.app_name)
+                R.id.textquizFragment -> getString(R.string.text_quiz)
+                R.id.imagequizFragment -> getString(R.string.image_quiz)
+                R.id.settingsFragment -> getString(R.string.action_settings)
+                R.id.helpFragment -> getString(R.string.action_help)
+               // R.id.tabsFragment -> getString(R.string.flags)
+                //R.id.flagsFragment -> toolbarTitleText
+                //R.id.regionFragment -> getString(R.string.states)
+                else -> getString(R.string.app_name)
+            }
         }
         return super.onPrepareOptionsMenu(menu)
     }
@@ -234,8 +241,13 @@ FlagsFragment.OnChangeToolbarTitleListener{
     }
 
     override fun onChangeToolbarTitle(title: String) {
-      val toolbarTitle =   toolbar.findViewById<TextView>(R.id.main_title)
+        toolbarTitleText = title
         toolbarTitle.text = title
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        outState.putString(Constants.TOOLBAR_TITLE_TEXT, toolbarTitleText)
     }
 
 }
