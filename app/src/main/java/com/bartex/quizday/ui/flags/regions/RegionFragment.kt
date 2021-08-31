@@ -7,7 +7,6 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -21,7 +20,6 @@ import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.RegionAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
 import com.bartex.quizday.ui.flags.FlagsViewModel
-import com.bartex.quizday.ui.flags.StatesSealed
 import com.google.android.material.chip.ChipGroup
 import java.util.*
 
@@ -135,25 +133,6 @@ class RegionFragment : Fragment(),
             else -> R.id.chip_Europa_region
         }
     }
-
-//    private fun renderDataFromRoom(data: StatesSealed?) {
-//            when(data){
-//                is StatesSealed.Success -> {
-//                    rvStatesRegion.visibility =  View.VISIBLE
-//                    progressBarRegion.visibility = View.GONE
-//
-//                    listOfRegionStates = data.states as MutableList<State>
-//                    renderData(listOfRegionStates)
-//                }
-//                is StatesSealed.Error -> {
-//                    Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT).show()
-//                }
-//                is StatesSealed.Loading -> {
-//                    rvStatesRegion.visibility = View.GONE
-//                    progressBarRegion.visibility = View.VISIBLE
-//                }
-//            }
-//        }
 
         //запоминаем  позицию списка, на которой сделан клик - на случай поворота экрана
         override fun onPause() {

@@ -1,6 +1,5 @@
 package com.bartex.quizday.ui.flags.regions
 
-import android.util.Log
 import androidx.preference.PreferenceManager
 import com.bartex.quizday.App
 import com.bartex.quizday.model.common.Constants

@@ -4,13 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bartex.quizday.App
-import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.repositories.state.roomcash.IRoomStateCash
 import com.bartex.quizday.model.repositories.state.roomcash.RoomStateCash
 import com.bartex.quizday.room.Database
 import com.bartex.quizday.ui.flags.StatesSealed
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Single
 
 class RegionViewModel(
         private var helper : IPreferenceHelper = PreferenceHelper(App.instance),

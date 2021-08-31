@@ -12,7 +12,6 @@ import com.bartex.quizday.model.fsm.Action
 import com.bartex.quizday.model.fsm.IFlagState
 import com.bartex.quizday.model.fsm.entity.Answer
 import com.bartex.quizday.model.fsm.entity.DataFlags
-import com.bartex.quizday.model.fsm.entity.DataForRegion
 import com.bartex.quizday.model.fsm.repo.FlagQuiz
 import com.bartex.quizday.model.fsm.repo.IFlagQuiz
 import com.bartex.quizday.model.fsm.repo.settings.ISettingsProvider
@@ -154,16 +153,9 @@ class FlagsViewModel(
         currentState = newState
     }
 
-    fun getListOfStatesFromNet():MutableList<State>{
-        return  listOfStates
-    }
-
+//передаём данные во фрагмент со списками стран регионов
     fun getDataFlagsToRegionFragment():LiveData<DataFlags>{
         return dataFlagsToRegionFragment
-    }
-
-    fun getDataToRegionFragment():DataForRegion{
-        return DataForRegion(listOfStates, region)
     }
 
 }

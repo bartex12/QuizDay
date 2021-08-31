@@ -2,7 +2,9 @@ package com.bartex.quizday.ui.flags.tabs
 
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -10,7 +12,6 @@ import androidx.viewpager.widget.ViewPager
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
 import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.fragment_tabs.*
 
 class TabsFragment: Fragment() {
     companion object{
