@@ -67,6 +67,9 @@
     <string name="flag">Флаг</string>
     <string name="search">Поиск</string>
     <string name="search_country">Поиск</string>
-
+    <string name="send_answer">Отправить</string>
+    <string name="answer">Ответ:</string>
+    <string name="states">Страны</string>
+    <string name="resultDialog">ResaltDialog</string>
 
 </resources>
