@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.bartex.quizday.ui.flags.FlagsFragment
+import com.bartex.quizday.ui.flags.mistakes.MistakesFragment
 import com.bartex.quizday.ui.flags.regions.RegionFragment
 
 class ViewPageAdapter(fragmentManager : FragmentManager)
@@ -17,7 +18,8 @@ class ViewPageAdapter(fragmentManager : FragmentManager)
 
     private val fragments = arrayOf(
             FlagsFragment(),
-            RegionFragment()
+            RegionFragment(),
+            MistakesFragment()
     )
 
     override fun getCount(): Int {

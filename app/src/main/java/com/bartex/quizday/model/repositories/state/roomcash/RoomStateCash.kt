@@ -1,5 +1,6 @@
 package com.bartex.quizday.model.repositories.state.roomcash
 
+import androidx.room.Query
 import com.bartex.quizday.model.common.MapOfCapital
 import com.bartex.quizday.model.common.MapOfRegion
 import com.bartex.quizday.model.common.MapOfState
@@ -47,6 +48,15 @@ class RoomStateCash(val db:Database):IRoomStateCash {
                 State(it.capital,it.flag, it.name, it.region,
                         it.nameRus, it.capitalRus, it.regionRus )
             }
+        }
+    }
+
+    //сделать отметку об ошибке
+    override fun writeMistakeInDatabase(notWellAnswer: String) {
+        val mistakeState = db.stateDao.getFlagByStateRus(notWellAnswer) //получаем страну по имени
+        if (mistakeState.mistake ==0){ //если статус ошибки = 0
+            mistakeState.mistake = 1 //меняем статус ошибки на 1
+            db.stateDao.update(mistakeState) //обновляем запись в базе
         }
     }
 

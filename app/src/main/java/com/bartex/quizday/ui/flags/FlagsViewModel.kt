@@ -19,6 +19,7 @@ import com.bartex.quizday.model.fsm.repo.settings.SettingsProvider
 import com.bartex.quizday.model.fsm.substates.ReadyState
 import com.bartex.quizday.model.repositories.state.IStatesRepo
 import com.bartex.quizday.model.repositories.state.StatesRepo
+import com.bartex.quizday.model.repositories.state.roomcash.IRoomStateCash
 import com.bartex.quizday.model.repositories.state.roomcash.RoomStateCash
 import com.bartex.quizday.room.Database
 import com.google.gson.FieldNamingPolicy
@@ -39,12 +40,11 @@ class FlagsViewModel(
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .excludeFieldsWithoutExposeAnnotation()
                 .create()
-            ))
-            .build()
-            .create(IDataSourceState::class.java),
+            )).build().create(IDataSourceState::class.java),
         roomCash = RoomStateCash(Database.getInstance() as Database)),
         private val storage: IFlagQuiz = FlagQuiz(),
         private val settingProvider: ISettingsProvider = SettingsProvider(App.instance),
+        private val roomCash: IRoomStateCash = RoomStateCash(Database.getInstance() as Database)
 ) : ViewModel()  {
 
     //список стран из сети
@@ -119,10 +119,21 @@ class FlagsViewModel(
     fun answer(guess:String){
         dataFlags = storage.getTypeAnswer(guess, dataFlags)
         when(dataFlags.typeAnswer){
-            Answer.NotWell ->  currentQuizState.value = currentState.executeAction(Action.OnNotWellClicked(dataFlags))
-            Answer.WellNotLast ->  currentQuizState.value = currentState.executeAction(Action.OnWellNotLastClicked(dataFlags))
-            Answer.WellAndLast ->  currentQuizState.value =  currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
+            Answer.NotWell -> {
+                currentQuizState.value = currentState.executeAction(Action.OnNotWellClicked(dataFlags))
+                roomCash.writeMistakeInDatabase(guess)
+            }
+            Answer.WellNotLast -> {
+                currentQuizState.value =  currentState.executeAction(Action.OnWellNotLastClicked(dataFlags))
+            }
+            Answer.WellAndLast -> {
+                currentQuizState.value = currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
+            }
         }
+    }
+
+    private fun writeMistakeInDatabase(guess: String) {
+
     }
 
     //обновить настройки звука

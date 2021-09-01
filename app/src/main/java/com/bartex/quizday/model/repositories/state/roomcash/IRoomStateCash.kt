@@ -7,4 +7,6 @@ interface IRoomStateCash {
     fun doStatesCash(listStates: List<State>): Single<List<State>>
     fun getStatesFromCash():Single<List<State>>//получение списка стран из кэша
     fun getRegionStatesFromCash(region:String):Single<List<State>> //получение списка стран с учётом региона
+
+   fun writeMistakeInDatabase(notWellAnswer:String) //делаeм запись в базе данных о том, что ответ неверный
 }
