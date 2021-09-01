@@ -8,6 +8,8 @@ import java.security.SecureRandom
 
 class FlagQuiz:IFlagQuiz {
 
+    private var random : SecureRandom = SecureRandom()
+
     //здесь сбрасываем переменные и очищаем списки а также формируем список с необходимым
     // числом флагов для новой викторины
     override fun resetQuiz(listStates: MutableList<State>, dataFlags:DataFlags, region:String):DataFlags {
@@ -51,6 +53,11 @@ class FlagQuiz:IFlagQuiz {
 
     //загрузка новых данных для викторины
     override fun loadNextFlag(dataFlags:DataFlags):DataFlags {
+        //выбираем случайную строку и запоминаем её  в классе данных, чтобы не потерять при повороте
+        dataFlags.row = random.nextInt(dataFlags.guessRows)
+        //выбираем случайный столбец и запоминаем его  в классе данных, чтобы не потерять при повороте
+        dataFlags.column = random.nextInt(2)
+
         //очистка списка кнопок с неправильными ответами
         dataFlags.buttonNotWellAnswerList.clear()
         // Получение  следующей страны для угадывания флага

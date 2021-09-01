@@ -48,7 +48,7 @@ class FlagsFragment: Fragment(){
     private lateinit var guessButton:Button  // текущая кнопка ответа
     private lateinit var progressBarFlags:ProgressBar
     private var guessLinearLayouts : Array<LinearLayout?> = arrayOfNulls(3) //кнопки ответов
-    private var random : SecureRandom = SecureRandom()
+
     private lateinit var chipGroup:ChipGroup
     private lateinit var navController:NavController
 
@@ -138,11 +138,7 @@ class FlagsFragment: Fragment(){
         answerTextView.text = "" //не показывать пока ответ
         showNextCountryFlag(data)  //svg изображение флага data
         showAnswerButtonsNumberAndNames(data)// Добавление кнопок
-        //выбираем случайную строку и запоминаем её  в классе данных, чтобы не потерять при повороте
-        data.row = random.nextInt(data.guessRows)
-        //выбираем случайный столбец и запоминаем его  в классе данных, чтобы не потерять при повороте
-        data.column = random.nextInt(2)
-        showCorrectAnswerButtom(data)
+        showCorrectAnswerButtom(data) //вешаем правильный ответ на случайную кнопку
     }
 
     //неправильный ответ
@@ -198,6 +194,7 @@ class FlagsFragment: Fragment(){
         }
     }
 
+    //вешаем правильный ответ на случайную кнопку
     private fun showCorrectAnswerButtom(data: DataFlags) {
         // Получение строки LinearLayouts
         val randomRow = guessLinearLayouts[data.row]
