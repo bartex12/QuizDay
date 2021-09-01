@@ -74,8 +74,8 @@ class RegionFragment : Fragment(),
                         listOfRegionStates = data.listStatesFromNet  // полный список стран
                         region = data.region //текущий регион
                         chipGroupRegion.check(getRegionId(region))
-
-                       // renderDataWithRegion(region)
+                        //не убирать эту строку иначе при повороте данные пропадают!
+                        renderDataWithRegion(region)
                     })
         }
 

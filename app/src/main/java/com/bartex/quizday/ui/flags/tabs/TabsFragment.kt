@@ -57,22 +57,4 @@ class TabsFragment: Fragment() {
         tabLayout =view.findViewById(R.id.tab_layout_flags)
 
     }
-//
-//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        super.onCreateOptionsMenu(menu, inflater)
-//        inflater.inflate(R.menu.main, menu)
-//    }
-//
-//    override fun onPrepareOptionsMenu(menu: Menu) {
-//        super.onPrepareOptionsMenu(menu)
-//        menu.findItem(R.id.action_help).isVisible = false
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        when (item.itemId) {
-//            R.id.action_settings ->
-//                navController.navigate(R.id.settingsFragment)
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
 }

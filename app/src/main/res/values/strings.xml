@@ -70,6 +70,6 @@
     <string name="send_answer">Отправить</string>
     <string name="answer">Ответ:</string>
     <string name="states">Страны</string>
-    <string name="resultDialog">ResaltDialog</string>
+    <string name="resultDialog">ResultDialog</string>
 
 </resources>

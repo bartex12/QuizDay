@@ -12,7 +12,7 @@ class ViewPageAdapter(fragmentManager : FragmentManager)
     companion object {
         const val FLAGS = 0
         const val STATES = 1
-        const val TRAINiNG = 2
+        const val MISTAKES = 2
     }
 
     private val fragments = arrayOf(
@@ -28,7 +28,7 @@ class ViewPageAdapter(fragmentManager : FragmentManager)
       return  when (position) {
             0 -> fragments[FLAGS]
             1 -> fragments[STATES]
-            2 -> fragments[TRAINiNG]
+            2 -> fragments[MISTAKES]
             else -> fragments[FLAGS]
         }
     }
@@ -37,7 +37,7 @@ class ViewPageAdapter(fragmentManager : FragmentManager)
         return  when(position){
             0->"Флаги"
             1->"Страны"
-            2->"Списки"
+            2->"Ошибки"
             else -> "Флаги"
         }
     }

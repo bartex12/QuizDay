@@ -14,10 +14,10 @@
         android:title="@string/action_settings"
         app:showAsAction="ifRoom" />
 
-    <item
-    android:id="@+id/action_help"
-    android:icon="@drawable/ic_baseline_help_outline_24"
-    android:orderInCategory="25"
-    android:title="@string/help"
-    app:showAsAction="never" />
+<!--    <item-->
+<!--    android:id="@+id/action_help"-->
+<!--    android:icon="@drawable/ic_baseline_help_outline_24"-->
+<!--    android:orderInCategory="25"-->
+<!--    android:title="@string/help"-->
+<!--    app:showAsAction="never" />-->
 </menu>
