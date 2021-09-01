@@ -34,7 +34,7 @@ class ResultDialog: DialogFragment() {
         )
         builder.setPositiveButton(R.string.reset_quiz) { _, _ ->
             flagsViewModel.resetQuiz()
-            dismiss()
+
         }
         return builder.create().apply {
             setCanceledOnTouchOutside(false)

@@ -69,7 +69,17 @@
     <fragment
         android:id="@+id/flagsFragment"
         android:name="com.bartex.quizday.ui.flags.FlagsFragment"
-        android:label="@string/flags" />
+        android:label="@string/flags" >
+        <action
+            android:id="@+id/action_flagsFragment_to_resultDialog"
+            app:destination="@id/resultDialog" />
+        <action
+            android:id="@+id/action_flagsFragment_to_helpFragment"
+            app:destination="@id/helpFragment" />
+        <action
+            android:id="@+id/action_flagsFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
     <dialog
         android:id="@+id/resultDialog"
         android:name="com.bartex.quizday.ui.flags.ResultDialog"
@@ -80,17 +90,27 @@
         android:label="@string/flags"
         tools:layout="@layout/fragment_tabs" >
         <action
-            android:id="@+id/action_tabsFragment_to_resultDialog"
-            app:destination="@id/resultDialog" />
+            android:id="@+id/action_tabsFragment_to_flagsFragment"
+            app:destination="@id/flagsFragment" />
         <action
-            android:id="@+id/action_tabsFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
+            android:id="@+id/action_tabsFragment_to_regionFragment"
+            app:destination="@id/regionFragment" />
         <action
             android:id="@+id/action_tabsFragment_to_helpFragment"
             app:destination="@id/helpFragment" />
+        <action
+            android:id="@+id/action_tabsFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/regionFragment"
         android:name="com.bartex.quizday.ui.flags.regions.RegionFragment"
-        android:label="@string/states" />
+        android:label="@string/states" >
+        <action
+            android:id="@+id/action_regionFragment_to_helpFragment"
+            app:destination="@id/helpFragment" />
+        <action
+            android:id="@+id/action_regionFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
 </navigation>

@@ -46,10 +46,10 @@ class TabsFragment: Fragment() {
 
         //устанавливаем текущую вкладку
         val tabPosition = arguments?.getInt(Constants.PAGER_POSITION, 0)
-        Log.d(TAG, "**-** TabsFragment onViewCreated  tabPosition = $tabPosition")
         tabPosition?. let{
             viewPager.currentItem = it
         }?: let{viewPager.currentItem = 0}
+        Log.d(TAG, "**-** TabsFragment onViewCreated  viewPager.currentItem = ${viewPager.currentItem}")
     }
 
     private fun initViews(view: View) {

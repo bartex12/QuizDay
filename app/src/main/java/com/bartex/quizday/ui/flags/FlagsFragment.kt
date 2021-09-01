@@ -53,11 +53,13 @@ class FlagsFragment: Fragment(){
     private lateinit var navController:NavController
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            return inflater.inflate(R.layout.fragment_flags, container, false)
+        Log.d(TAG, "FlagsFragment onCreateView")
+        return inflater.inflate(R.layout.fragment_flags, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "FlagsFragment onViewCreated")
 
         navController = Navigation.findNavController(view)
 
@@ -93,9 +95,15 @@ class FlagsFragment: Fragment(){
     // метод onStart вызывается после onViewCreated.
     override fun onStart() {
         super.onStart()
+        Log.d(TAG, "FlagsFragment onStart")
         flagsViewModel.updateSoundOnOff() //обновляем звук
         flagsViewModel.updateNumberFlagsInQuiz() //обновляем число вопросов в викторине
         updateGuessRows(flagsViewModel.getGuessRows()) //обновляем число выриантов ответов в викторине
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "FlagsFragment onResume")
     }
 
     private fun initChipGroupListener() {
@@ -129,12 +137,14 @@ class FlagsFragment: Fragment(){
 
     //состояние готовности к викторине - показываем первый флаг
     private fun showReadyState(data: DataFlags) {
+        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
         flagsViewModel.loadNextFlag(data)
     }
 
     //следующий вопрос
     private fun showNextFlagState(data: DataFlags) {
-        showCurrentQuestionNumber(data) //показать номер текущего вопроса
+        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        //showCurrentQuestionNumber(data) //показать номер текущего вопроса
         answerTextView.text = "" //не показывать пока ответ
         showNextCountryFlag(data)  //svg изображение флага data
         showAnswerButtonsNumberAndNames(data)// Добавление кнопок
@@ -144,7 +154,8 @@ class FlagsFragment: Fragment(){
     //неправильный ответ
     private fun showNotWellState(data: DataFlags) {
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
-        showCurrentQuestionNumber(data) //показать номер текущего вопроса
+        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        //showCurrentQuestionNumber(data) //показать номер текущего вопроса
         showIncorrectAnswer()//показать неправильный ответ
         //todo анимацию встряхивания сделать
         showNextCountryFlag(data) //svg изображение флага
@@ -155,7 +166,8 @@ class FlagsFragment: Fragment(){
     // Ответ правильный, но викторина не закончена
     private fun showWellNotLastState(data: DataFlags) {
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 50) }.start()
-        showCurrentQuestionNumber(data) //показать номер текущего вопроса
+        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        //showCurrentQuestionNumber(data) //показать номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons()  // Блокировка всех кнопок ответов
         handler.postDelayed(
@@ -168,7 +180,8 @@ class FlagsFragment: Fragment(){
     // Ответ правильный и викторина закончена
     private fun showWellAndLastState(data: DataFlags) {
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
-        showCurrentQuestionNumber(data) //показать номер текущего вопроса
+        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        //showCurrentQuestionNumber(data) //показать номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons() //сделать иконки недоступными
         showNextCountryFlag(data)  //svg изображение флага
@@ -186,6 +199,10 @@ class FlagsFragment: Fragment(){
         questionNumberTextView.text = getString(
                 R.string.question, data.correctAnswers, data.flagsInQuiz
         )
+    }
+
+    private fun getToolbarTitle(data: DataFlags):String {
+        return getString(R.string.question, data.correctAnswers, data.flagsInQuiz)
     }
 
     private fun showNextCountryFlag(data: DataFlags) {

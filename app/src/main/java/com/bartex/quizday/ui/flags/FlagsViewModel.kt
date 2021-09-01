@@ -53,6 +53,9 @@ class FlagsViewModel(
     private val currentQuizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
     //данные для RegionFragment - есть список из сети и регион, так как формируется в resetQuiz()
     private var dataFlagsToRegionFragment:MutableLiveData<DataFlags> = MutableLiveData<DataFlags>()
+    //заголовок тулбара во FlagFragment
+    private var toolbarTitleInFlags:MutableLiveData<String> = MutableLiveData<String>()
+
 
     private var dataFlags:DataFlags = DataFlags() // здесь храним данные для состояний конечного автомата
     private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
@@ -156,6 +159,14 @@ class FlagsViewModel(
 //передаём данные во фрагмент со списками стран регионов
     fun getDataFlagsToRegionFragment():LiveData<DataFlags>{
         return dataFlagsToRegionFragment
+    }
+
+    fun updateToolbarTitle(title:String){
+        toolbarTitleInFlags.value = title
+    }
+
+    fun getFlagsToolbarTitle():LiveData<String>{
+        return  toolbarTitleInFlags
     }
 
 }

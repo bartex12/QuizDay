@@ -75,7 +75,7 @@ class RegionFragment : Fragment(),
                         region = data.region //текущий регион
                         chipGroupRegion.check(getRegionId(region))
 
-                        renderDataWithRegion(region)
+                       // renderDataWithRegion(region)
                     })
         }
 
@@ -141,7 +141,7 @@ class RegionFragment : Fragment(),
             val manager = rvStatesRegion.layoutManager as LinearLayoutManager
             val firstPosition = manager.findFirstVisibleItemPosition()
             regionViewModel.savePositionState(firstPosition)
-            Log.d(TAG, "StatesFragment onPause firstPosition = $firstPosition")
+            Log.d(TAG, "RegionFragment onPause firstPosition = $firstPosition")
         }
 
         private fun initAdapter() {
@@ -165,7 +165,7 @@ class RegionFragment : Fragment(),
 
                 adapter?.listOfRegion = listOfStates
                 rvStatesRegion.layoutManager?.scrollToPosition(position) //крутим в запомненную позицию списка
-                Log.d(TAG, "StatesFragment renderState scrollToPosition = $position")
+                Log.d(TAG, "RegionFragment renderData scrollToPosition = $position")
             }
         }
 
@@ -193,7 +193,7 @@ class RegionFragment : Fragment(),
 
         override fun onQueryTextSubmit(query: String?): Boolean {
             //ничего не делаем - не будет фрагмента поиска, так как при вводе символов
-            //изменяется список внутри StatesFragment
+            //изменяется список внутри RegionFragment
             return false
         }
 
