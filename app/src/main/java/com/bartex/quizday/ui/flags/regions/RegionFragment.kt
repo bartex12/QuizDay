@@ -67,6 +67,8 @@ class RegionFragment : Fragment(),
             setHasOptionsMenu(true)
             requireActivity().invalidateOptionsMenu()
 
+            //чтобы получить текущий регион - сделал обмен данными через flagsViewModel
+            // во flagsViewModel в методе resetQuiz() кладём значение, а здесь принимаем
             flagsViewModel.getDataFlagsToRegionFragment()
                     .observe(viewLifecycleOwner, {data->
                         listOfRegionStates = data.listStatesFromNet  // полный список стран
