@@ -1,13 +1,14 @@
 package com.bartex.quizday.model.repositories.state.roomcash
 
-import androidx.room.Query
 import com.bartex.quizday.model.common.MapOfCapital
 import com.bartex.quizday.model.common.MapOfRegion
 import com.bartex.quizday.model.common.MapOfState
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.room.Database
 import com.bartex.quizday.room.tables.RoomState
+import com.google.gson.annotations.Expose
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 class RoomStateCash(val db:Database):IRoomStateCash {
 
@@ -41,6 +42,16 @@ class RoomStateCash(val db:Database):IRoomStateCash {
         }
     }
 
+    //получение списка всех стран (кроме отфильтрованных из-за неполных данных)
+    override fun getStatesFromDatabase(): Single<MutableList<State>> =
+        Single.fromCallable {
+            db.stateDao.getAll().map{
+                State(it.capital,it.flag, it.name, it.region,
+                        it.nameRus, it.capitalRus, it.regionRus
+                )
+            }.toMutableList()
+    } .subscribeOn(Schedulers.io())
+
     //получение списка стран с учётом региона (кроме отфильтрованных из-за неполных данных)
     override fun getRegionStatesFromCash(region: String): Single<List<State>>  {
         return Single.fromCallable {
@@ -52,12 +63,40 @@ class RoomStateCash(val db:Database):IRoomStateCash {
     }
 
     //сделать отметку об ошибке
-    override fun writeMistakeInDatabase(notWellAnswer: String) {
-        val mistakeState = db.stateDao.getFlagByStateRus(notWellAnswer) //получаем страну по имени
-        if (mistakeState.mistake ==0){ //если статус ошибки = 0
-            mistakeState.mistake = 1 //меняем статус ошибки на 1
-            db.stateDao.update(mistakeState) //обновляем запись в базе
-        }
-    }
+    override fun writeMistakeInDatabase(mistakeAnswer: String): Single<Boolean> =
+        //todo в базе ничего нет
+        Single.fromCallable {
+            val mistakeRoomState: RoomState = db.stateDao.getStateByNameRus(mistakeAnswer) //получаем страну по имени
+            if (mistakeRoomState.mistake == 0) { //если статус ошибки = 0
+                mistakeRoomState.mistake = 1 //меняем статус ошибки на 1
+               db.stateDao.update(mistakeRoomState) //обновляем запись в базе
+            }
+            //проверяем как прошла запись
+            val result:Int =  db.stateDao.getMistakeByNameRus(mistakeAnswer)
+            result == 1 //если 1 - возвращаем true, иначе false
+            }
+        .subscribeOn(Schedulers.io())
+
+
+    //получить список стран на которых сделаны ошибки
+    override fun getMistakesFromDatabase(): Single<List<State>> =
+            Single.fromCallable {
+              val listOfMistakes:List<RoomState> =  db.stateDao.getMistakesList()
+               val states =  listOfMistakes.map{
+                    State(it.capital, it.flag, it.name, it.region, it.nameRus, it.capitalRus, it.regionRus
+                    )
+                }
+                states
+            }
+                    .subscribeOn(Schedulers.io())
+
+    override fun isDatabaseFull(): Single<MutableList<State>> =
+         Single.fromCallable {
+            db.stateDao.getAll().map{
+                State(it.capital, it.flag, it.name, it.region, it.nameRus, it.capitalRus, it.regionRus)
+            }.toMutableList()
+         }.subscribeOn(Schedulers.io())
 
 }
+
+

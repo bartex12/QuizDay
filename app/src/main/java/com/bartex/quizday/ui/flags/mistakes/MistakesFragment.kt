@@ -7,6 +7,7 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -20,6 +21,7 @@ import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.RegionAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
 import com.bartex.quizday.ui.flags.FlagsViewModel
+import com.bartex.quizday.ui.flags.StatesSealed
 import com.bartex.quizday.ui.flags.regions.RegionViewModel
 import com.google.android.material.chip.ChipGroup
 import java.util.*
@@ -43,17 +45,21 @@ class MistakesFragment: Fragment(),
     private lateinit  var emptyViewMistake: TextView
     private lateinit var chipGroupMistake: ChipGroup
     private var region:String = ""
+    private var mistakeAnswer:String = "Афганистан"
+
 
     companion object {
         const val TAG = "33333"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        Log.d(TAG, "MistakesFragment onCreateView ")
         return inflater.inflate(R.layout.fragment_mistakes, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "MistakesFragment onViewCreated ")
 
         navController = Navigation.findNavController(view)
 
@@ -69,15 +75,22 @@ class MistakesFragment: Fragment(),
         setHasOptionsMenu(true)
         requireActivity().invalidateOptionsMenu()
 
-        flagsViewModel.getDataFlagsToRegionFragment()
+        mistakesViewModel.getMistakes()
                 .observe(viewLifecycleOwner, {data->
-                    //todo получение из базы данных
-                    listOfMistakeStates = mutableListOf<State>() /*data.listStatesFromNet  // полный список стран*/
-                    region = data.region //текущий регион
-                    chipGroupMistake.check(getRegionId(region))
-                    //не убирать эту строку иначе при повороте данные пропадают!
-                    renderDataWithRegion(region)
+                    when(data){
+                        is StatesSealed.Success -> {
+                            chipGroupMistake.check(R.id.chip_all_region)
+                            //список стран на которых были сделаны ошибки
+                            listOfMistakeStates = data.states as MutableList<State>
+                            renderData(listOfMistakeStates)
+                        }
+                        is StatesSealed.Error ->{
+                            Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT).show()
+                        }
+                        is StatesSealed.Loading -> {}
+                    }
                 })
+
     }
 
 
@@ -94,20 +107,6 @@ class MistakesFragment: Fragment(),
             val newRegion: String = getRegionName(id)
 
             renderDataWithRegion(newRegion)
-        }
-    }
-
-    private fun renderDataWithRegion(newRegion: String) {
-        when (newRegion) {
-            Constants.REGION_ALL -> {
-                renderData(listOfMistakeStates)
-            }
-            else -> {
-                val filteredList = listOfMistakeStates.filter { state ->
-                    state.regionRus == newRegion
-                } as MutableList<State>
-                renderData(filteredList)
-            }
         }
     }
 
@@ -154,19 +153,33 @@ class MistakesFragment: Fragment(),
         rvStatesMistake.adapter = adapter
     }
 
-    private fun renderData(listOfStates:MutableList<State>) {
-        if(listOfStates.isEmpty()){
+    private fun renderData(listOfMistakeStates:MutableList<State>) {
+        if(listOfMistakeStates.isEmpty()){
             rvStatesMistake.visibility = View.GONE
             emptyViewMistake.visibility = View.VISIBLE
         }else{
             rvStatesMistake.visibility =  View.VISIBLE
             emptyViewMistake.visibility = View.GONE
 
-            listOfStates.sortBy { it.nameRus }
+            listOfMistakeStates.sortBy { it.nameRus }
 
-            adapter?.listOfRegion = listOfStates
+            adapter?.listOfRegion = listOfMistakeStates
             rvStatesMistake.layoutManager?.scrollToPosition(position) //крутим в запомненную позицию списка
             Log.d(TAG, "MistakesFragment renderData scrollToPosition = $position")
+        }
+    }
+
+    private fun renderDataWithRegion(newRegion: String) {
+        when (newRegion) {
+            Constants.REGION_ALL -> {
+                renderData(listOfMistakeStates)
+            }
+            else -> {
+                val filteredList = listOfMistakeStates.filter { state ->
+                    state.regionRus == newRegion
+                } as MutableList<State>
+                renderData(filteredList)
+            }
         }
     }
 

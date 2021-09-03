@@ -40,7 +40,6 @@ class FlagsFragment: Fragment(){
 
     private lateinit var handler : Handler   // Для задержки загрузки следующего флага
     private lateinit var quizLinearLayout  : LinearLayout // root макета фрагмента
-    private lateinit var questionNumberTextView  : TextView   //для номера текущего вопрос
     private lateinit var answerTextView : TextView  //для правильного ответа
     private lateinit var flagImageView  : ImageView  //Для вывода флага
     private lateinit var guessButton:Button  // текущая кнопка ответа
@@ -69,15 +68,24 @@ class FlagsFragment: Fragment(){
 
         val  isNetworkAvailable = (requireActivity() as MainActivity).getNetworkAvailable()
 
-        //при первом обращении получаем список стран из сети , при поворотах экрана - из ViewModel
+        //при первом запуске при налиции интернета получаем список стран из сети и заполняем базу данных
+        //затем данные получаем из базы
         if (savedInstanceState == null){
-            //получаем страны из сети и после этого запускаем викторину
-            flagsViewModel.getStatesSealed(isNetworkAvailable)
-                    .observe(viewLifecycleOwner,  {
-                        renderData(it)
-                    })
-            //выделение на Европу при перврй загрузке
+            //выделение на Европу при перврй загрузке (можно также запоминать в Pref)
             chipGroup.check(R.id.chip_Europa)
+
+            flagsViewModel.getDatabaseSize()
+                    .observe(viewLifecycleOwner, {
+                        if (it.size >200){
+                            renderDataFromDatabase(it)
+                        }else{
+                            //получаем страны из сети и после этого запускаем викторину
+                            flagsViewModel.getStatesSealed(isNetworkAvailable)
+                                    .observe(viewLifecycleOwner,  {
+                                        renderData(it)
+                                    })
+                        }
+                    })
         }
 
         //следим за состоянием конечного автомата
@@ -88,6 +96,7 @@ class FlagsFragment: Fragment(){
                     Log.d(TAG, "FlagsFragment onViewCreated: newQuizState = $newQuizState")
                 })
     }
+
 
     // метод onStart вызывается после onViewCreated.
     override fun onStart() {
@@ -128,6 +137,17 @@ class FlagsFragment: Fragment(){
 
     //состояние готовности к викторине - показываем первый флаг
     private fun showReadyState(data: DataFlags) {
+//        val regionSize = data.listStatesFromNet.filter {
+//            it.regionRus == data.region
+//        }.size
+//
+//        for (i in 0 until chipGroup.size ){
+//           if( chipGroup.getChildAt(i).isPressed) {
+//               var name:String = chipGroup.getChildAt(i).textView.text.toString()
+//               name += regionSize.toString()
+//           }
+//        }
+
         flagsViewModel.loadNextFlag(data)
     }
 
@@ -142,6 +162,7 @@ class FlagsFragment: Fragment(){
 
     //неправильный ответ
     private fun showNotWellState(data: DataFlags) {
+        flagsViewModel.writeMistakeInDatabase() //делаем отметку об ошибке в базе данных
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
         flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
         showIncorrectAnswer()//показать неправильный ответ
@@ -288,6 +309,13 @@ class FlagsFragment: Fragment(){
         }
     }
 
+    private fun renderDataFromDatabase(data: List<State>?) {
+        //сохраняем список стран во ViewModel на время жизни фрагмента
+        flagsViewModel.saveListOfStates(data as MutableList<State>)
+        //переводим конечный автомат в состояние ReadyState
+        flagsViewModel.resetQuiz()
+    }
+    
     private val guessButtonListener:   View.OnClickListener =   View.OnClickListener { v ->
        guessButton = v as Button //нажатая кнопка ответа
         val guess = guessButton.text.toString() //ответ как текст на кнопке

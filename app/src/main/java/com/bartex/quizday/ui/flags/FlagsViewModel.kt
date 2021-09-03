@@ -1,5 +1,7 @@
 package com.bartex.quizday.ui.flags
 
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,6 +27,7 @@ import com.bartex.quizday.room.Database
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Single
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -49,6 +52,8 @@ class FlagsViewModel(
 
     //список стран из сети
     private val listStatesFromNet = MutableLiveData<StatesSealed>()
+    //список стран из базы
+    private val listStatesFromDatabase = MutableLiveData<MutableList<State>>()
     //состояние конечного автомата
     private val currentQuizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
     //данные для RegionFragment - есть список из сети и регион, так как формируется в resetQuiz()
@@ -113,6 +118,7 @@ class FlagsViewModel(
     fun loadNextFlag(dataFlags:DataFlags){
         this.dataFlags =  storage.loadNextFlag(dataFlags)
         currentQuizState.value =  currentState.executeAction(Action.OnNextFlagClicked(this.dataFlags))
+
     }
 
     //по типу ответа при щелчке по кнопке задаём состояние
@@ -121,7 +127,6 @@ class FlagsViewModel(
         when(dataFlags.typeAnswer){
             Answer.NotWell -> {
                 currentQuizState.value = currentState.executeAction(Action.OnNotWellClicked(dataFlags))
-                roomCash.writeMistakeInDatabase(guess)
             }
             Answer.WellNotLast -> {
                 currentQuizState.value =  currentState.executeAction(Action.OnWellNotLastClicked(dataFlags))
@@ -132,8 +137,20 @@ class FlagsViewModel(
         }
     }
 
-    private fun writeMistakeInDatabase(guess: String) {
-
+    fun writeMistakeInDatabase() {
+        dataFlags.correctAnswer?. let{
+            roomCash.writeMistakeInDatabase(it)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ isMistakeWriten ->
+                    if (isMistakeWriten) {
+                        Log.d(TAG, "writeMistakeInDatabase: ")
+                    }else{
+                        Log.d(TAG, "NOT write ")
+                    }
+                }, {
+                    Log.d(TAG, "${it.message}")
+                })
+        }
     }
 
     //обновить настройки звука
@@ -180,4 +197,33 @@ class FlagsViewModel(
         return  toolbarTitleInFlags
     }
 
+    fun getDatabaseSize(): LiveData<MutableList<State>>{
+        isDatabaseFull()
+        return listStatesFromDatabase
+    }
+
+
+    private fun isDatabaseFull() {
+        roomCash.isDatabaseFull()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    listStatesFromDatabase.value = it
+                },{
+                    Log.d(TAG, "${it.message}")
+                })
+    }
+    fun getStatesFromDatabase(): LiveData<MutableList<State>>{
+       roomCash.getStatesFromDatabase()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    listStatesFromDatabase.value = it
+                },{
+                    Log.d(TAG, "${it.message}")
+                })
+        return listStatesFromDatabase
+    }
+
+    companion object{
+    const val TAG = "33333"
+}
 }

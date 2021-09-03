@@ -71,5 +71,7 @@
     <string name="answer">Ответ:</string>
     <string name="states">Страны</string>
     <string name="resultDialog">ResultDialog</string>
+    <string name="drawer_name">Quizday - знания на ладони</string>
+    <string name="drawer_header_subtitle">Развлекательн-познавательная викторина</string>
 
 </resources>
