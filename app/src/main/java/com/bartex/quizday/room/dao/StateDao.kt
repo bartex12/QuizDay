@@ -1,5 +1,6 @@
 package com.bartex.quizday.room.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.bartex.quizday.room.tables.RoomState
 
@@ -53,4 +54,7 @@ interface StateDao {
 
     @Query("SELECT*FROM RoomState WHERE mistake = 1")
     fun getMistakesList():List<RoomState>
+
+    @Query("SELECT*FROM RoomState WHERE mistake = 1")
+    fun getAllMistakesLive():LiveData<List<RoomState>>
 }

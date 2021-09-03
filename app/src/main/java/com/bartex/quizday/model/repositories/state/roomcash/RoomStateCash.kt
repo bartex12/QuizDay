@@ -1,5 +1,7 @@
 package com.bartex.quizday.model.repositories.state.roomcash
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import com.bartex.quizday.model.common.MapOfCapital
 import com.bartex.quizday.model.common.MapOfRegion
 import com.bartex.quizday.model.common.MapOfState
@@ -32,17 +34,6 @@ class RoomStateCash(val db:Database):IRoomStateCash {
     }
 
     //получение списка всех стран (кроме отфильтрованных из-за неполных данных)
-    override fun getStatesFromCash(): Single<List<State>> {
-        return Single.fromCallable {
-            db.stateDao.getAll().map{
-                State(it.capital,it.flag, it.name, it.region,
-                    it.nameRus, it.capitalRus, it.regionRus
-                )
-            }
-        }
-    }
-
-    //получение списка всех стран (кроме отфильтрованных из-за неполных данных)
     override fun getStatesFromDatabase(): Single<MutableList<State>> =
         Single.fromCallable {
             db.stateDao.getAll().map{
@@ -53,14 +44,14 @@ class RoomStateCash(val db:Database):IRoomStateCash {
     } .subscribeOn(Schedulers.io())
 
     //получение списка стран с учётом региона (кроме отфильтрованных из-за неполных данных)
-    override fun getRegionStatesFromCash(region: String): Single<List<State>>  {
-        return Single.fromCallable {
+    override fun getRegionStatesFromCash(region: String): Single<List<State>>  =
+        Single.fromCallable {
             db.stateDao.getRegionStates(region).map{
                 State(it.capital,it.flag, it.name, it.region,
                         it.nameRus, it.capitalRus, it.regionRus )
             }
         }
-    }
+            .subscribeOn(Schedulers.io())
 
     //сделать отметку об ошибке
     override fun writeMistakeInDatabase(mistakeAnswer: String): Single<Boolean> =
@@ -89,6 +80,10 @@ class RoomStateCash(val db:Database):IRoomStateCash {
                 states
             }
                     .subscribeOn(Schedulers.io())
+
+    override fun getAllMistakesLive(): LiveData<List<RoomState>> {
+        return db.stateDao.getAllMistakesLive()
+    }
 
     override fun isDatabaseFull(): Single<MutableList<State>> =
          Single.fromCallable {

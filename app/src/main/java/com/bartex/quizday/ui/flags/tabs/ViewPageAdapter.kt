@@ -12,14 +12,14 @@ class ViewPageAdapter(fragmentManager : FragmentManager)
 
     companion object {
         const val FLAGS = 0
-        const val STATES = 1
-        const val MISTAKES = 2
+        const val MISTAKES = 1
+        const val STATES = 2
     }
 
     private val fragments = arrayOf(
             FlagsFragment(),
+            MistakesFragment(),
             RegionFragment(),
-            MistakesFragment()
     )
 
     override fun getCount(): Int {
@@ -29,8 +29,8 @@ class ViewPageAdapter(fragmentManager : FragmentManager)
     override fun getItem(position: Int): Fragment {
       return  when (position) {
             0 -> fragments[FLAGS]
-            1 -> fragments[STATES]
-            2 -> fragments[MISTAKES]
+            1 -> fragments[MISTAKES]
+            2 -> fragments[STATES]
             else -> fragments[FLAGS]
         }
     }
@@ -38,8 +38,8 @@ class ViewPageAdapter(fragmentManager : FragmentManager)
     override fun getPageTitle(position: Int): CharSequence {
         return  when(position){
             0->"Флаги"
-            1->"Страны"
-            2->"Ошибки"
+            1->"Ошибки"
+            2->"Страны"
             else -> "Флаги"
         }
     }

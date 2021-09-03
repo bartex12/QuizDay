@@ -31,6 +31,8 @@
     <string name="dialog_title_device_is_offline">Нет соединения с Интернетом</string>
     <string name="dialog_message_device_is_offline">Вы не сможете эффективно использовать приложение
         без подключения к Интернету. Пожалуйста, проверьте интернет-соединение</string>
+    <string name="dialog_message_load_impossible">Для первоначальной загрузки данных требуется Интернет.
+        Пожалуйста, проверьте интернет-соединение</string>
     <string name="dialog_title_stub">Неизвестная ошибка</string>
     <string name="dialog_button_cancel">Понятно</string>
     <string name="flags_of_states">Флаги стран мира</string>

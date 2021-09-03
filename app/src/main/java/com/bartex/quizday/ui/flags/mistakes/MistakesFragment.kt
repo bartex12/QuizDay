@@ -40,7 +40,7 @@ class MistakesFragment: Fragment(),
     private val flagsViewModel by lazy {
         ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
     }
-    private var listOfMistakeStates  = mutableListOf<State>() //список стран региона
+    private var listOfMistakeStates  = mutableListOf<State>() //список стран региона с ошибками
     private lateinit var rvStatesMistake: RecyclerView
     private lateinit  var emptyViewMistake: TextView
     private lateinit var chipGroupMistake: ChipGroup
@@ -70,27 +70,22 @@ class MistakesFragment: Fragment(),
         initAdapter()
         initChipGroupListener()
 
-        //приводим меню тулбара в соответствии с onPrepareOptionsMenu в MainActivity
-        //без этой строки меню в тулбаре ведёт себя неправильно
         setHasOptionsMenu(true)
         requireActivity().invalidateOptionsMenu()
 
-        mistakesViewModel.getMistakes()
-                .observe(viewLifecycleOwner, {data->
-                    when(data){
-                        is StatesSealed.Success -> {
-                            chipGroupMistake.check(R.id.chip_all_region)
-                            //список стран на которых были сделаны ошибки
-                            listOfMistakeStates = data.states as MutableList<State>
-                            renderData(listOfMistakeStates)
-                        }
-                        is StatesSealed.Error ->{
-                            Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT).show()
-                        }
-                        is StatesSealed.Loading -> {}
-                    }
+        //получаем все ошибки автоматически при любом изменении в базе данных
+        mistakesViewModel.getAllMistakesLive()
+                .observe(viewLifecycleOwner, {
+                    listOfMistakeStates =   it.map {room->
+                        State(capital =room.capital, flag = room.flag,name =room.name,
+                            region = room.region, nameRus = room.nameRus,
+                            capitalRus = room.capitalRus, regionRus = room.regionRus
+                        )
+                    } as MutableList<State>
+                    chipGroupMistake.check(R.id.chip_all_mistakes)
+                    //mistakesViewModel.saveMistakesList(listOfMistakeStates)
+                    renderDataWithRegion(Constants.REGION_ALL)
                 })
-
     }
 
 
@@ -101,36 +96,15 @@ class MistakesFragment: Fragment(),
 
     }
 
-    private fun initChipGroupListener() {
-        chipGroupMistake.setOnCheckedChangeListener { _, id ->
-            chipGroupMistake.check(id)
-            val newRegion: String = getRegionName(id)
-
-            renderDataWithRegion(newRegion)
-        }
-    }
-
     private fun getRegionName(id: Int): String {
         return when (id) {
-            R.id.chip_all_region -> Constants.REGION_ALL
-            R.id.chip_Europa_region -> Constants.REGION_EUROPE
-            R.id.chip_Asia_region -> Constants.REGION_ASIA
-            R.id.chip_America_region -> Constants.REGION_AMERICAS
-            R.id.chip_Oceania_region -> Constants.REGION_OCEANIA
-            R.id.chip_Africa_region -> Constants.REGION_AFRICA
+            R.id.chip_all_mistakes -> Constants.REGION_ALL
+            R.id.chip_Europa_mistakes -> Constants.REGION_EUROPE
+            R.id.chip_Asia_mistakes -> Constants.REGION_ASIA
+            R.id.chip_America_mistakes -> Constants.REGION_AMERICAS
+            R.id.chip_Oceania_mistakes -> Constants.REGION_OCEANIA
+            R.id.chip_Africa_mistakes -> Constants.REGION_AFRICA
             else -> Constants.REGION_EUROPE
-        }
-    }
-
-    private fun getRegionId(region: String): Int {
-        return when (region) {
-            Constants.REGION_ALL -> R.id.chip_all_region
-            Constants.REGION_EUROPE -> R.id.chip_Europa_region
-            Constants.REGION_ASIA -> R.id.chip_Asia_region
-            Constants.REGION_AMERICAS -> R.id.chip_America_region
-            Constants.REGION_OCEANIA -> R.id.chip_Oceania_region
-            Constants.REGION_AFRICA -> R.id.chip_Africa_region
-            else -> R.id.chip_Europa_region
         }
     }
 
@@ -178,8 +152,18 @@ class MistakesFragment: Fragment(),
                 val filteredList = listOfMistakeStates.filter { state ->
                     state.regionRus == newRegion
                 } as MutableList<State>
+
                 renderData(filteredList)
             }
+        }
+    }
+
+    private fun initChipGroupListener() {
+        chipGroupMistake.setOnCheckedChangeListener { _, id ->
+            chipGroupMistake.check(id)
+            val newRegion: String = getRegionName(id)
+            //mistakesViewModel.saveNewRegion(newRegion)
+            renderDataWithRegion(newRegion)
         }
     }
 

@@ -77,15 +77,15 @@ class FlagsViewModel(
        isNeedToCreateDialog = isNeed
     }
 
-    fun getStatesSealed(isNetworkAvailable:Boolean) : LiveData<StatesSealed> {
-        loadDataSealed(isNetworkAvailable)
+    fun getStatesSealed() : LiveData<StatesSealed> {
+        loadDataSealed()
         return listStatesFromNet
     }
 
-    private fun loadDataSealed(isNetworkAvailable:Boolean){
+    private fun loadDataSealed(){
         listStatesFromNet.value = StatesSealed.Loading(0)
 
-        statesRepo.getStates(isNetworkAvailable)
+        statesRepo.getStates()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({states->
                 listStatesFromNet.value = StatesSealed.Success(states = states)
@@ -178,6 +178,21 @@ class FlagsViewModel(
     fun getRegion( ):String{
       return  region
     }
+    fun getRegionNameAndNumber( data: DataFlags):String{
+        var regionSize = 0
+        regionSize = when (region) {
+            Constants.REGION_ALL -> {
+                data.listStatesFromNet.size
+            }
+            else -> {
+                data.listStatesFromNet.filter {
+                    it.regionRus == data.region
+                }.size
+            }
+        }
+        return  "$region $regionSize"
+    }
+
 
     //сохраняем текущее состояние
     fun saveCurrentState( newState:IFlagState){

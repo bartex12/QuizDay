@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -22,8 +23,11 @@ import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.IFlagState
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.substates.*
+import com.bartex.quizday.network.NoInternetDialogFragment
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
+import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import kotlinx.android.synthetic.main.nav_header_main.view.*
 
 class FlagsFragment: Fragment(){
 
@@ -76,14 +80,22 @@ class FlagsFragment: Fragment(){
 
             flagsViewModel.getDatabaseSize()
                     .observe(viewLifecycleOwner, {
-                        if (it.size >200){
-                            renderDataFromDatabase(it)
-                        }else{
-                            //получаем страны из сети и после этого запускаем викторину
-                            flagsViewModel.getStatesSealed(isNetworkAvailable)
-                                    .observe(viewLifecycleOwner,  {
-                                        renderData(it)
-                                    })
+                        if (it.size >200){ //если в базе есть записи
+                            renderDataFromDatabase(it)  //берём из базы
+                        }else{ //если в базе ничего нет
+                            if (isNetworkAvailable){ //если сеть есть
+                                //получаем страны из сети и после этого запускаем викторину
+                                flagsViewModel.getStatesSealed()
+                                        .observe(viewLifecycleOwner,  {
+                                            renderData(it)
+                                        })
+                            }else{//если нет ни сети ни данных в базе - показываем предупреждение
+                                showAlertDialog(
+                                        getString(R.string.dialog_title_device_is_offline),
+                                        getString(R.string.dialog_message_load_impossible)
+                                )
+                            }
+
                         }
                     })
         }
@@ -95,6 +107,11 @@ class FlagsFragment: Fragment(){
                     renderViewState(newQuizState)
                     Log.d(TAG, "FlagsFragment onViewCreated: newQuizState = $newQuizState")
                 })
+    }
+
+    private fun showAlertDialog(title: String?, message: String?) {
+        NoInternetDialogFragment.newInstance(title, message)
+                .show(requireActivity().supportFragmentManager, Constants.DIALOG_FRAGMENT)
     }
 
 
@@ -109,15 +126,7 @@ class FlagsFragment: Fragment(){
 
     private fun initChipGroupListener() {
         chipGroup.setOnCheckedChangeListener { _, id ->
-            val newRegion:String = when (id) {
-                R.id.chip_all-> Constants.REGION_ALL
-                R.id.chip_Europa -> Constants.REGION_EUROPE
-                R.id.chip_Asia -> Constants.REGION_ASIA
-                R.id.chip_America-> Constants.REGION_AMERICAS
-                R.id.chip_Oceania -> Constants.REGION_OCEANIA
-                R.id.chip_Africa -> Constants.REGION_AFRICA
-                else -> Constants.REGION_EUROPE
-            }
+            val newRegion:String = getChipNameById(id)
             if (newRegion != flagsViewModel.getRegion()){
                 flagsViewModel.saveRegion(newRegion)
                 flagsViewModel.resetQuiz()
@@ -137,22 +146,13 @@ class FlagsFragment: Fragment(){
 
     //состояние готовности к викторине - показываем первый флаг
     private fun showReadyState(data: DataFlags) {
-//        val regionSize = data.listStatesFromNet.filter {
-//            it.regionRus == data.region
-//        }.size
-//
-//        for (i in 0 until chipGroup.size ){
-//           if( chipGroup.getChildAt(i).isPressed) {
-//               var name:String = chipGroup.getChildAt(i).textView.text.toString()
-//               name += regionSize.toString()
-//           }
-//        }
-
+        getNumberOnChipName(data) //показываем количество стран в регионе
         flagsViewModel.loadNextFlag(data)
     }
 
     //следующий вопрос
     private fun showNextFlagState(data: DataFlags) {
+        getNumberOnChipName(data)//показываем количество стран в регионе
         flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
         answerTextView.text = "" //не показывать пока ответ
         showNextCountryFlag(data)  //svg изображение флага data
@@ -162,6 +162,7 @@ class FlagsFragment: Fragment(){
 
     //неправильный ответ
     private fun showNotWellState(data: DataFlags) {
+        getNumberOnChipName(data)//показываем количество стран в регионе
         flagsViewModel.writeMistakeInDatabase() //делаем отметку об ошибке в базе данных
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
         flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
@@ -174,6 +175,7 @@ class FlagsFragment: Fragment(){
 
     // Ответ правильный, но викторина не закончена
     private fun showWellNotLastState(data: DataFlags) {
+        getNumberOnChipName(data)//показываем количество стран в регионе
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 50) }.start()
         flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
@@ -187,6 +189,7 @@ class FlagsFragment: Fragment(){
 
     // Ответ правильный и викторина закончена
     private fun showWellAndLastState(data: DataFlags) {
+        getNumberOnChipName(data)//показываем количество стран в регионе
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
         flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
@@ -315,7 +318,7 @@ class FlagsFragment: Fragment(){
         //переводим конечный автомат в состояние ReadyState
         flagsViewModel.resetQuiz()
     }
-    
+
     private val guessButtonListener:   View.OnClickListener =   View.OnClickListener { v ->
        guessButton = v as Button //нажатая кнопка ответа
         val guess = guessButton.text.toString() //ответ как текст на кнопке
@@ -342,4 +345,30 @@ class FlagsFragment: Fragment(){
             guessLinearLayouts[row]?.visibility = View.VISIBLE
         }
     }
+
+    private fun getNumberOnChipName(data: DataFlags) {
+        for (i in 0 until chipGroup.childCount) {
+            val chip = chipGroup.getChildAt(i) as Chip
+            var regionName = ""
+            regionName = if (chip.isChecked) {
+                flagsViewModel.getRegionNameAndNumber(data)
+            }else{
+                getChipNameById(chip.id)
+            }
+            chip.text = regionName
+        }
+    }
+
+    private fun getChipNameById(chipId: Int):String {
+      return  when (chipId) {
+            R.id.chip_all -> Constants.REGION_ALL
+            R.id.chip_Europa -> Constants.REGION_EUROPE
+            R.id.chip_Asia -> Constants.REGION_ASIA
+            R.id.chip_America -> Constants.REGION_AMERICAS
+            R.id.chip_Oceania -> Constants.REGION_OCEANIA
+            R.id.chip_Africa -> Constants.REGION_AFRICA
+            else -> Constants.REGION_EUROPE
+        }
+    }
+
 }

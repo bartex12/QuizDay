@@ -64,8 +64,6 @@ class RegionFragment : Fragment(),
             initAdapter()
             initChipGroupListener()
 
-            //приводим меню тулбара в соответствии с onPrepareOptionsMenu в MainActivity
-            //без этой строки меню в тулбаре ведёт себя неправильно
             setHasOptionsMenu(true)
             requireActivity().invalidateOptionsMenu()
 
@@ -91,7 +89,6 @@ class RegionFragment : Fragment(),
             chipGroupRegion.setOnCheckedChangeListener { _, id ->
                 chipGroupRegion.check(id)
                 val newRegion: String = getRegionName(id)
-
                 renderDataWithRegion(newRegion)
             }
         }
