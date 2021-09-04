@@ -31,13 +31,7 @@ class RegionAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.bind(sort(listOfRegion)[position])
-    }
-
-    private fun sort(listOfRegion: MutableList<State>):List<State>{
-        return listOfRegion.sortedBy {
-            it.nameRus
-        }
+        holder.bind(listOfRegion[position])
     }
 
     override fun getItemCount(): Int {

@@ -161,8 +161,8 @@ class RegionFragment : Fragment(),
                 emptyViewRegion.visibility = View.GONE
 
                 listOfStates.sortBy { it.nameRus }
-
                 adapter?.listOfRegion = listOfStates
+
                 rvStatesRegion.layoutManager?.scrollToPosition(position) //крутим в запомненную позицию списка
                 Log.d(TAG, "RegionFragment renderData scrollToPosition = $position")
             }

@@ -57,4 +57,5 @@ interface StateDao {
 
     @Query("SELECT*FROM RoomState WHERE mistake = 1")
     fun getAllMistakesLive():LiveData<List<RoomState>>
+
 }

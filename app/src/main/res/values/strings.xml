@@ -75,5 +75,7 @@
     <string name="resultDialog">ResultDialog</string>
     <string name="drawer_name">Quizday - знания на ладони</string>
     <string name="drawer_header_subtitle">Развлекательн-познавательная викторина</string>
+    <string name="header">Заголовок</string>
+    <string name="stateName">Название страны</string>
 
 </resources>

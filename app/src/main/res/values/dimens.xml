@@ -11,4 +11,8 @@
 
     <dimen name="spacing">8dp</dimen>
     <dimen name="answer_size">24sp</dimen>
+
+    <dimen name="layout_margin_4dp">4dp</dimen>
+    <dimen name="layout_margin_8dp">8dp</dimen>
+    <dimen name="layout_margin_16dp">16dp</dimen>
 </resources>

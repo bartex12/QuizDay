@@ -55,7 +55,6 @@ class RoomStateCash(val db:Database):IRoomStateCash {
 
     //сделать отметку об ошибке
     override fun writeMistakeInDatabase(mistakeAnswer: String): Single<Boolean> =
-        //todo в базе ничего нет
         Single.fromCallable {
             val mistakeRoomState: RoomState = db.stateDao.getStateByNameRus(mistakeAnswer) //получаем страну по имени
             if (mistakeRoomState.mistake == 0) { //если статус ошибки = 0
@@ -68,6 +67,19 @@ class RoomStateCash(val db:Database):IRoomStateCash {
             }
         .subscribeOn(Schedulers.io())
 
+    //удалить отметку об ошибке
+    override fun removeMistakeFromDatabase(nameRus: String): Single<Boolean> =
+        Single.fromCallable {
+            val mistakeRoomState: RoomState = db.stateDao.getStateByNameRus(nameRus) //получаем страну по имени
+            if (mistakeRoomState.mistake == 1) { //если статус ошибки = 0
+                mistakeRoomState.mistake = 0 //меняем статус ошибки на 1
+                db.stateDao.update(mistakeRoomState) //обновляем запись в базе
+            }
+            //проверяем как прошло удаление отметки
+            val result:Int =  db.stateDao.getMistakeByNameRus(nameRus)
+            result == 0 //если 0 - возвращаем true, иначе false
+        }
+            .subscribeOn(Schedulers.io())
 
     //получить список стран на которых сделаны ошибки
     override fun getMistakesFromDatabase(): Single<List<State>> =
@@ -81,16 +93,17 @@ class RoomStateCash(val db:Database):IRoomStateCash {
             }
                     .subscribeOn(Schedulers.io())
 
-    override fun getAllMistakesLive(): LiveData<List<RoomState>> {
-        return db.stateDao.getAllMistakesLive()
-    }
-
     override fun loadAllData(): Single<MutableList<State>> =
          Single.fromCallable {
             db.stateDao.getAll().map{
                 State(it.capital, it.flag, it.name, it.region, it.nameRus, it.capitalRus, it.regionRus)
             }.toMutableList()
          }.subscribeOn(Schedulers.io())
+
+    override fun getAllMistakesLive(): LiveData<List<RoomState>> {
+        return db.stateDao.getAllMistakesLive()
+    }
+
 
 }
 

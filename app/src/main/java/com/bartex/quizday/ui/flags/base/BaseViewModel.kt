@@ -1,6 +1,5 @@
 package com.bartex.quizday.ui.flags.base
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bartex.quizday.App

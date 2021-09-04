@@ -93,7 +93,6 @@ class FlagsFragment: Fragment(){
                                         getString(R.string.dialog_message_load_impossible)
                                 )
                             }
-
                         }
                     })
         }

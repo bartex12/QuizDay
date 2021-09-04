@@ -18,8 +18,8 @@ class ViewPageAdapter(fragmentManager : FragmentManager)
 
     private val fragments = arrayOf(
             FlagsFragment(),
-            MistakesFragment(),
-            RegionFragment(),
+            MistakesFragment()/*,
+            RegionFragment(),*/
     )
 
     override fun getCount(): Int {

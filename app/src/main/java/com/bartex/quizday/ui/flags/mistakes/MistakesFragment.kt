@@ -1,14 +1,11 @@
 package com.bartex.quizday.ui.flags.mistakes
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.view.inputmethod.InputMethodManager
-import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -18,11 +15,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
-import com.bartex.quizday.ui.adapters.RegionAdapter
+import com.bartex.quizday.ui.adapters.MistakesAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
 import com.bartex.quizday.ui.flags.FlagsViewModel
-import com.bartex.quizday.ui.flags.StatesSealed
-import com.bartex.quizday.ui.flags.regions.RegionViewModel
+import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import java.util.*
 
@@ -30,7 +26,7 @@ class MistakesFragment: Fragment(),
         SearchView.OnQueryTextListener {
 
     private var position = 0
-    private var adapter: RegionAdapter? = null
+    private var adapter:  MistakesAdapter? = null
     private lateinit var navController: NavController
 
     private val mistakesViewModel by lazy{
@@ -44,9 +40,7 @@ class MistakesFragment: Fragment(),
     private lateinit var rvStatesMistake: RecyclerView
     private lateinit  var emptyViewMistake: TextView
     private lateinit var chipGroupMistake: ChipGroup
-    private var region:String = ""
-    private var mistakeAnswer:String = "Афганистан"
-
+    private var region:String = Constants.REGION_ALL
 
     companion object {
         const val TAG = "33333"
@@ -73,6 +67,16 @@ class MistakesFragment: Fragment(),
         setHasOptionsMenu(true)
         requireActivity().invalidateOptionsMenu()
 
+        //чтобы получить текущий регион - сделал обмен данными через flagsViewModel
+        // во flagsViewModel в методе resetQuiz() кладём значение, а здесь принимаем
+        flagsViewModel.getDataFlagsToRegionFragment()
+            .observe(viewLifecycleOwner, {data->
+                region = data.region //текущий регион
+                chipGroupMistake.check(getRegionId(region))
+                //не убирать эту строку иначе при повороте данные пропадают!
+                renderDataWithRegion(region)
+            })
+
         //получаем все ошибки автоматически при любом изменении в базе данных
         mistakesViewModel.getAllMistakesLive()
                 .observe(viewLifecycleOwner, {
@@ -82,8 +86,8 @@ class MistakesFragment: Fragment(),
                             capitalRus = room.capitalRus, regionRus = room.regionRus
                         )
                     } as MutableList<State>
-                    chipGroupMistake.check(R.id.chip_all_mistakes)
-                    renderDataWithRegion(Constants.REGION_ALL)
+                    chipGroupMistake.check(getRegionId(region))
+                    renderDataWithRegion(region)
                 })
     }
 
@@ -93,18 +97,6 @@ class MistakesFragment: Fragment(),
         emptyViewMistake = view.findViewById(R.id.empty_view_mistakes)
         chipGroupMistake = view.findViewById(R.id.chip_region_mistakes)
 
-    }
-
-    private fun getRegionName(id: Int): String {
-        return when (id) {
-            R.id.chip_all_mistakes -> Constants.REGION_ALL
-            R.id.chip_Europa_mistakes -> Constants.REGION_EUROPE
-            R.id.chip_Asia_mistakes -> Constants.REGION_ASIA
-            R.id.chip_America_mistakes -> Constants.REGION_AMERICAS
-            R.id.chip_Oceania_mistakes -> Constants.REGION_OCEANIA
-            R.id.chip_Africa_mistakes -> Constants.REGION_AFRICA
-            else -> Constants.REGION_EUROPE
-        }
     }
 
     //запоминаем  позицию списка, на которой сделан клик - на случай поворота экрана
@@ -119,10 +111,12 @@ class MistakesFragment: Fragment(),
 
     private fun initAdapter() {
         rvStatesMistake.layoutManager = LinearLayoutManager(requireActivity())
-        adapter = RegionAdapter(
-                getOnClickListener(),
+
+        adapter = MistakesAdapter(
+                getOnRemoveListener(),
                 SvgImageLoader(requireActivity())
         )
+
         rvStatesMistake.adapter = adapter
     }
 
@@ -134,9 +128,9 @@ class MistakesFragment: Fragment(),
             rvStatesMistake.visibility =  View.VISIBLE
             emptyViewMistake.visibility = View.GONE
 
-            listOfMistakeStates.sortBy { it.nameRus }
+            listOfMistakeStates.sortBy {it.nameRus}
+            adapter?.listOfMistakes = listOfMistakeStates
 
-            adapter?.listOfRegion = listOfMistakeStates
             rvStatesMistake.layoutManager?.scrollToPosition(position) //крутим в запомненную позицию списка
             Log.d(TAG, "MistakesFragment renderData scrollToPosition = $position")
         }
@@ -151,7 +145,6 @@ class MistakesFragment: Fragment(),
                 val filteredList = listOfMistakeStates.filter { state ->
                     state.regionRus == newRegion
                 } as MutableList<State>
-
                 renderData(filteredList)
             }
         }
@@ -159,20 +152,15 @@ class MistakesFragment: Fragment(),
 
     private fun initChipGroupListener() {
         chipGroupMistake.setOnCheckedChangeListener { _, id ->
-            chipGroupMistake.check(id)
             val newRegion: String = getRegionName(id)
             renderDataWithRegion(newRegion)
         }
     }
 
-    private fun getOnClickListener(): RegionAdapter.OnItemClickListener =
-            object : RegionAdapter.OnItemClickListener{
-                override fun onItemClick(state: State) {
-                    //чтобы сразу исчезала клавиатура а не после перехода в детали
-                    val inputManager: InputMethodManager =
-                            requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    inputManager.hideSoftInputFromWindow(
-                            requireActivity().currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+    private fun getOnRemoveListener(): MistakesAdapter.OnRemoveListener =
+            object: MistakesAdapter.OnRemoveListener{
+                override fun onRemove(nameRus: String) {
+                    mistakesViewModel.removeMistakeFromDatabase(nameRus)
                 }
             }
 
@@ -205,11 +193,35 @@ class MistakesFragment: Fragment(),
                         }
                     }
                 }
-                adapter?.listOfRegion = listSearched
+                adapter?.listOfMistakes = listSearched
             }else{
-                adapter?.listOfRegion = listOfMistakeStates
+                adapter?.listOfMistakes = listOfMistakeStates
             }
         }
         return false
+    }
+
+    private fun getRegionId(region: String): Int {
+        return when (region) {
+            Constants.REGION_ALL -> R.id.chip_all_mistakes
+            Constants.REGION_EUROPE -> R.id.chip_Europa_mistakes
+            Constants.REGION_ASIA -> R.id.chip_Asia_mistakes
+            Constants.REGION_AMERICAS -> R.id.chip_America_mistakes
+            Constants.REGION_OCEANIA -> R.id.chip_Oceania_mistakes
+            Constants.REGION_AFRICA -> R.id.chip_Africa_mistakes
+            else -> R.id.chip_Europa_region
+        }
+    }
+
+    private fun getRegionName(id: Int): String {
+        return when (id) {
+            R.id.chip_all_mistakes -> Constants.REGION_ALL
+            R.id.chip_Europa_mistakes -> Constants.REGION_EUROPE
+            R.id.chip_Asia_mistakes -> Constants.REGION_ASIA
+            R.id.chip_America_mistakes -> Constants.REGION_AMERICAS
+            R.id.chip_Oceania_mistakes -> Constants.REGION_OCEANIA
+            R.id.chip_Africa_mistakes -> Constants.REGION_AFRICA
+            else -> Constants.REGION_EUROPE
+        }
     }
 }
