@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -27,7 +26,6 @@ import com.bartex.quizday.network.NoInternetDialogFragment
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import kotlinx.android.synthetic.main.nav_header_main.view.*
 
 class FlagsFragment: Fragment(){
 
@@ -78,7 +76,7 @@ class FlagsFragment: Fragment(){
             //выделение на Европу при перврй загрузке (можно также запоминать в Pref)
             chipGroup.check(R.id.chip_Europa)
 
-            flagsViewModel.getDatabaseSize()
+            flagsViewModel.getDataFromDatabase()
                     .observe(viewLifecycleOwner, {
                         if (it.size >200){ //если в базе есть записи
                             renderDataFromDatabase(it)  //берём из базы

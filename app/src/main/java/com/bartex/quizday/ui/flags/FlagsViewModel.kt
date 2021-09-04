@@ -1,7 +1,6 @@
 package com.bartex.quizday.ui.flags
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -27,7 +26,6 @@ import com.bartex.quizday.room.Database
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Single
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -212,30 +210,19 @@ class FlagsViewModel(
         return  toolbarTitleInFlags
     }
 
-    fun getDatabaseSize(): LiveData<MutableList<State>>{
-        isDatabaseFull()
+    fun getDataFromDatabase(): LiveData<MutableList<State>>{
+        loadDataFromDatabase()
         return listStatesFromDatabase
     }
 
-
-    private fun isDatabaseFull() {
-        roomCash.isDatabaseFull()
+    private fun loadDataFromDatabase() {
+        roomCash.loadAllData()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     listStatesFromDatabase.value = it
                 },{
                     Log.d(TAG, "${it.message}")
                 })
-    }
-    fun getStatesFromDatabase(): LiveData<MutableList<State>>{
-       roomCash.getStatesFromDatabase()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    listStatesFromDatabase.value = it
-                },{
-                    Log.d(TAG, "${it.message}")
-                })
-        return listStatesFromDatabase
     }
 
     companion object{

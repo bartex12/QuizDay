@@ -83,7 +83,6 @@ class MistakesFragment: Fragment(),
                         )
                     } as MutableList<State>
                     chipGroupMistake.check(R.id.chip_all_mistakes)
-                    //mistakesViewModel.saveMistakesList(listOfMistakeStates)
                     renderDataWithRegion(Constants.REGION_ALL)
                 })
     }
@@ -162,7 +161,6 @@ class MistakesFragment: Fragment(),
         chipGroupMistake.setOnCheckedChangeListener { _, id ->
             chipGroupMistake.check(id)
             val newRegion: String = getRegionName(id)
-            //mistakesViewModel.saveNewRegion(newRegion)
             renderDataWithRegion(newRegion)
         }
     }

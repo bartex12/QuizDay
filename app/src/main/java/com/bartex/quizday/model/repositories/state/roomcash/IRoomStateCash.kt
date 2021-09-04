@@ -13,6 +13,6 @@ interface IRoomStateCash {
     fun getMistakesFromDatabase(): Single<List<State>>
     fun  getAllMistakesLive(): LiveData<List<RoomState>> //получение списка ошибок в виде LiveData
 
-    fun isDatabaseFull(): Single<MutableList<State>>
+    fun loadAllData(): Single<MutableList<State>>
     fun getStatesFromDatabase(): Single<MutableList<State>> //получение списка стран из базы
 }

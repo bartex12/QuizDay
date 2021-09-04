@@ -85,7 +85,7 @@ class RoomStateCash(val db:Database):IRoomStateCash {
         return db.stateDao.getAllMistakesLive()
     }
 
-    override fun isDatabaseFull(): Single<MutableList<State>> =
+    override fun loadAllData(): Single<MutableList<State>> =
          Single.fromCallable {
             db.stateDao.getAll().map{
                 State(it.capital, it.flag, it.name, it.region, it.nameRus, it.capitalRus, it.regionRus)
