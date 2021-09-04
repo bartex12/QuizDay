@@ -1,11 +1,13 @@
 package com.bartex.quizday
 
 import android.content.Context
+import android.graphics.Color
 import android.media.AudioManager
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -23,10 +25,13 @@ import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.network.OnlineLiveData
 import com.bartex.quizday.network.NoInternetDialogFragment
 import com.bartex.quizday.network.isInternetAvailable
+import com.bartex.quizday.ui.flags.FlagsFragment
 import com.bartex.quizday.ui.flags.FlagsViewModel
 import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.app_bar_main.*
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+FlagsFragment.OnChangeToolbarTitleListener{
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navController:NavController
@@ -57,10 +62,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     showNoInternetConnectionDialog()
                 }
             })
-        Log.d(TAG, "*** MainActivity onCreate  isNetworkAvailable = $isNetworkAvailable")
+        //Log.d(TAG, "*** MainActivity onCreate  isNetworkAvailable = $isNetworkAvailable")
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        //отключаем показ заголовка тулбара, так как там свой макет с main_title
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        //текстовое поле в тулбаре
+        with(toolbar.findViewById<TextView>(R.id.main_title)){
+            textSize = 16f
+            setTextColor(Color.WHITE)
+            text = context.getString(R.string.app_name)
+        }
 
         // Задание значений по умолчанию для SharedPreferences
         PreferenceManager.setDefaultValues(this, R.xml.pref_setting, false)
@@ -111,17 +125,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         id?. let {
             menu?.findItem(R.id.action_settings)?.isVisible = it != R.id.settingsFragment
             menu?.findItem(R.id.action_help)?.isVisible = it!= R.id.helpFragment
+            menu?.findItem(R.id.search)?.isVisible = it== R.id.regionFragment
 
-            //заголовки тулбара в зависимости от фрагмента
-            toolbar.title = when(it){
-                R.id.homeFragment -> getString(R.string.app_name)
-                R.id.textquizFragment -> getString(R.string.text_quiz)
-                R.id.imagequizFragment -> getString(R.string.image_quiz)
-                R.id.settingsFragment -> getString(R.string.action_settings)
-                R.id.helpFragment -> getString(R.string.action_help)
-                R.id.flagsFragment -> getString(R.string.flags)
-                else -> getString(R.string.app_name)
-            }
+//            //заголовки тулбара в зависимости от фрагмента
+//            toolbar.title = when(it){
+//                R.id.homeFragment -> getString(R.string.app_name)
+//                R.id.textquizFragment -> getString(R.string.text_quiz)
+//                R.id.imagequizFragment -> getString(R.string.image_quiz)
+//                R.id.settingsFragment -> getString(R.string.action_settings)
+//                R.id.helpFragment -> getString(R.string.action_help)
+//                R.id.flagsFragment -> getString(R.string.flags)
+//                R.id.tabsFragment -> getString(R.string.flags)
+//                else -> getString(R.string.app_name)
+//            }
         }
         return super.onPrepareOptionsMenu(menu)
     }
@@ -153,10 +169,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
 
-            R.id.flagsFragment -> {
+            R.id.tabsFragment -> {
                 when (item.itemId) {
-                    R.id.action_help -> navController.navigate(R.id.action_flagsFragment_to_helpFragment)
-                    R.id.action_settings -> navController.navigate(R.id.action_flagsFragment_to_settingsFragment)
+                    R.id.action_help -> navController.navigate(R.id.action_tabsFragment_to_helpFragment)
+                    R.id.action_settings -> navController.navigate(R.id.action_tabsFragment_to_settingsFragment)
                 }
             }
 
@@ -215,6 +231,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     companion object{
         const val TAG = "33333"
+    }
+
+    override fun onChangeToolbarTitle(title: String) {
+      val toolbarTitle =   toolbar.findViewById<TextView>(R.id.main_title)
+        toolbarTitle.text = title
     }
 
 }

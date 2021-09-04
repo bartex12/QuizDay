@@ -19,6 +19,8 @@ class StatesRepo(private val api: IDataSourceState, private val roomCash: IRoomS
                     val statesFiltered = states.filter { st->
                         st.name!=null && st.capital!=null && st.flag!=null &&
                                 st.name.isNotBlank() && st.capital.isNotBlank() && st.flag.isNotBlank()
+                                && st.name != "Puerto Rico" && st.name !=  "French Guiana"
+
                     }
                     //добавляем русские названия из Map
                     states.map { state ->
@@ -32,4 +34,10 @@ class StatesRepo(private val api: IDataSourceState, private val roomCash: IRoomS
            roomCash.getStatesFromCash() //получение списка стран  из кэша
         }
            .subscribeOn(Schedulers.io())
+
+    //получение списка стран из базы данных с учётом региона
+    override fun getStatesFromCash(region: String):  Single<List<State>> =
+      roomCash.getRegionStatesFromCash(region)
+              .subscribeOn(Schedulers.io())
+
 }

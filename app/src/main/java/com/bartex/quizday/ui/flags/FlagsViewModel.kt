@@ -1,11 +1,11 @@
 package com.bartex.quizday.ui.flags
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bartex.quizday.App
 import com.bartex.quizday.model.api.IDataSourceState
+import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.common.Constants.baseUrl
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.Action
@@ -14,6 +14,8 @@ import com.bartex.quizday.model.fsm.entity.Answer
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.repo.FlagQuiz
 import com.bartex.quizday.model.fsm.repo.IFlagQuiz
+import com.bartex.quizday.model.fsm.repo.settings.ISettingsProvider
+import com.bartex.quizday.model.fsm.repo.settings.SettingsProvider
 import com.bartex.quizday.model.fsm.substates.ReadyState
 import com.bartex.quizday.model.repositories.state.IStatesRepo
 import com.bartex.quizday.model.repositories.state.StatesRepo
@@ -27,7 +29,7 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class FlagsViewModel(
-    var statesRepo: IStatesRepo = StatesRepo(
+        private var statesRepo: IStatesRepo = StatesRepo(
         Retrofit.Builder()
             .baseUrl(baseUrl)
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
@@ -40,75 +42,120 @@ class FlagsViewModel(
             ))
             .build()
             .create(IDataSourceState::class.java),
-    RoomStateCash(Database.getInstance() as Database))
+        roomCash = RoomStateCash(Database.getInstance() as Database)),
+        private val storage: IFlagQuiz = FlagQuiz(),
+        private val settingProvider: ISettingsProvider = SettingsProvider(App.instance),
 ) : ViewModel()  {
 
-    private val listStates = MutableLiveData<StatesSealed>()
+    //список стран из сети
+    private val listStatesFromNet = MutableLiveData<StatesSealed>()
+    //состояние конечного автомата
+    private val currentQuizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
+    //данные для RegionFragment - есть список из сети и регион, так как формируется в resetQuiz()
+    private var dataFlagsToRegionFragment:MutableLiveData<DataFlags> = MutableLiveData<DataFlags>()
 
-    private val quizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
-    private var storage: IFlagQuiz = FlagQuiz(App.instance)
-    var dataflags:DataFlags = DataFlags()
+    private var dataFlags:DataFlags = DataFlags() // здесь храним данные для состояний конечного автомата
+    private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
+    private var region:String = Constants.REGION_EUROPE //Здесь храним текущий регион
+    private var currentState:IFlagState = ReadyState(DataFlags()) //Здесь храним текущее состояние
+    private var isNeedToCreateDialog:Boolean = true//Здесь храним флаг необходимости создания диалога
+
+
+    fun isNeedToCreateDialog():Boolean{
+        return isNeedToCreateDialog
+    }
+
+    fun setNeedToCreateDialog(isNeed:Boolean){
+       isNeedToCreateDialog = isNeed
+    }
 
     fun getStatesSealed(isNetworkAvailable:Boolean) : LiveData<StatesSealed> {
         loadDataSealed(isNetworkAvailable)
-        return listStates
+        return listStatesFromNet
     }
 
     private fun loadDataSealed(isNetworkAvailable:Boolean){
-        listStates.value = StatesSealed.Loading(0)
+        listStatesFromNet.value = StatesSealed.Loading(0)
 
         statesRepo.getStates(isNetworkAvailable)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({states->
-                listStates.value = StatesSealed.Success(states = states)
+                listStatesFromNet.value = StatesSealed.Success(states = states)
             },{error ->
-                listStates.value = StatesSealed.Error(error = error)
+                listStatesFromNet.value = StatesSealed.Error(error = error)
             })
     }
 
     //получить состояние конечного автомата
     fun getCurrentState(): LiveData<IFlagState> {
-        return quizState
+        return currentQuizState
     }
+
+    //сохраняем список стран чтобы не пропадал при поворотах экрана
+   fun saveListOfStates( listStates:MutableList<State>){
+        dataFlags.listStatesFromNet = listStates //для удобства храним в данных
+       listOfStates = listStates //а также храним во ViewModel
+   }
 
     //начальное состояние не имеет предыдущего
-    fun resetQuiz(listStates: MutableList<State>){
-        dataflags.listStates = listStates //передаём список в класс данных
-        dataflags =  storage.resetQuiz(dataflags) //подготовка переменных и списков
-        quizState.value =  ReadyState(dataflags) //передаём полученные данные в состояние
-    }
-    //загрузить первый флаг
-    fun loadFirstFlag(currentState: IFlagState, dataFlags:DataFlags){
-        dataflags =  storage.loadNextFlag(dataFlags)
-        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(dataflags))
-    }
+    fun resetQuiz(){
+        setNeedToCreateDialog(true) //возвращаем флаг разрешения создания диалога
+        dataFlagsToRegionFragment.value = dataFlags //для передачи в RegionFragment
 
-    //по типу ответа при щелчке по кнопке задаём состояние
-    fun answer(currentState: IFlagState, guess:String){
-        dataflags = storage.getTypeAnswer(guess, dataflags)
-        when(dataflags.typeAnswer){
-            Answer.NotWell ->  quizState.value = currentState.executeAction(Action.OnNotWellClicked(dataflags))
-            Answer.WellNotLast ->  quizState.value = currentState.executeAction(Action.OnWellNotLastClicked(dataflags))
-            Answer.WellAndLast ->  quizState.value =  currentState.executeAction(Action.OnWellAndLastClicked(dataflags))
-        }
+        dataFlags =  storage.resetQuiz(listOfStates, dataFlags, region) //подготовка переменных и списков
+        currentQuizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
     }
 
     //загрузить следующий флаг
-    fun loadNextFlag(currentState: IFlagState, dataFlags:DataFlags){
-        dataflags =  storage.loadNextFlag(dataFlags)
-        quizState.value =  currentState.executeAction(Action.OnNextFlagClicked(dataflags))
+    fun loadNextFlag(dataFlags:DataFlags){
+        this.dataFlags =  storage.loadNextFlag(dataFlags)
+        currentQuizState.value =  currentState.executeAction(Action.OnNextFlagClicked(this.dataFlags))
     }
 
+    //по типу ответа при щелчке по кнопке задаём состояние
+    fun answer(guess:String){
+        dataFlags = storage.getTypeAnswer(guess, dataFlags)
+        when(dataFlags.typeAnswer){
+            Answer.NotWell ->  currentQuizState.value = currentState.executeAction(Action.OnNotWellClicked(dataFlags))
+            Answer.WellNotLast ->  currentQuizState.value = currentState.executeAction(Action.OnWellNotLastClicked(dataFlags))
+            Answer.WellAndLast ->  currentQuizState.value =  currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
+        }
+    }
+
+    //обновить настройки звука
     fun updateSoundOnOff(){
-        storage.updateSoundOnOff()
+        settingProvider.updateSoundOnOff()
     }
 
+    //обновить количество вопросов в викторине
     fun updateNumberFlagsInQuiz(){
-        dataflags = storage.updateNumberFlagsInQuiz(dataflags)
+        dataFlags = settingProvider.updateNumberFlagsInQuiz(dataFlags)
     }
 
+    //получить количество рядов кнопок с ответами
     fun getGuessRows():Int{
-        dataflags = storage.getGuessRows(dataflags)
-        return dataflags.guessRows
+        dataFlags = settingProvider.getGuessRows(dataFlags)
+        return dataFlags.guessRows
     }
+
+    //сохраняем регион в классе данных
+    fun saveRegion( newRegion:String){
+        dataFlags.region = newRegion // в dataFlags
+        region = newRegion  // в переменную ViewModel
+        dataFlagsToRegionFragment.value = dataFlags //для передачи в RegionFragment
+    }
+    fun getRegion( ):String{
+      return  region
+    }
+
+    //сохраняем текущее состояние
+    fun saveCurrentState( newState:IFlagState){
+        currentState = newState
+    }
+
+//передаём данные во фрагмент со списками стран регионов
+    fun getDataFlagsToRegionFragment():LiveData<DataFlags>{
+        return dataFlagsToRegionFragment
+    }
+
 }

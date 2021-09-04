@@ -30,6 +30,9 @@ interface StateDao {
     @Query("SELECT*FROM RoomState")
     fun getAll():List<RoomState>
 
+    @Query("SELECT*FROM RoomState WHERE region = :region")
+    fun getRegionStates(region:String):List<RoomState>
+
     @Query("SELECT*FROM RoomState WHERE name = :name")
     fun getFlagByState(name:String):RoomState
 

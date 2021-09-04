@@ -43,8 +43,8 @@
             android:id="@+id/action_imagequizFragment_to_helpFragment"
             app:destination="@id/helpFragment" />
         <action
-            android:id="@+id/action_imagequizFragment_to_flagsFragment"
-            app:destination="@id/flagsFragment" />
+            android:id="@+id/action_imagequizFragment_to_tabsFragment"
+            app:destination="@id/tabsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -69,12 +69,28 @@
     <fragment
         android:id="@+id/flagsFragment"
         android:name="com.bartex.quizday.ui.flags.FlagsFragment"
-        android:label="FlagsFragment" >
+        android:label="FlagsFragment" />
+    <dialog
+        android:id="@+id/resultDialog"
+        android:name="com.bartex.quizday.ui.flags.ResultDialog"
+        android:label="ResultDialog" />
+    <fragment
+        android:id="@+id/tabsFragment"
+        android:name="com.bartex.quizday.ui.flags.tabs.TabsFragment"
+        android:label="fragment_tabs"
+        tools:layout="@layout/fragment_tabs" >
         <action
-            android:id="@+id/action_flagsFragment_to_settingsFragment"
+            android:id="@+id/action_tabsFragment_to_resultDialog"
+            app:destination="@id/resultDialog" />
+        <action
+            android:id="@+id/action_tabsFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
         <action
-            android:id="@+id/action_flagsFragment_to_helpFragment"
+            android:id="@+id/action_tabsFragment_to_helpFragment"
             app:destination="@id/helpFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/regionFragment"
+        android:name="com.bartex.quizday.ui.flags.regions.RegionFragment"
+        android:label="RegionFragment" />
 </navigation>

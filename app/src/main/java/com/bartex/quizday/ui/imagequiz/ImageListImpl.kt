@@ -3,18 +3,18 @@ package com.bartex.quizday.ui.imagequiz
 import android.app.Application
 import androidx.core.content.ContextCompat
 import com.bartex.quizday.R
-import com.bartex.quizday.model.MainList
+import com.bartex.quizday.ui.adapters.ItemList
 
-class ImageListImpl(val application: Application):IImageList {
+class ImageListImpl(private val application: Application):IImageList {
 
-    override fun getImageList(): List<MainList> {
+    override fun getImageList(): List<ItemList> {
         //получаем две строки
         return listOf(
-                MainList(application.resources.getString(R.string.flags_of_states),
+                ItemList(application.resources.getString(R.string.flags_of_states),
                         ContextCompat.getDrawable(application, R.drawable.flags )!!),
-                MainList(application.resources.getString(R.string.anything),
+                ItemList(application.resources.getString(R.string.anything),
                         ContextCompat.getDrawable(application, R.drawable.text_x )!!),
-                MainList(application.resources.getString(R.string.anything),
+                ItemList(application.resources.getString(R.string.anything),
                         ContextCompat.getDrawable(application, R.drawable.text_x )!!)
         )
     }
