@@ -62,6 +62,9 @@ dependencies {
     //GlideToVectorYou
     implementation 'com.github.corouteam:GlideToVectorYou:v2.0.0'
 
+    //picasso
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+
     //room - не забыть добавить плагин  apply plugin: 'kotlin-kapt'
     implementation 'androidx.room:room-runtime:2.3.0'
     kapt 'androidx.room:room-compiler:2.3.0'

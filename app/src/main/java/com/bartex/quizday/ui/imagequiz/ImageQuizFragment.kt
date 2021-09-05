@@ -61,7 +61,7 @@ class ImageQuizFragment : Fragment() {
         rv_image.adapter = adapter
     }
 
-    private fun renderData(list: List<ItemList>) {
+    private fun renderData(list: List<ItemListPicture>) {
         adapter?.listOfTypes = list
     }
 

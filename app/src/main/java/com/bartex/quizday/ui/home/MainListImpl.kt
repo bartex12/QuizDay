@@ -7,13 +7,12 @@ import com.bartex.quizday.ui.adapters.ItemList
 
 class MainListImpl(private val application:Application):IMainList {
 
-    override fun getList(): List<ItemList> {
-        //получаем две строки
-      return listOf(
-              ItemList(application.resources.getString(R.string.textQuizMain),
-                      ContextCompat.getDrawable(application, R.drawable.text_x )!!),
-              ItemList(application.resources.getString(R.string.imageQuizMain),
-                              ContextCompat.getDrawable(application, R.drawable.sm )!!)
+    override fun getList(): MutableList<ItemList> {
+      return mutableListOf(
+          ItemList(application.resources.getString(R.string.textQuizMain), R.drawable.text_t),
+          ItemList(application.resources.getString(R.string.imageQuizMain),R.drawable.sm),
+          ItemList(application.resources.getString(R.string.settings),null),
+          ItemList(application.resources.getString(R.string.help), null)
       )
     }
 }

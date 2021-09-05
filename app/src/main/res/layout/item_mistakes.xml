@@ -45,9 +45,9 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:tint="?colorPrimary"
-        app:layout_constraintEnd_toStartOf="@+id/show_mistake_name_layout"
-        app:layout_constraintBottom_toBottomOf="@+id/show_mistake_name_layout"
-        app:layout_constraintTop_toTopOf="@+id/show_mistake_name_layout"
+        app:layout_constraintEnd_toStartOf="@+id/show_mistake_layout"
+        app:layout_constraintBottom_toBottomOf="@+id/show_mistake_layout"
+        app:layout_constraintTop_toTopOf="@+id/show_mistake_layout"
         app:srcCompat="@drawable/ic_baseline_delete_outline_24" />
 
     <androidx.constraintlayout.widget.Group
@@ -60,7 +60,7 @@
         tools:visibility="visible"/>
 
     <LinearLayout
-        android:id="@+id/show_mistake_name_layout"
+        android:id="@+id/show_mistake_layout"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:gravity="center"

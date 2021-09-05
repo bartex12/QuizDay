@@ -8,14 +8,14 @@ import com.bartex.quizday.ui.adapters.ItemList
 
 class ImageQuizViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _imageList =  MutableLiveData<List<ItemList>>()
+    private val _imageList =  MutableLiveData<List<ItemListPicture>>()
     private val imageRepo: IImageList = ImageListImpl(application)
-
-    fun getImageList():LiveData<List<ItemList>>{
-        return _imageList
-    }
 
     fun loadData(){
         _imageList.value = imageRepo.getImageList()
+    }
+
+    fun getImageList():LiveData<List<ItemListPicture>>{
+        return _imageList
     }
 }

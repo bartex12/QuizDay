@@ -133,12 +133,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val id = navController.currentDestination?.id
         //видимость иконок в тулбаре
         id?. let {
-            menu?.findItem(R.id.action_settings)?.isVisible = it != R.id.settingsFragment
+            menu?.findItem(R.id.action_settings)?.isVisible = (it == R.id.tabsFragment) ||
+                    (it == R.id.textquizFragment)
             menu?.findItem(R.id.search)?.isVisible = it== R.id.regionFragment
 
             //заголовки тулбара в зависимости от фрагмента
             toolbar.title = when(id){
-                R.id.homeFragment -> getString(R.string.app_name)
+                R.id.homeFragmentNew -> getString(R.string.app_name)
                 R.id.textquizFragment -> getString(R.string.text_quiz)
                 R.id.imagequizFragment -> getString(R.string.image_quiz)
                 R.id.settingsFragment -> getString(R.string.action_settings)
@@ -159,9 +160,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     //кроме того пришлось делать перебор всех вариантов (может лучше  убрать меню во фрагменты)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (navController.currentDestination?.id ){
-            R.id.homeFragment -> {
+
+            R.id.homeFragmentNew -> {
                 when (item.itemId) {
-                    R.id.action_settings -> navController.navigate(R.id.action_homeFragment_to_settingsFragment)
+                    R.id.action_settings -> navController.navigate(R.id.action_homeFragmentNew_to_settingsFragment)
                 }
             }
 

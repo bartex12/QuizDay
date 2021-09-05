@@ -52,7 +52,7 @@ class MistakesAdapter(
         private val ivFlagMistake =  itemView.findViewById<AppCompatImageView>(R.id.iv_flag_mistake)
         private val showMistakeName = itemView.findViewById<AppCompatImageView>(R.id.show_mistake_name)
         private val showMistakeGroup =itemView.findViewById<Group>(R.id.show_mistake_group)
-        private val showMistakeNameLayout = itemView.findViewById<LinearLayout>(R.id.show_mistake_name_layout)
+        private val showMistakeNameLayout = itemView.findViewById<LinearLayout>(R.id.show_mistake_layout)
         private val removeMistake = itemView.findViewById<AppCompatImageView>(R.id.remove_mistake)
 
         fun bind(state: State) {
@@ -69,7 +69,6 @@ class MistakesAdapter(
                 if (!isOPenList.contains(state.nameRus)){
                     state.nameRus?.let { nameRus -> isOPenList.add(nameRus) }
                     setVisibleName()
-
                 }else{
                     isOPenList.remove(state.nameRus)
                     setInvisibleName()
