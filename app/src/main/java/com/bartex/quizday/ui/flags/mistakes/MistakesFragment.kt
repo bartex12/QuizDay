@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -72,7 +71,7 @@ class MistakesFragment: Fragment(),
         flagsViewModel.getDataFlagsToRegionFragment()
             .observe(viewLifecycleOwner, {data->
                 region = data.region //текущий регион
-                chipGroupMistake.check(getRegionId(region))
+                chipGroupMistake.check(UtilMistakes.getRegionId(region))
                 //не убирать эту строку иначе при повороте данные пропадают!
                 renderDataWithRegion(region)
             })
@@ -86,17 +85,16 @@ class MistakesFragment: Fragment(),
                             capitalRus = room.capitalRus, regionRus = room.regionRus
                         )
                     } as MutableList<State>
-                    chipGroupMistake.check(getRegionId(region))
+                    UtilMistakes.showCountByRegion(chipGroupMistake, listOfMistakeStates)
+                    chipGroupMistake.check(UtilMistakes.getRegionId(region))
                     renderDataWithRegion(region)
                 })
     }
-
 
     private fun initViews(view: View) {
         rvStatesMistake = view.findViewById(R.id.rv_states_mistakes)
         emptyViewMistake = view.findViewById(R.id.empty_view_mistakes)
         chipGroupMistake = view.findViewById(R.id.chip_region_mistakes)
-
     }
 
     //запоминаем  позицию списка, на которой сделан клик - на случай поворота экрана
@@ -116,7 +114,6 @@ class MistakesFragment: Fragment(),
                 getOnRemoveListener(),
                 SvgImageLoader(requireActivity())
         )
-
         rvStatesMistake.adapter = adapter
     }
 
@@ -124,6 +121,11 @@ class MistakesFragment: Fragment(),
         if(listOfMistakeStates.isEmpty()){
             rvStatesMistake.visibility = View.GONE
             emptyViewMistake.visibility = View.VISIBLE
+            if (region == Constants.REGION_ALL){
+                emptyViewMistake.text = getString(R.string.no_data_state_test_all)
+            }else{
+                emptyViewMistake.text = getString(R.string.no_data_state_test_region)
+            }
         }else{
             rvStatesMistake.visibility =  View.VISIBLE
             emptyViewMistake.visibility = View.GONE
@@ -152,8 +154,8 @@ class MistakesFragment: Fragment(),
 
     private fun initChipGroupListener() {
         chipGroupMistake.setOnCheckedChangeListener { _, id ->
-            val newRegion: String = getRegionName(id)
-            renderDataWithRegion(newRegion)
+            region = UtilMistakes.getRegionName(id)
+            renderDataWithRegion(region)
         }
     }
 
@@ -200,28 +202,5 @@ class MistakesFragment: Fragment(),
         }
         return false
     }
-
-    private fun getRegionId(region: String): Int {
-        return when (region) {
-            Constants.REGION_ALL -> R.id.chip_all_mistakes
-            Constants.REGION_EUROPE -> R.id.chip_Europa_mistakes
-            Constants.REGION_ASIA -> R.id.chip_Asia_mistakes
-            Constants.REGION_AMERICAS -> R.id.chip_America_mistakes
-            Constants.REGION_OCEANIA -> R.id.chip_Oceania_mistakes
-            Constants.REGION_AFRICA -> R.id.chip_Africa_mistakes
-            else -> R.id.chip_Europa_region
-        }
-    }
-
-    private fun getRegionName(id: Int): String {
-        return when (id) {
-            R.id.chip_all_mistakes -> Constants.REGION_ALL
-            R.id.chip_Europa_mistakes -> Constants.REGION_EUROPE
-            R.id.chip_Asia_mistakes -> Constants.REGION_ASIA
-            R.id.chip_America_mistakes -> Constants.REGION_AMERICAS
-            R.id.chip_Oceania_mistakes -> Constants.REGION_OCEANIA
-            R.id.chip_Africa_mistakes -> Constants.REGION_AFRICA
-            else -> Constants.REGION_EUROPE
-        }
-    }
+    
 }

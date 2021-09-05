@@ -14,6 +14,9 @@ object Constants {
     const val  REGION_OCEANIA = "Океания"
     const val  REGION_ALL= "Все"
 
+    val  LIST_OF_REGIONS= arrayOf( REGION_ALL, REGION_EUROPE, REGION_ASIA, REGION_AMERICAS,
+            REGION_AFRICA, REGION_OCEANIA)
+
     const val TOTAL_QUESTIONS = "TOTAL_QUESTIONS"
     const val TOTAL_GUESSES = "TOTAL_GUESSES"
 
