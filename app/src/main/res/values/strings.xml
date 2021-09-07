@@ -90,5 +90,7 @@
     <string name="choose_play">ПОИГРАЕМ!</string>
     <string name="choose_play2">Поиграем!</string>
     <string name="divider">divider</string>
+    <string name="MediumTextStub">Правильно</string>
+    <string name="questionsStub">Мадагаскар</string>
 
 </resources>

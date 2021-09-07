@@ -19,7 +19,6 @@ class StatesRepo(private val api: IDataSourceState, private val roomCash: IRoomS
                         st.name!=null && st.capital!=null && st.flag!=null &&
                                 st.name.isNotBlank() && st.capital.isNotBlank() && st.flag.isNotBlank()
                                 && st.name != "Puerto Rico" && st.name !=  "French Guiana"
-
                     }
                     //добавляем русские названия из Map
                     states.map { state ->

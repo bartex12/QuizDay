@@ -1,11 +1,10 @@
-package com.bartex.quizday.ui.flags
+package com.bartex.quizday.ui.flags.tabs.flag
 
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
 
@@ -13,7 +12,6 @@ class ResultDialog: DialogFragment() {
 
     private var total:Int = 0
     private var totalGuesses:Int = 0
-    lateinit var navController:NavController
 
     private val flagsViewModel by lazy{
         ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)

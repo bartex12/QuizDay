@@ -1,4 +1,4 @@
-package com.bartex.quizday.ui.flags
+package com.bartex.quizday.ui.flags.tabs.flag
 
 import android.media.AudioManager
 import android.media.ToneGenerator
@@ -23,6 +23,7 @@ import com.bartex.quizday.model.fsm.IFlagState
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.substates.*
 import com.bartex.quizday.network.NoInternetDialogFragment
+import com.bartex.quizday.ui.flags.StatesSealed
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -106,12 +107,6 @@ class FlagsFragment: Fragment(){
                 })
     }
 
-    private fun showAlertDialog(title: String?, message: String?) {
-        NoInternetDialogFragment.newInstance(title, message)
-                .show(requireActivity().supportFragmentManager, Constants.DIALOG_FRAGMENT)
-    }
-
-
     // метод onStart вызывается после onViewCreated.
     override fun onStart() {
         super.onStart()
@@ -119,6 +114,11 @@ class FlagsFragment: Fragment(){
         flagsViewModel.updateSoundOnOff() //обновляем звук
         flagsViewModel.updateNumberFlagsInQuiz() //обновляем число вопросов в викторине
         updateGuessRows(flagsViewModel.getGuessRows()) //обновляем число выриантов ответов в викторине
+    }
+
+    private fun showAlertDialog(title: String?, message: String?) {
+        NoInternetDialogFragment.newInstance(title, message)
+                .show(requireActivity().supportFragmentManager, Constants.DIALOG_FRAGMENT)
     }
 
     private fun initChipGroupListener() {
@@ -217,9 +217,9 @@ class FlagsFragment: Fragment(){
     //вешаем правильный ответ на случайную кнопку
     private fun showCorrectAnswerButtom(data: DataFlags) {
         // Получение строки LinearLayouts
-        val randomRow = guessLinearLayouts[data.row]
+        val randomRow = guessLinearLayouts[data.randomRow]
         // Случайная замена одной кнопки правильным ответом
-        (randomRow?.getChildAt(data.column) as Button).text = data.correctAnswer
+        (randomRow?.getChildAt(data.randomColumn) as Button).text = data.correctAnswer
     }
 
     // Добавление 2, 4, 6 кнопок в зависимости от значения guessRows

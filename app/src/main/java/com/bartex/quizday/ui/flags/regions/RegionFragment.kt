@@ -19,7 +19,7 @@ import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.RegionAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
-import com.bartex.quizday.ui.flags.FlagsViewModel
+import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
 import com.google.android.material.chip.ChipGroup
 import java.util.*
 

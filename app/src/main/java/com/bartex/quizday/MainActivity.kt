@@ -24,7 +24,8 @@ import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.network.NoInternetDialogFragment
 import com.bartex.quizday.network.OnlineLiveData
 import com.bartex.quizday.network.isInternetAvailable
-import com.bartex.quizday.ui.flags.FlagsViewModel
+import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
+import com.bartex.quizday.ui.flags.tabs.state.StatesViewModel
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.app_bar_main.*
 
@@ -43,7 +44,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val flagsViewModel by lazy{
         ViewModelProvider(this).get(FlagsViewModel::class.java)
     }
-
+    private val statesViewModel by lazy{
+        ViewModelProvider(this).get(StatesViewModel::class.java)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -98,6 +101,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         //используем flagsViewModel для получения данных от фрагмента - вместо интерфейса
         flagsViewModel.getFlagsToolbarTitle()
+                .observe(this, {newTitle->
+                    toolbarTitleText = newTitle
+                    toolbar.title = toolbarTitleText
+                })
+        statesViewModel.getFlagsToolbarTitle()
                 .observe(this, {newTitle->
                     toolbarTitleText = newTitle
                     toolbar.title = toolbarTitleText

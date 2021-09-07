@@ -97,6 +97,10 @@ class RoomStateCash(val db:Database):IRoomStateCash {
          Single.fromCallable {
             db.stateDao.getAll().map{
                 State(it.capital, it.flag, it.name, it.region, it.nameRus, it.capitalRus, it.regionRus)
+            }.filter {st->
+                st.name!=null && st.capital!=null && st.flag!=null &&
+                        st.name.isNotBlank() && st.capital.isNotBlank() && st.flag.isNotBlank()
+                        && st.name != "Puerto Rico" && st.name !=  "French Guiana"
             }.toMutableList()
          }.subscribeOn(Schedulers.io())
 
