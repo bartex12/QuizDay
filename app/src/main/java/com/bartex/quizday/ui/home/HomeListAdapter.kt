@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import com.bartex.quizday.R
 import com.bartex.quizday.ui.adapters.ItemList
 import com.squareup.picasso.Picasso
 
+//context получаем извне  чтобы не париться с нуллабельным parent.context
 class HomeListAdapter(private val context: Context,
                       private val dataSource: MutableList<ItemList>):BaseAdapter()  {
 
@@ -44,6 +46,9 @@ class HomeListAdapter(private val context: Context,
         itemList.image?. let{
             Picasso.with(context).load(it).placeholder(R.mipmap.ic_launcher).into(imageView)
         }
+        //установим шрифт для строк списка
+        val titleTypeFace = ResourcesCompat.getFont(context, R.font.josefinsans_semibolditalic)
+        titleTextView.typeface = titleTypeFace
         return rowView
     }
 }

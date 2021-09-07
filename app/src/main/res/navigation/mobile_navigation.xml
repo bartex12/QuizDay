@@ -102,7 +102,7 @@
     </fragment>
     <fragment
         android:id="@+id/homeFragmentNew"
-        android:name="com.bartex.quizday.ui.home.HomeFragmentNew"
+        android:name="com.bartex.quizday.ui.home.HomeFragment"
         android:label="HomeFragmentNew" >
         <action
             android:id="@+id/action_homeFragmentNew_to_settingsFragment"

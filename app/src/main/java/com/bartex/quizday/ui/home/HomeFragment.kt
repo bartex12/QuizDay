@@ -6,6 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.SimpleAdapter
+import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -15,20 +18,21 @@ import com.bartex.quizday.R
 import com.bartex.quizday.ui.adapters.HomeAdapter
 import com.bartex.quizday.ui.adapters.ItemList
 
-class HomeFragmentNew: Fragment() {
+class HomeFragment: Fragment() {
 
     private val homeViewModel by lazy {
         ViewModelProvider(this).get(HomeViewModel::class.java)
     }
     lateinit var navController: NavController
     lateinit var listView:ListView
+    lateinit var tv01:TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_home_new, container, false)
+        return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -50,7 +54,8 @@ class HomeFragmentNew: Fragment() {
         listView.setOnItemClickListener { _, _, position, _ ->
             when(position){
                 0 -> navController.navigate(R.id.textquizFragment)
-                1 -> navController.navigate(R.id.imagequizFragment)
+               // 1 -> navController.navigate(R.id.imagequizFragment) //пока исключаем
+                1 -> navController.navigate(R.id.tabsFragment)
                 2 -> navController.navigate(R.id.settingsFragment)
                 3 -> navController.navigate(R.id.helpFragment)
             }

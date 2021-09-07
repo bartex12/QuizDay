@@ -87,6 +87,8 @@
     <string name="picture">picture</string>
     <string name="choose_menu">ВЫБИРАЙ!</string>
     <string name="choose_quiz">ИГРАЕМ</string>
+    <string name="choose_play">ПОИГРАЕМ!</string>
+    <string name="choose_play2">Поиграем!</string>
     <string name="divider">divider</string>
 
 </resources>

@@ -201,7 +201,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 navController.navigate(R.id.textquizFragment)
             }
             R.id.imagequizFragment -> {
-                navController.navigate(R.id.imagequizFragment)
+                //navController.navigate(R.id.imagequizFragment) //пока исключаем
+                navController.navigate(R.id.tabsFragment)
             }
             R.id.nav_settings -> {
                 navController.navigate(R.id.settingsFragment)

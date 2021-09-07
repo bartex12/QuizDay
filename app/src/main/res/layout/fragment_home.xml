@@ -9,7 +9,9 @@
     <RelativeLayout
         android:id="@+id/RelativeLayout01"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/layout_margin_8dp">
+
         <ImageView
             android:id="@+id/ImageView_MenuHeader"
             android:layout_width="wrap_content"
@@ -20,8 +22,9 @@
         <TextView
             android:id="@+id/TextView01"
             android:layout_height="wrap_content"
-            android:text="@string/choose_quiz"
-            android:textSize="32sp"
+            android:text="@string/choose_play2"
+            android:fontFamily="@font/bressay_trial"
+            android:textSize="28sp"
             android:shadowDx="5"
             android:shadowDy="5"
             android:shadowRadius="2"
@@ -63,11 +66,13 @@
 
         <ImageView
             android:id="@+id/ImageView_MenuBottom"
-            android:src="@drawable/pazl_coner400"
-            android:layout_alignParentBottom="true"
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:scaleType="fitEnd"/>
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="11dp"
+            android:scaleType="fitEnd"
+            android:src="@drawable/pazl_coner400" />
 
     </RelativeLayout>
 </LinearLayout>
