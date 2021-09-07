@@ -11,8 +11,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class StatesRepo(private val api: IDataSourceState, private val roomCash: IRoomStateCash): IStatesRepo {
 
-    override fun getStates(isNetworkAvailable:Boolean): Single<List<State>> =
-        if(isNetworkAvailable){
+    override fun getStates(): Single<List<State>> =
             api.getStates()
                 .flatMap {states->
                     //отбираем только те, где значения не равны null
@@ -20,7 +19,6 @@ class StatesRepo(private val api: IDataSourceState, private val roomCash: IRoomS
                         st.name!=null && st.capital!=null && st.flag!=null &&
                                 st.name.isNotBlank() && st.capital.isNotBlank() && st.flag.isNotBlank()
                                 && st.name != "Puerto Rico" && st.name !=  "French Guiana"
-
                     }
                     //добавляем русские названия из Map
                     states.map { state ->
@@ -30,10 +28,7 @@ class StatesRepo(private val api: IDataSourceState, private val roomCash: IRoomS
                     }
                     roomCash.doStatesCash(statesFiltered) //пишем в базу и возвращаем Single<List<State>>
                 }
-        }else{
-           roomCash.getStatesFromCash() //получение списка стран  из кэша
-        }
-           .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.io())
 
     //получение списка стран из базы данных с учётом региона
     override fun getStatesFromCash(region: String):  Single<List<State>> =

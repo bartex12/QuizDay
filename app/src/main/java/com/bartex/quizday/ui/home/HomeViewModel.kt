@@ -8,10 +8,10 @@ import com.bartex.quizday.ui.adapters.ItemList
 
 class HomeViewModel(application: Application) :AndroidViewModel(application) {
 
-    private val _mainList =  MutableLiveData<List<ItemList>>()
+    private val _mainList =  MutableLiveData<MutableList<ItemList>>()
     private val mainRepo:IMainList = MainListImpl(application)
 
-    fun getMainList():LiveData<List<ItemList>>{
+    fun getMainList():LiveData<MutableList<ItemList>>{
         return _mainList
     }
 

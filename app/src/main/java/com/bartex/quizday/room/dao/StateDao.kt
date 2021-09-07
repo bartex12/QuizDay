@@ -1,5 +1,6 @@
 package com.bartex.quizday.room.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.bartex.quizday.room.tables.RoomState
 
@@ -34,14 +35,27 @@ interface StateDao {
     fun getRegionStates(region:String):List<RoomState>
 
     @Query("SELECT*FROM RoomState WHERE name = :name")
-    fun getFlagByState(name:String):RoomState
+    fun getStateByName(name:String):RoomState
 
     @Query("SELECT*FROM RoomState WHERE nameRus = :nameRus")
-    fun getFlagByStateRus(nameRus:String):RoomState
+    fun getStateByNameRus(nameRus:String):RoomState
 
     @Query("SELECT flag FROM RoomState WHERE name = :name")
-    fun getFlagOnlyByState(name:String):String
+    fun getFlagOnlyByName(name:String):String
 
     @Query("SELECT flag FROM RoomState WHERE nameRus = :nameRus")
-    fun getFlagOnlyByStateRus(nameRus:String):String
+    fun getFlagOnlyByNameRus(nameRus:String):String
+
+    @Query("SELECT mistake FROM RoomState WHERE name = :name")
+    fun getMistakeByName(name:String):Int
+
+    @Query("SELECT mistake FROM RoomState WHERE nameRus = :nameRus")
+    fun getMistakeByNameRus(nameRus:String):Int
+
+    @Query("SELECT*FROM RoomState WHERE mistake = 1")
+    fun getMistakesList():List<RoomState>
+
+    @Query("SELECT*FROM RoomState WHERE mistake = 1")
+    fun getAllMistakesLive():LiveData<List<RoomState>>
+
 }

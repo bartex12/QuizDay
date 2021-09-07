@@ -13,7 +13,6 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bartex.quizday.R
-import com.bartex.quizday.ui.adapters.ItemList
 import com.bartex.quizday.ui.adapters.HomeAdapter
 
 class ImageQuizFragment : Fragment() {
@@ -21,7 +20,7 @@ class ImageQuizFragment : Fragment() {
     private lateinit var imageViewModel: ImageQuizViewModel
 
     lateinit var navController: NavController
-    lateinit var rv_image: RecyclerView
+    private lateinit var rvImage: RecyclerView
     private var adapter: HomeAdapter? = null
 
     override fun onCreateView(
@@ -55,13 +54,13 @@ class ImageQuizFragment : Fragment() {
     }
 
     private fun initAdapter(view:View) {
-        rv_image = view.findViewById(R.id.rv_image)
-        rv_image.layoutManager = LinearLayoutManager(requireActivity())
+        rvImage = view.findViewById(R.id.rv_image)
+        rvImage.layoutManager = LinearLayoutManager(requireActivity())
         adapter = HomeAdapter(getOnClickListener())
-        rv_image.adapter = adapter
+        rvImage.adapter = adapter
     }
 
-    private fun renderData(list: List<ItemList>) {
+    private fun renderData(list: List<ItemListPicture>) {
         adapter?.listOfTypes = list
     }
 

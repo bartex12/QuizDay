@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/layout_margin_8dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_flag_mistake"
+        android:layout_width="90dp"
+        android:layout_height="60dp"
+        android:padding="5dp"
+        android:layout_margin="@dimen/layout_margin_8dp"
+        android:contentDescription="@string/flag"
+        android:layout_marginStart="@dimen/layout_margin_8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/photo_56in100" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_name_mistake"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/stateName"
+        android:maxLines="3"
+        android:textColor="@color/black"
+        android:layout_marginStart="@dimen/layout_margin_8dp"
+        app:layout_constraintEnd_toEndOf="@+id/barrier_mistake"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/iv_flag_mistake"
+        app:layout_constraintTop_toTopOf="@+id/iv_flag_mistake"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_flag_mistake"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier_mistake"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        app:barrierDirection="start"
+        app:constraint_referenced_ids="remove_mistake" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/remove_mistake"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:tint="?colorPrimary"
+        app:layout_constraintEnd_toStartOf="@+id/show_mistake_layout"
+        app:layout_constraintBottom_toBottomOf="@+id/show_mistake_layout"
+        app:layout_constraintTop_toTopOf="@+id/show_mistake_layout"
+        app:srcCompat="@drawable/ic_baseline_delete_outline_24" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/show_mistake_group"
+        android:visibility="gone"
+        app:constraint_referenced_ids=
+            "tv_name_mistake, remove_mistake"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        tools:visibility="visible"/>
+
+    <LinearLayout
+        android:id="@+id/show_mistake_layout"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:layout_marginEnd="@dimen/layout_margin_8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_flag_mistake"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_flag_mistake">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/show_mistake_name"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:tint="?colorPrimary"
+            app:srcCompat="@drawable/ic_baseline_visibility_24" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

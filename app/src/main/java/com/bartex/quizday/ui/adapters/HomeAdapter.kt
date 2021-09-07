@@ -7,10 +7,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bartex.quizday.R
+import com.bartex.quizday.ui.imagequiz.ItemListPicture
 
 class HomeAdapter(private val onItemClickListener: OnitemClickListener,):RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
 
-    var listOfTypes : List<ItemList> = listOf()
+    var listOfTypes : List<ItemListPicture> = listOf()
     set(value) {
         field = value
         notifyDataSetChanged()
@@ -39,7 +40,7 @@ class HomeAdapter(private val onItemClickListener: OnitemClickListener,):Recycle
 
     inner class ViewHolder(itemView: View):RecyclerView.ViewHolder(itemView) {
 
-        fun bind(data: ItemList){
+        fun bind(data: ItemListPicture){
             itemView.findViewById<TextView>(R.id.tv_name).text = data.title
             itemView.findViewById<ImageView>(R.id.iv_main).setImageDrawable(data.image)
         }

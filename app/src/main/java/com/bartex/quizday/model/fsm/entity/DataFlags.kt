@@ -10,12 +10,12 @@ data class DataFlags(
         var guessRows:Int = 2, // Количество строк с кнопками вариантов
         var correctAnswer : String? = null,  //правильный ответ
         var correctAnswers:Int = 0,  //количество правильных ответов
-        var totalGuesses:Int = 0 , // общее количество попыток
+        var totalGuesses:Int = 0, // общее количество попыток
         var typeAnswer:Answer? = null, //тип ответа
         var region:String = Constants.REGION_EUROPE, //текущий регион
         var nextCountry:State? = null, //следующая страна для угадывания флага
-        var row:Int = 0,  //строка кнопок ответов
-        var column:Int = 0, //столбец кнопок ответов
+        var randomRow:Int = 0,  //строка кнопки правильного ответа
+        var randomColumn:Int = 0, //столбец кнопки правильного ответа
         var buttonNotWellAnswerList: MutableList<String> =  mutableListOf(), //список неправильных ответов
         var listStatesFromNet: MutableList<State> = mutableListOf(),//список стран из сети
         var listStates: MutableList<State> = mutableListOf(), //список стран с учётом выбранного региона

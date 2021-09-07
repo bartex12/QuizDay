@@ -1,4 +1,4 @@
-package com.bartex.quizday.ui.flags
+package com.bartex.quizday.ui.flags.tabs.flag
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -33,8 +33,7 @@ class ResultDialog: DialogFragment() {
                 getString(R.string.results, total, totalGuesses, total*100/totalGuesses.toDouble())
         )
         builder.setPositiveButton(R.string.reset_quiz) { _, _ ->
-            flagsViewModel.resetQuiz()
-            dismiss()
+            flagsViewModel.resetQuiz() //просто вызываем метод вьюмодели
         }
         return builder.create().apply {
             setCanceledOnTouchOutside(false)

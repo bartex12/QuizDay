@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Color
 import android.media.AudioManager
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
@@ -22,25 +21,32 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
 import com.bartex.quizday.model.common.Constants
-import com.bartex.quizday.network.OnlineLiveData
 import com.bartex.quizday.network.NoInternetDialogFragment
+import com.bartex.quizday.network.OnlineLiveData
 import com.bartex.quizday.network.isInternetAvailable
-import com.bartex.quizday.ui.flags.FlagsFragment
-import com.bartex.quizday.ui.flags.FlagsViewModel
+import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
+import com.bartex.quizday.ui.flags.tabs.state.StatesViewModel
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.app_bar_main.*
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
-FlagsFragment.OnChangeToolbarTitleListener{
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener{
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navController:NavController
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toolbar: Toolbar
-    private lateinit var audioManager: AudioManager
+    private lateinit var toolbarTitle: TextView
+    private  var toolbarTitleText: String = ""
 
+    private lateinit var audioManager: AudioManager
     private var isNetworkAvailable: Boolean = true //Доступна ли сеть
 
+    private val flagsViewModel by lazy{
+        ViewModelProvider(this).get(FlagsViewModel::class.java)
+    }
+    private val statesViewModel by lazy{
+        ViewModelProvider(this).get(StatesViewModel::class.java)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -62,18 +68,18 @@ FlagsFragment.OnChangeToolbarTitleListener{
                     showNoInternetConnectionDialog()
                 }
             })
-        //Log.d(TAG, "*** MainActivity onCreate  isNetworkAvailable = $isNetworkAvailable")
 
         toolbar = findViewById(R.id.toolbar)
+        toolbar.setTitleTextAppearance(this, R.style.ToolbarTitleStyle)
         setSupportActionBar(toolbar)
-
         //отключаем показ заголовка тулбара, так как там свой макет с main_title
         supportActionBar?.setDisplayShowTitleEnabled(false)
+        toolbarTitle =toolbar.findViewById<TextView>(R.id.main_title)
         //текстовое поле в тулбаре
-        with(toolbar.findViewById<TextView>(R.id.main_title)){
+        with(toolbarTitle){
             textSize = 16f
             setTextColor(Color.WHITE)
-            text = context.getString(R.string.app_name)
+            text =""
         }
 
         // Задание значений по умолчанию для SharedPreferences
@@ -92,6 +98,18 @@ FlagsFragment.OnChangeToolbarTitleListener{
         //работа гамбургера и стрелки вверх в toolbar
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setNavigationItemSelectedListener(this)
+
+        //используем flagsViewModel для получения данных от фрагмента - вместо интерфейса
+        flagsViewModel.getFlagsToolbarTitle()
+                .observe(this, {newTitle->
+                    toolbarTitleText = newTitle
+                    toolbar.title = toolbarTitleText
+                })
+        statesViewModel.getFlagsToolbarTitle()
+                .observe(this, {newTitle->
+                    toolbarTitleText = newTitle
+                    toolbar.title = toolbarTitleText
+                })
     }
 
     //щелчки по стрелке вверх - как appBarConfiguration и по гамбургеру - как super.onSupportNavigateUp()
@@ -123,21 +141,23 @@ FlagsFragment.OnChangeToolbarTitleListener{
         val id = navController.currentDestination?.id
         //видимость иконок в тулбаре
         id?. let {
-            menu?.findItem(R.id.action_settings)?.isVisible = it != R.id.settingsFragment
-            menu?.findItem(R.id.action_help)?.isVisible = it!= R.id.helpFragment
+            menu?.findItem(R.id.action_settings)?.isVisible = (it == R.id.tabsFragment) ||
+                    (it == R.id.textquizFragment)
             menu?.findItem(R.id.search)?.isVisible = it== R.id.regionFragment
 
-//            //заголовки тулбара в зависимости от фрагмента
-//            toolbar.title = when(it){
-//                R.id.homeFragment -> getString(R.string.app_name)
-//                R.id.textquizFragment -> getString(R.string.text_quiz)
-//                R.id.imagequizFragment -> getString(R.string.image_quiz)
-//                R.id.settingsFragment -> getString(R.string.action_settings)
-//                R.id.helpFragment -> getString(R.string.action_help)
-//                R.id.flagsFragment -> getString(R.string.flags)
-//                R.id.tabsFragment -> getString(R.string.flags)
-//                else -> getString(R.string.app_name)
-//            }
+            //заголовки тулбара в зависимости от фрагмента
+            toolbar.title = when(id){
+                R.id.homeFragmentNew -> getString(R.string.app_name)
+                R.id.textquizFragment -> getString(R.string.text_quiz)
+                R.id.imagequizFragment -> getString(R.string.image_quiz)
+                R.id.settingsFragment -> getString(R.string.action_settings)
+                R.id.helpFragment -> getString(R.string.help)
+                R.id.flagsFragment ->  getString(R.string.flags)
+                R.id.tabsFragment ->toolbarTitleText //то что пришло из фрагмента флагов
+                R.id.regionFragment ->getString(R.string.states)
+                R.id.resultDialog -> toolbarTitleText //чтобы не просвечивало при повороте
+                else -> getString(R.string.app_name)
+            }
         }
         return super.onPrepareOptionsMenu(menu)
     }
@@ -148,39 +168,31 @@ FlagsFragment.OnChangeToolbarTitleListener{
     //кроме того пришлось делать перебор всех вариантов (может лучше  убрать меню во фрагменты)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (navController.currentDestination?.id ){
-            R.id.homeFragment -> {
+
+            R.id.homeFragmentNew -> {
                 when (item.itemId) {
-                    R.id.action_settings -> navController.navigate(R.id.action_homeFragment_to_settingsFragment)
-                    R.id.action_help -> navController.navigate(R.id.action_homeFragment_to_helpFragment)
+                    R.id.action_settings -> navController.navigate(R.id.action_homeFragmentNew_to_settingsFragment)
                 }
             }
 
             R.id.textquizFragment -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_textquizFragment_to_settingsFragment)
-                    R.id.action_help -> navController.navigate(R.id.action_textquizFragment_to_helpFragment)
                 }
             }
 
             R.id.imagequizFragment -> {
                 when (item.itemId) {
-                    R.id.action_help -> navController.navigate(R.id.action_imagequizFragment_to_helpFragment)
                     R.id.action_settings -> navController.navigate(R.id.action_imagequizFragment_to_settingsFragment)
                 }
             }
 
             R.id.tabsFragment -> {
                 when (item.itemId) {
-                    R.id.action_help -> navController.navigate(R.id.action_tabsFragment_to_helpFragment)
                     R.id.action_settings -> navController.navigate(R.id.action_tabsFragment_to_settingsFragment)
                 }
             }
 
-            R.id.settingsFragment -> {
-                when (item.itemId) {
-                    R.id.action_help -> navController.navigate(R.id.action_settingsFragment_to_helpFragment)
-                }
-            }
             R.id.helpFragment -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_helpFragment_to_settingsFragment)
@@ -197,7 +209,8 @@ FlagsFragment.OnChangeToolbarTitleListener{
                 navController.navigate(R.id.textquizFragment)
             }
             R.id.imagequizFragment -> {
-                navController.navigate(R.id.imagequizFragment)
+                //navController.navigate(R.id.imagequizFragment) //пока исключаем
+                navController.navigate(R.id.tabsFragment)
             }
             R.id.nav_settings -> {
                 navController.navigate(R.id.settingsFragment)
@@ -229,13 +242,5 @@ FlagsFragment.OnChangeToolbarTitleListener{
 
     fun getNetworkAvailable(): Boolean = isNetworkAvailable
 
-    companion object{
-        const val TAG = "33333"
-    }
-
-    override fun onChangeToolbarTitle(title: String) {
-      val toolbarTitle =   toolbar.findViewById<TextView>(R.id.main_title)
-        toolbarTitle.text = title
-    }
 
 }

@@ -3,10 +3,13 @@ package com.bartex.quizday.model.fsm.repo
 import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.entity.Answer
+import com.bartex.quizday.model.fsm.entity.ButtonTag
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import java.security.SecureRandom
 
 class FlagQuiz:IFlagQuiz {
+
+    private var random : SecureRandom = SecureRandom()
 
     //здесь сбрасываем переменные и очищаем списки а также формируем список с необходимым
     // числом флагов для новой викторины
@@ -25,8 +28,8 @@ class FlagQuiz:IFlagQuiz {
         dataFlags.correctAnswer = null //правильный ответ
         dataFlags.typeAnswer = null //тип ответа
         dataFlags.nextCountry = null //следующая страна для угадывания флага
-        dataFlags.row = 0  //номер строки кнопки ответа
-        dataFlags.column = 0 //номер столбца кнопки ответа
+        dataFlags.randomRow = 0  //номер строки кнопки ответа
+        dataFlags.randomColumn = 0 //номер столбца кнопки ответа
         dataFlags.correctAnswers = 0  // Сброс количества правильных ответов
         dataFlags.totalGuesses = 0 //  Сброс общего количества попыток
         dataFlags.quizCountriesList.clear()  // Очистка списка стран текущей викторины
@@ -51,6 +54,12 @@ class FlagQuiz:IFlagQuiz {
 
     //загрузка новых данных для викторины
     override fun loadNextFlag(dataFlags:DataFlags):DataFlags {
+        // код ниже - это случайная позиция для правильного ответа
+        //выбираем случайную строку и запоминаем её  в классе данных, чтобы не потерять при повороте
+        dataFlags.randomRow = random.nextInt(dataFlags.guessRows)
+        //выбираем случайный столбец и запоминаем его  в классе данных, чтобы не потерять при повороте
+        dataFlags.randomColumn = random.nextInt(2)
+
         //очистка списка кнопок с неправильными ответами
         dataFlags.buttonNotWellAnswerList.clear()
         // Получение  следующей страны для угадывания флага
@@ -87,6 +96,25 @@ class FlagQuiz:IFlagQuiz {
             dataFlags.typeAnswer =  Answer.NotWell
             //добавляем в список неправильных ответов чтобы задавать свойство isEnable кнопок
             dataFlags.buttonNotWellAnswerList.add(guess)
+        }
+        return dataFlags
+    }
+
+    override fun getTypeAnswerWithTag(tag: ButtonTag, dataFlags: DataFlags): DataFlags {
+        ++dataFlags.totalGuesses  // Увеличение количества попыток пользователя
+        if(tag.row == dataFlags.randomRow && tag.column == dataFlags.randomColumn){
+            //если ответ правильный и последний
+            if (dataFlags.correctAnswers == dataFlags.flagsInQuiz) {
+                dataFlags.typeAnswer =Answer.WellAndLast
+            }else {
+                // Ответ правильный, но викторина не закончена
+                dataFlags.typeAnswer = Answer.WellNotLast
+            }
+        }else{
+            // Неправильный ответ
+            dataFlags.typeAnswer =  Answer.NotWell
+            //добавляем в список неправильных ответов чтобы задавать свойство isEnable кнопок
+            dataFlags.buttonNotWellAnswerList.add(tag.nameRus)
         }
         return dataFlags
     }

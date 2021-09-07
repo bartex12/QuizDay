@@ -3,25 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/homeFragment">
-
-    <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.bartex.quizday.ui.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/action_homeFragment_to_helpFragment"
-            app:destination="@id/helpFragment" />
-        <action
-            android:id="@+id/action_homeFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
-    </fragment>
+    app:startDestination="@id/homeFragmentNew">
 
     <fragment
         android:id="@+id/textquizFragment"
         android:name="com.bartex.quizday.ui.textquiz.TextQuizFragment"
-        android:label="@string/menu_textquiz"
+        android:label="@string/text_quiz"
         tools:layout="@layout/fragment_textquiz" >
         <action
             android:id="@+id/action_textquizFragment_to_settingsFragment"
@@ -34,7 +21,7 @@
     <fragment
         android:id="@+id/imagequizFragment"
         android:name="com.bartex.quizday.ui.imagequiz.ImageQuizFragment"
-        android:label="@string/menu_imagequiz"
+        android:label="@string/image_quiz"
         tools:layout="@layout/fragment_imagquiz" >
         <action
             android:id="@+id/action_imagequizFragment_to_settingsFragment"
@@ -49,7 +36,7 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.bartex.quizday.ui.setting.SettingsFragment"
-        android:label="SettingsFragment" >
+        android:label="@string/settings" >
         <action
             android:id="@+id/action_settingsFragment_to_helpFragment"
             app:destination="@id/helpFragment"
@@ -59,7 +46,7 @@
     <fragment
         android:id="@+id/helpFragment"
         android:name="com.bartex.quizday.ui.help.HelpFragment"
-        android:label="HelpFragment" >
+        android:label="@string/help" >
         <action
             android:id="@+id/action_helpFragment_to_settingsFragment"
             app:destination="@id/settingsFragment"
@@ -68,29 +55,75 @@
     </fragment>
     <fragment
         android:id="@+id/flagsFragment"
-        android:name="com.bartex.quizday.ui.flags.FlagsFragment"
-        android:label="FlagsFragment" />
+        android:name="com.bartex.quizday.ui.flags.tabs.flag.FlagsFragment"
+        android:label="@string/flags" >
+        <action
+            android:id="@+id/action_flagsFragment_to_resultDialog"
+            app:destination="@id/resultDialog" />
+        <action
+            android:id="@+id/action_flagsFragment_to_helpFragment"
+            app:destination="@id/helpFragment" />
+        <action
+            android:id="@+id/action_flagsFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
     <dialog
         android:id="@+id/resultDialog"
-        android:name="com.bartex.quizday.ui.flags.ResultDialog"
-        android:label="ResultDialog" />
+        android:name="com.bartex.quizday.ui.flags.tabs.flag.ResultDialog"
+        android:label="@string/resultDialog" />
     <fragment
         android:id="@+id/tabsFragment"
         android:name="com.bartex.quizday.ui.flags.tabs.TabsFragment"
-        android:label="fragment_tabs"
+        android:label="@string/flags"
         tools:layout="@layout/fragment_tabs" >
         <action
-            android:id="@+id/action_tabsFragment_to_resultDialog"
-            app:destination="@id/resultDialog" />
+            android:id="@+id/action_tabsFragment_to_flagsFragment"
+            app:destination="@id/flagsFragment" />
+        <action
+            android:id="@+id/action_tabsFragment_to_regionFragment"
+            app:destination="@id/regionFragment" />
+        <action
+            android:id="@+id/action_tabsFragment_to_helpFragment"
+            app:destination="@id/helpFragment" />
         <action
             android:id="@+id/action_tabsFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
         <action
-            android:id="@+id/action_tabsFragment_to_helpFragment"
-            app:destination="@id/helpFragment" />
+            android:id="@+id/action_tabsFragment_to_statesFragment"
+            app:destination="@id/statesFragment" />
     </fragment>
     <fragment
         android:id="@+id/regionFragment"
         android:name="com.bartex.quizday.ui.flags.regions.RegionFragment"
-        android:label="RegionFragment" />
+        android:label="@string/states" >
+        <action
+            android:id="@+id/action_regionFragment_to_helpFragment"
+            app:destination="@id/helpFragment" />
+        <action
+            android:id="@+id/action_regionFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/homeFragmentNew"
+        android:name="com.bartex.quizday.ui.home.HomeFragment"
+        android:label="HomeFragmentNew" >
+        <action
+            android:id="@+id/action_homeFragmentNew_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_homeFragmentNew_to_helpFragment"
+            app:destination="@id/helpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/statesFragment"
+        android:name="com.bartex.quizday.ui.flags.tabs.state.StatesFragment"
+        android:label="StatesFragment" >
+        <action
+            android:id="@+id/action_statesFragment_to_resultDialogState"
+            app:destination="@id/resultDialogState" />
+    </fragment>
+    <dialog
+        android:id="@+id/resultDialogState"
+        android:name="com.bartex.quizday.ui.flags.tabs.state.ResultDialogState"
+        android:label="ResultDialogState" />
 </navigation>

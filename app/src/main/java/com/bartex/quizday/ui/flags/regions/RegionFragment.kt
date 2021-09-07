@@ -19,7 +19,7 @@ import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.RegionAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
-import com.bartex.quizday.ui.flags.FlagsViewModel
+import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
 import com.google.android.material.chip.ChipGroup
 import java.util.*
 
@@ -64,17 +64,17 @@ class RegionFragment : Fragment(),
             initAdapter()
             initChipGroupListener()
 
-            //приводим меню тулбара в соответствии с onPrepareOptionsMenu в MainActivity
-            //без этой строки меню в тулбаре ведёт себя неправильно
             setHasOptionsMenu(true)
             requireActivity().invalidateOptionsMenu()
 
+            //чтобы получить текущий регион - сделал обмен данными через flagsViewModel
+            // во flagsViewModel в методе resetQuiz() кладём значение, а здесь принимаем
             flagsViewModel.getDataFlagsToRegionFragment()
                     .observe(viewLifecycleOwner, {data->
                         listOfRegionStates = data.listStatesFromNet  // полный список стран
                         region = data.region //текущий регион
                         chipGroupRegion.check(getRegionId(region))
-
+                        //не убирать эту строку иначе при повороте данные пропадают!
                         renderDataWithRegion(region)
                     })
         }
@@ -91,7 +91,6 @@ class RegionFragment : Fragment(),
             chipGroupRegion.setOnCheckedChangeListener { _, id ->
                 chipGroupRegion.check(id)
                 val newRegion: String = getRegionName(id)
-
                 renderDataWithRegion(newRegion)
             }
         }
@@ -141,7 +140,7 @@ class RegionFragment : Fragment(),
             val manager = rvStatesRegion.layoutManager as LinearLayoutManager
             val firstPosition = manager.findFirstVisibleItemPosition()
             regionViewModel.savePositionState(firstPosition)
-            Log.d(TAG, "StatesFragment onPause firstPosition = $firstPosition")
+            Log.d(TAG, "RegionFragment onPause firstPosition = $firstPosition")
         }
 
         private fun initAdapter() {
@@ -162,10 +161,10 @@ class RegionFragment : Fragment(),
                 emptyViewRegion.visibility = View.GONE
 
                 listOfStates.sortBy { it.nameRus }
-
                 adapter?.listOfRegion = listOfStates
+
                 rvStatesRegion.layoutManager?.scrollToPosition(position) //крутим в запомненную позицию списка
-                Log.d(TAG, "StatesFragment renderState scrollToPosition = $position")
+                Log.d(TAG, "RegionFragment renderData scrollToPosition = $position")
             }
         }
 
@@ -193,7 +192,7 @@ class RegionFragment : Fragment(),
 
         override fun onQueryTextSubmit(query: String?): Boolean {
             //ничего не делаем - не будет фрагмента поиска, так как при вводе символов
-            //изменяется список внутри StatesFragment
+            //изменяется список внутри RegionFragment
             return false
         }
 

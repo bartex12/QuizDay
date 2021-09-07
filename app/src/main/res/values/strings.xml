@@ -3,7 +3,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_subtitle">Знания на ладони</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="newButton">NewButton</string>
     <string name="action_settings">Настройки</string>
@@ -31,6 +31,8 @@
     <string name="dialog_title_device_is_offline">Нет соединения с Интернетом</string>
     <string name="dialog_message_device_is_offline">Вы не сможете эффективно использовать приложение
         без подключения к Интернету. Пожалуйста, проверьте интернет-соединение</string>
+    <string name="dialog_message_load_impossible">Для первоначальной загрузки данных требуется Интернет.
+        Пожалуйста, проверьте интернет-соединение</string>
     <string name="dialog_title_stub">Неизвестная ошибка</string>
     <string name="dialog_button_cancel">Понятно</string>
     <string name="flags_of_states">Флаги стран мира</string>
@@ -64,9 +66,31 @@
     <string name="chooseRegion">Выберите регион</string>
     <string name="no_data_state">Нет данных \n Проверьте наличие Интернета</string>
     <string name="no_data_state_test">Пока нет данных</string>
+    <string name="no_data_state_test_all">Вы пока не делали \n ошибок в викторине</string>
+    <string name="no_data_state_test_region">В этом регионе \n пока ошибок нет</string>
+
     <string name="flag">Флаг</string>
+    <string name="home_item">home_item</string>
     <string name="search">Поиск</string>
     <string name="search_country">Поиск</string>
+    <string name="send_answer">Отправить</string>
+    <string name="answer">Ответ:</string>
+    <string name="states">Страны</string>
+    <string name="resultDialog">ResultDialog</string>
+    <string name="drawer_name">Quizday - знания на ладони</string>
+    <string name="drawer_header_subtitle">Развлекательн-познавательная викторина</string>
+    <string name="header">Заголовок</string>
+    <string name="stateName">Название страны</string>
 
+
+    <string name="menu">MAIN MENU</string>
+    <string name="picture">picture</string>
+    <string name="choose_menu">ВЫБИРАЙ!</string>
+    <string name="choose_quiz">ИГРАЕМ</string>
+    <string name="choose_play">ПОИГРАЕМ!</string>
+    <string name="choose_play2">Поиграем!</string>
+    <string name="divider">divider</string>
+    <string name="MediumTextStub">Правильно</string>
+    <string name="questionsStub">Мадагаскар</string>
 
 </resources>
