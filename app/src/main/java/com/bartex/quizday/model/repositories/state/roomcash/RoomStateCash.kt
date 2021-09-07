@@ -1,14 +1,12 @@
 package com.bartex.quizday.model.repositories.state.roomcash
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.bartex.quizday.model.common.MapOfCapital
 import com.bartex.quizday.model.common.MapOfRegion
 import com.bartex.quizday.model.common.MapOfState
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.room.Database
 import com.bartex.quizday.room.tables.RoomState
-import com.google.gson.annotations.Expose
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 
@@ -107,8 +105,6 @@ class RoomStateCash(val db:Database):IRoomStateCash {
     override fun getAllMistakesLive(): LiveData<List<RoomState>> {
         return db.stateDao.getAllMistakesLive()
     }
-
-
 }
 
 

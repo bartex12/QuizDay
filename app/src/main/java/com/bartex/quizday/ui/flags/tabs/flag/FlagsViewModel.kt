@@ -60,13 +60,11 @@ class FlagsViewModel(
     //заголовок тулбара во FlagFragment
     private var toolbarTitleInFlags:MutableLiveData<String> = MutableLiveData<String>()
 
-
     private var dataFlags:DataFlags = DataFlags() // здесь храним данные для состояний конечного автомата
     private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
     private var region:String = Constants.REGION_EUROPE //Здесь храним текущий регион
     private var currentState:IFlagState = ReadyState(DataFlags()) //Здесь храним текущее состояние
     private var isNeedToCreateDialog:Boolean = true//Здесь храним флаг необходимости создания диалога
-
 
     fun isNeedToCreateDialog():Boolean{
         return isNeedToCreateDialog

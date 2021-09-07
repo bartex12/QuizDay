@@ -201,5 +201,4 @@ class MistakesFragment: Fragment(),
         }
         return false
     }
-
 }

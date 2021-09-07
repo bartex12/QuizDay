@@ -30,8 +30,6 @@ class StatesRepo(private val api: IDataSourceState, private val roomCash: IRoomS
                 }
                     .subscribeOn(Schedulers.io())
 
-
-
     //получение списка стран из базы данных с учётом региона
     override fun getStatesFromCash(region: String):  Single<List<State>> =
       roomCash.getRegionStatesFromCash(region)

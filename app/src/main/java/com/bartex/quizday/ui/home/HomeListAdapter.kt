@@ -2,7 +2,6 @@ package com.bartex.quizday.ui.home
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +19,6 @@ class HomeListAdapter(private val context: Context,
 
     private val inflater: LayoutInflater
             = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
 
     override fun getCount(): Int {
        return dataSource.size

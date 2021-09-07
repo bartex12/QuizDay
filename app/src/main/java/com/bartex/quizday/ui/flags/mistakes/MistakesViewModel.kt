@@ -18,7 +18,6 @@ class MistakesViewModel(
         private var roomCash : IRoomStateCash =  RoomStateCash(Database.getInstance() as Database)
 ):ViewModel() {
 
-
     fun getPositionState(): Int{
         return helper.getPositionState()
     }
@@ -36,14 +35,15 @@ class MistakesViewModel(
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ isMistakeRemoved ->
                         if (isMistakeRemoved) {
-                            Log.d(FlagsViewModel.TAG, "MistakeRemoved: ")
+                            Log.d(TAG, "MistakeRemoved: ")
                         }else{
-                            Log.d(FlagsViewModel.TAG, "NOT Removed ")
+                            Log.d(TAG, "NOT Removed ")
                         }
                     }, {error->
-                        Log.d(FlagsViewModel.TAG, "${error.message}")
+                        Log.d(TAG, "${error.message}")
                     })
-
     }
-
+    companion object{
+        const val TAG = "33333"
+    }
 }

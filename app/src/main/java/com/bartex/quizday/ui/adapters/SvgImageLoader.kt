@@ -13,5 +13,4 @@ class SvgImageLoader(private val activity: Activity):IImageLoader<ImageView> {
                 .with(activity)
                 .load(Uri.parse(url), container)
     }
-
 }

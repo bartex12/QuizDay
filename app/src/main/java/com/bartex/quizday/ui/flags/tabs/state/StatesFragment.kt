@@ -366,6 +366,7 @@ class StatesFragment : Fragment(){
             }
         }
     }
+
     // Обновление guessRows на основании значения SharedPreferences
     private fun updateGuessRows(guessRows:Int) {
         // Сначала все компоненты LinearLayout скрываются

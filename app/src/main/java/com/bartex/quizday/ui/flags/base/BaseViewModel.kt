@@ -10,6 +10,7 @@ import com.bartex.quizday.ui.flags.StatesSealed
 import com.bartex.quizday.ui.flags.regions.IPreferenceHelper
 import com.bartex.quizday.ui.flags.regions.PreferenceHelper
 
+//todo убрать дублирование
 open class BaseViewModel(
         var helper : IPreferenceHelper = PreferenceHelper(App.instance),
         var roomCash : IRoomStateCash =  RoomStateCash(Database.getInstance() as Database)

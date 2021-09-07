@@ -61,7 +61,6 @@ class StatesViewModel (
     //заголовок тулбара во FlagFragment
     private var toolbarTitleInFlags:MutableLiveData<String> = MutableLiveData<String>()
 
-
     private var dataFlags: DataFlags = DataFlags() // здесь храним данные для состояний конечного автомата
     private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
     private var region:String = Constants.REGION_EUROPE //Здесь храним текущий регион
@@ -92,7 +91,6 @@ class StatesViewModel (
     fun getCurrentState(): LiveData<IFlagState> {
         return currentQuizState
     }
-
 
     fun getDataFromDatabase(): LiveData<MutableList<State>> {
         loadDataFromDatabase()
@@ -238,6 +236,4 @@ class StatesViewModel (
         dataFlags = settingProvider.getGuessRows(dataFlags)
         return dataFlags.guessRows
     }
-
-
 }
