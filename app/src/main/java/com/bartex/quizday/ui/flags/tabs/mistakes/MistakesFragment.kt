@@ -1,4 +1,4 @@
-package com.bartex.quizday.ui.flags.mistakes
+package com.bartex.quizday.ui.flags.tabs.mistakes
 
 import android.os.Bundle
 import android.util.Log
@@ -6,6 +6,7 @@ import android.view.*
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -16,6 +17,7 @@ import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.MistakesAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
+import com.bartex.quizday.ui.flags.shared.SharedViewModel
 import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
 import com.bartex.quizday.ui.flags.tabs.state.StatesViewModel
 import com.google.android.material.chip.ChipGroup
@@ -32,13 +34,7 @@ class MistakesFragment: Fragment(),
         ViewModelProvider(requireActivity()).get(MistakesViewModel::class.java)
     }
 
-    private val flagsViewModel by lazy {
-        ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
-    }
-
-    private val statesViewModel by lazy {
-        ViewModelProvider(requireActivity()).get(StatesViewModel::class.java)
-    }
+    private val model: SharedViewModel by activityViewModels()
 
     private var listOfMistakeStates  = mutableListOf<State>() //список стран региона с ошибками
     private lateinit var rvStatesMistake: RecyclerView
@@ -71,15 +67,14 @@ class MistakesFragment: Fragment(),
         setHasOptionsMenu(true)
         requireActivity().invalidateOptionsMenu()
 
-        //чтобы получить текущий регион - сделал обмен данными через flagsViewModel
-        // во flagsViewModel в методах  resetQuiz() и saveRegion() кладём значение, а здесь принимаем
-        flagsViewModel.getDataFlagsToAnotherFragment()
-            .observe(viewLifecycleOwner, {data->
-                region = data.region //текущий регион
-                chipGroupMistake.check(UtilMistakes.getRegionId(region)) //отметка на чипе
-                //не убирать эту строку иначе при повороте данные пропадают!
-                renderDataWithRegion(region)
-            })
+        //чтобы получить текущий регион - сделал обмен данными через SharedViewModel
+        // во FlagsFragment и StateFragment в initChipGroupListener() кладём значение, а здесь принимаем
+        model.newRegion.observe(viewLifecycleOwner,{newRegion->
+            region = newRegion
+            chipGroupMistake.check(UtilMistakes.getRegionId(region)) //отметка на чипе
+            //не убирать эту строку иначе при повороте данные пропадают!
+            renderDataWithRegion(region)
+        })
 
         //получаем все ошибки автоматически при любом изменении в базе данных
         mistakesViewModel.getAllMistakesLive()

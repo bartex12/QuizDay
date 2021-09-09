@@ -1,4 +1,4 @@
-package com.bartex.quizday.ui.flags.mistakes
+package com.bartex.quizday.ui.flags.tabs.mistakes
 
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants

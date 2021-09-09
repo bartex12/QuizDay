@@ -56,8 +56,6 @@ class StatesViewModel (
     private val listStatesFromDatabase = MutableLiveData<MutableList<State>>()
     //состояние конечного автомата
     private val currentQuizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
-    //данные для RegionFragment - есть список из сети и регион, так как формируется в resetQuiz()
-    private var dataFlagsToRegionFragment:MutableLiveData<DataFlags> = MutableLiveData<DataFlags>()
     //заголовок тулбара во FlagFragment
     private var toolbarTitleInFlags:MutableLiveData<String> = MutableLiveData<String>()
 
@@ -130,7 +128,6 @@ class StatesViewModel (
     fun saveRegion( newRegion:String){
         dataFlags.region = newRegion // в dataFlags
         region = newRegion  // в переменную ViewModel
-        dataFlagsToRegionFragment.value = dataFlags //для передачи текущих данных в другие фрагменты
     }
     fun getRegion( ):String{
         return  region
@@ -154,8 +151,6 @@ class StatesViewModel (
     //начальное состояние не имеет предыдущего
     fun resetQuiz(){
         setNeedToCreateDialog(true) //возвращаем флаг разрешения создания диалога
-        dataFlagsToRegionFragment.value = dataFlags //для передачи текущих данных в другие фрагменты
-
         dataFlags =  storage.resetQuiz(listOfStates, dataFlags, region) //подготовка переменных и списков
         currentQuizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
     }
@@ -195,11 +190,6 @@ class StatesViewModel (
                 currentQuizState.value = currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
             }
         }
-    }
-
-    //передаём данные в другие фрагменты
-    fun getDataFlagsToAnotherFragment():LiveData<DataFlags>{
-        return dataFlagsToRegionFragment
     }
 
     fun updateToolbarTitle(title:String){

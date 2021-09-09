@@ -19,4 +19,17 @@ class PreferenceHelper(val app: App):IPreferenceHelper {
                 .getInt(Constants.FIRST_POSITION_STATE, 0)
         return position
     }
+
+    override fun saveCurrentRegion(currentRegion: String) {
+        PreferenceManager.getDefaultSharedPreferences(app)
+                .edit()
+                .putString(Constants.CURRENT_REGION, currentRegion)
+                .apply()
+    }
+
+    override fun getCurrentRegion():String{
+      val currentRegion =  PreferenceManager.getDefaultSharedPreferences(app)
+                .getString(Constants.CURRENT_REGION, Constants.REGION_ALL)!!
+        return currentRegion
+    }
 }

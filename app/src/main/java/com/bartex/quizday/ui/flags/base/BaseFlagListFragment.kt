@@ -3,8 +3,6 @@ package com.bartex.quizday.ui.flags.base
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.bartex.quizday.ui.flags.mistakes.MistakesViewModel
-import com.bartex.quizday.ui.flags.regions.RegionViewModel
 
 //todo убрать дублирование
 abstract class BaseFlagListFragment: Fragment(),

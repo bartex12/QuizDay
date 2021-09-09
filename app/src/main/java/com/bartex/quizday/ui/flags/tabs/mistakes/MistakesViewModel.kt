@@ -1,4 +1,4 @@
-package com.bartex.quizday.ui.flags.mistakes
+package com.bartex.quizday.ui.flags.tabs.mistakes
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -8,7 +8,6 @@ import com.bartex.quizday.model.repositories.state.roomcash.IRoomStateCash
 import com.bartex.quizday.model.repositories.state.roomcash.RoomStateCash
 import com.bartex.quizday.room.Database
 import com.bartex.quizday.room.tables.RoomState
-import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
 import com.bartex.quizday.ui.flags.regions.IPreferenceHelper
 import com.bartex.quizday.ui.flags.regions.PreferenceHelper
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -43,6 +42,7 @@ class MistakesViewModel(
                         Log.d(TAG, "${error.message}")
                     })
     }
+
     companion object{
         const val TAG = "33333"
     }

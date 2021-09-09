@@ -14,13 +14,10 @@ object Constants {
     const val  REGION_OCEANIA = "Океания"
     const val  REGION_ALL= "Все"
 
-    val  LIST_OF_REGIONS= arrayOf( REGION_ALL, REGION_EUROPE, REGION_ASIA, REGION_AMERICAS,
-            REGION_AFRICA, REGION_OCEANIA)
-
     const val TOTAL_QUESTIONS = "TOTAL_QUESTIONS"
     const val TOTAL_GUESSES = "TOTAL_GUESSES"
 
     const val PAGER_POSITION = "PAGER_POSITION"
     const val  FIRST_POSITION_STATE = "FIRST_POSITION_STATE"
-    const val  TOOLBAR_TITLE_TEXT = "TOOLBAR_TITLE_TEXT"
+    const val  CURRENT_REGION = "CURRENT_REGION"
 }

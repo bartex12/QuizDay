@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -23,6 +24,7 @@ import com.bartex.quizday.model.fsm.IFlagState
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.substates.*
 import com.bartex.quizday.network.NoInternetDialogFragment
+import com.bartex.quizday.ui.flags.shared.SharedViewModel
 import com.bartex.quizday.ui.flags.StatesSealed
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import com.google.android.material.chip.Chip
@@ -37,6 +39,9 @@ class FlagsFragment: Fragment(){
     private val flagsViewModel by lazy{
         ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
     }
+
+    private val model: SharedViewModel by activityViewModels()
+
     private val  mToneGenerator: ToneGenerator by lazy{
         ToneGenerator(AudioManager.STREAM_MUSIC, 100)
     }
@@ -127,6 +132,8 @@ class FlagsFragment: Fragment(){
             if (newRegion != flagsViewModel.getRegion()){
                 flagsViewModel.saveRegion(newRegion)
                 flagsViewModel.resetQuiz()
+
+                model.update(newRegion)
             }
         }
     }

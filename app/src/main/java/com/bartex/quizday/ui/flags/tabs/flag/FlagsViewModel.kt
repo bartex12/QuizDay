@@ -24,6 +24,8 @@ import com.bartex.quizday.model.repositories.state.roomcash.IRoomStateCash
 import com.bartex.quizday.model.repositories.state.roomcash.RoomStateCash
 import com.bartex.quizday.room.Database
 import com.bartex.quizday.ui.flags.StatesSealed
+import com.bartex.quizday.ui.flags.regions.IPreferenceHelper
+import com.bartex.quizday.ui.flags.regions.PreferenceHelper
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -46,7 +48,8 @@ class FlagsViewModel(
         roomCash = RoomStateCash(Database.getInstance() as Database)),
         private val storage: IFlagQuiz = FlagQuiz(),
         private val settingProvider: ISettingsProvider = SettingsProvider(App.instance),
-        private val roomCash: IRoomStateCash = RoomStateCash(Database.getInstance() as Database)
+        private val roomCash: IRoomStateCash = RoomStateCash(Database.getInstance() as Database),
+        private var helper : IPreferenceHelper = PreferenceHelper(App.instance),
 ) : ViewModel()  {
 
     //список стран из сети
@@ -55,8 +58,6 @@ class FlagsViewModel(
     private val listStatesFromDatabase = MutableLiveData<MutableList<State>>()
     //состояние конечного автомата
     private val currentQuizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
-    //данные для RegionFragment - есть список из сети и регион, так как формируется в resetQuiz()
-    private var dataFlagsToRegionFragment:MutableLiveData<DataFlags> = MutableLiveData<DataFlags>()
     //заголовок тулбара во FlagFragment
     private var toolbarTitleInFlags:MutableLiveData<String> = MutableLiveData<String>()
 
@@ -65,6 +66,7 @@ class FlagsViewModel(
     private var region:String = Constants.REGION_EUROPE //Здесь храним текущий регион
     private var currentState:IFlagState = ReadyState(DataFlags()) //Здесь храним текущее состояние
     private var isNeedToCreateDialog:Boolean = true//Здесь храним флаг необходимости создания диалога
+
 
     fun isNeedToCreateDialog():Boolean{
         return isNeedToCreateDialog
@@ -105,9 +107,8 @@ class FlagsViewModel(
     //начальное состояние не имеет предыдущего
     fun resetQuiz(){
         setNeedToCreateDialog(true) //возвращаем флаг разрешения создания диалога
-        dataFlagsToRegionFragment.value = dataFlags // //для передачи текущих данных в другие фрагменты
-
         dataFlags =  storage.resetQuiz(listOfStates, dataFlags, region) //подготовка переменных и списков
+        helper.saveCurrentRegion(dataFlags.region) // сохраняем регион в преференсис
         currentQuizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
     }
 
@@ -115,7 +116,6 @@ class FlagsViewModel(
     fun loadNextFlag(dataFlags:DataFlags){
         this.dataFlags =  storage.loadNextFlag(dataFlags)
         currentQuizState.value =  currentState.executeAction(Action.OnNextFlagClicked(this.dataFlags))
-
     }
 
     //по типу ответа при щелчке по кнопке задаём состояние
@@ -170,8 +170,8 @@ class FlagsViewModel(
     fun saveRegion( newRegion:String){
         dataFlags.region = newRegion // в dataFlags
         region = newRegion  // в переменную ViewModel
-        dataFlagsToRegionFragment.value = dataFlags //для передачи текущих данных в другие фрагменты
     }
+
     fun getRegion( ):String{
       return  region
     }
@@ -194,11 +194,6 @@ class FlagsViewModel(
     //сохраняем текущее состояние
     fun saveCurrentState( newState:IFlagState){
         currentState = newState
-    }
-
-//передаём данные во фрагмент со списками стран регионов
-    fun getDataFlagsToAnotherFragment():LiveData<DataFlags>{
-        return dataFlagsToRegionFragment
     }
 
     fun updateToolbarTitle(title:String){

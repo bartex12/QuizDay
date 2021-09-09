@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -19,6 +20,7 @@ import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.RegionAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
+import com.bartex.quizday.ui.flags.shared.SharedViewModel
 import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
 import com.google.android.material.chip.ChipGroup
 import java.util.*
@@ -30,13 +32,13 @@ class RegionFragment : Fragment(),
     private var position = 0
     private var adapter: RegionAdapter? = null
     private lateinit var navController: NavController
+
     private val regionViewModel by lazy{
         ViewModelProvider(requireActivity()).get(RegionViewModel::class.java)
     }
 
-    private val flagsViewModel by lazy {
-        ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
-    }
+    private val model: SharedViewModel by activityViewModels()
+
         private var listOfRegionStates  = mutableListOf<State>() //список стран региона
         private lateinit var rvStatesRegion: RecyclerView
         private lateinit  var emptyViewRegion: TextView
@@ -67,15 +69,24 @@ class RegionFragment : Fragment(),
             setHasOptionsMenu(true)
             requireActivity().invalidateOptionsMenu()
 
-            //чтобы получить текущий регион - сделал обмен данными через flagsViewModel
-            // во flagsViewModel в методе resetQuiz() кладём значение, а здесь принимаем
-            flagsViewModel.getDataFlagsToAnotherFragment()
+            //чтобы получить текущий регион - сделал обмен данными через SharedViewModel
+            // в других фрагментах кладём значение, а здесь принимаем
+            model.newRegion.observe(viewLifecycleOwner, {newRegion ->
+                region = newRegion //текущий регион
+                chipGroupRegion.check(getRegionId(region))
+                //не убирать эту строку иначе при повороте данные пропадают!
+                renderDataWithRegion(region)
+            })
+
+            regionViewModel.getAllDataLive()
                     .observe(viewLifecycleOwner, {data->
-                        listOfRegionStates = data.listStatesFromNet  // полный список стран
-                        region = data.region //текущий регион
-                        chipGroupRegion.check(getRegionId(region))
-                        //не убирать эту строку иначе при повороте данные пропадают!
-                        renderDataWithRegion(region)
+                        listOfRegionStates =   data .map{
+                        State(it.capital, it.flag, it.name, it.region, it.nameRus, it.capitalRus, it.regionRus)
+                    }.filter {st->
+                        st.name!=null && st.capital!=null && st.flag!=null &&
+                                st.name.isNotBlank() && st.capital.isNotBlank() && st.flag.isNotBlank()
+                                && st.name != "Puerto Rico" && st.name !=  "French Guiana"
+                    } as MutableList<State>
                     })
         }
 
