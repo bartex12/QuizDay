@@ -46,7 +46,7 @@ class StatesFragment : Fragment(){
     private lateinit var handler : Handler   // Для задержки загрузки следующего флага
     private lateinit var quizLinearLayout  : LinearLayout // root макета фрагмента
     private lateinit var answerTextView : TextView  //для правильно/неправильно
-    private lateinit var quistionTextView  : TextView  //Для вывода страны-вопроса
+    private lateinit var questionTextView  : TextView  //Для вывода страны-вопроса
     private lateinit var guessButton: ImageView  // текущая кнопка ответа
     private lateinit var progressBarStates: ProgressBar
     private var guessLinearLayouts : Array<LinearLayout?> = arrayOfNulls(3) //кнопки ответов
@@ -76,18 +76,18 @@ class StatesFragment : Fragment(){
         //затем данные получаем из базы
         if (savedInstanceState == null){
             //выделение на Европу при перврй загрузке (можно также запоминать в Pref)
-            chipGroup.check(R.id.chip_Europa)
+            chipGroup.check(R.id.chip_Europa_states)
 
             statesViewModel.getDataFromDatabase()
-                    .observe(viewLifecycleOwner, {
-                        if (it.size >200){ //если в базе есть записи
-                            renderDataFromDatabase(it)  //берём из базы
+                    .observe(viewLifecycleOwner, {listOfState->
+                        if (listOfState.size >200){ //если в базе есть записи
+                            renderDataFromDatabase(listOfState)  //берём из базы
                         }else{ //если в базе ничего нет
                             if (isNetworkAvailable){ //если сеть есть
                                 //получаем страны из сети и после этого запускаем викторину
                                 statesViewModel.getStatesSealed()
-                                        .observe(viewLifecycleOwner,  {
-                                            renderData(it)
+                                        .observe(viewLifecycleOwner,  {stateSealed->
+                                            renderData(stateSealed)
                                         })
                             }else{//если нет ни сети ни данных в базе - показываем предупреждение
                                 showAlertDialog(
@@ -244,7 +244,7 @@ class StatesFragment : Fragment(){
 
         quizLinearLayout = view.findViewById<View>(R.id.quizLinearLayoutStates) as LinearLayout
         answerTextView = view.findViewById<View>(R.id.answerTextView_states) as TextView
-        quistionTextView = view.findViewById<View>(R.id.questionTextView_states) as TextView
+        questionTextView = view.findViewById<View>(R.id.questionTextView_states) as TextView
         progressBarStates = view.findViewById<View>(R.id.progressBarStates) as ProgressBar
 
         guessLinearLayouts[0] = view.findViewById<View>(R.id.row1LinearLayout_states) as LinearLayout
@@ -255,7 +255,7 @@ class StatesFragment : Fragment(){
     //показываем страну, которую нужно угадать
     private fun showNextCountry(data: DataFlags) {
         data.nextCountry?.nameRus.let { nameRus ->
-            quistionTextView.text = nameRus
+            questionTextView.text = nameRus
         }
     }
 

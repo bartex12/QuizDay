@@ -17,6 +17,7 @@ import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.MistakesAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
 import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
+import com.bartex.quizday.ui.flags.tabs.state.StatesViewModel
 import com.google.android.material.chip.ChipGroup
 import java.util.*
 
@@ -34,6 +35,11 @@ class MistakesFragment: Fragment(),
     private val flagsViewModel by lazy {
         ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
     }
+
+    private val statesViewModel by lazy {
+        ViewModelProvider(requireActivity()).get(StatesViewModel::class.java)
+    }
+
     private var listOfMistakeStates  = mutableListOf<State>() //список стран региона с ошибками
     private lateinit var rvStatesMistake: RecyclerView
     private lateinit  var emptyViewMistake: TextView
@@ -66,11 +72,11 @@ class MistakesFragment: Fragment(),
         requireActivity().invalidateOptionsMenu()
 
         //чтобы получить текущий регион - сделал обмен данными через flagsViewModel
-        // во flagsViewModel в методе resetQuiz() кладём значение, а здесь принимаем
-        flagsViewModel.getDataFlagsToRegionFragment()
+        // во flagsViewModel в методах  resetQuiz() и saveRegion() кладём значение, а здесь принимаем
+        flagsViewModel.getDataFlagsToAnotherFragment()
             .observe(viewLifecycleOwner, {data->
                 region = data.region //текущий регион
-                chipGroupMistake.check(UtilMistakes.getRegionId(region))
+                chipGroupMistake.check(UtilMistakes.getRegionId(region)) //отметка на чипе
                 //не убирать эту строку иначе при повороте данные пропадают!
                 renderDataWithRegion(region)
             })
@@ -85,7 +91,7 @@ class MistakesFragment: Fragment(),
                         )
                     } as MutableList<State>
                     UtilMistakes.showCountByRegion(chipGroupMistake, listOfMistakeStates)
-                    chipGroupMistake.check(UtilMistakes.getRegionId(region))
+                    chipGroupMistake.check(UtilMistakes.getRegionId(region))//отметка на чипе
                     renderDataWithRegion(region)
                 })
     }

@@ -69,7 +69,7 @@ class RegionFragment : Fragment(),
 
             //чтобы получить текущий регион - сделал обмен данными через flagsViewModel
             // во flagsViewModel в методе resetQuiz() кладём значение, а здесь принимаем
-            flagsViewModel.getDataFlagsToRegionFragment()
+            flagsViewModel.getDataFlagsToAnotherFragment()
                     .observe(viewLifecycleOwner, {data->
                         listOfRegionStates = data.listStatesFromNet  // полный список стран
                         region = data.region //текущий регион

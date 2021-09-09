@@ -78,15 +78,15 @@ class FlagsFragment: Fragment(){
             chipGroup.check(R.id.chip_Europa)
 
             flagsViewModel.getDataFromDatabase()
-                    .observe(viewLifecycleOwner, {
-                        if (it.size >200){ //если в базе есть записи
-                            renderDataFromDatabase(it)  //берём из базы
+                    .observe(viewLifecycleOwner, {listOfState->
+                        if (listOfState.size >200){ //если в базе есть записи
+                            renderDataFromDatabase(listOfState)  //берём из базы
                         }else{ //если в базе ничего нет
                             if (isNetworkAvailable){ //если сеть есть
                                 //получаем страны из сети и после этого запускаем викторину
                                 flagsViewModel.getStatesSealed()
-                                        .observe(viewLifecycleOwner,  {
-                                            renderData(it)
+                                        .observe(viewLifecycleOwner,  {stateSealed->
+                                            renderData(stateSealed)
                                         })
                             }else{//если нет ни сети ни данных в базе - показываем предупреждение
                                 showAlertDialog(

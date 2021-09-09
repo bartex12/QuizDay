@@ -33,16 +33,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class FlagsViewModel(
         private var statesRepo: IStatesRepo = StatesRepo(
-        Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-            .addConverterFactory(
-                GsonConverterFactory.create(
-                    GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .excludeFieldsWithoutExposeAnnotation()
-                .create()
-            )).build().create(IDataSourceState::class.java),
+                Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                    .addConverterFactory(
+                        GsonConverterFactory.create(
+                            GsonBuilder()
+                        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                        .excludeFieldsWithoutExposeAnnotation()
+                        .create()
+                    )).build().create(IDataSourceState::class.java),
         roomCash = RoomStateCash(Database.getInstance() as Database)),
         private val storage: IFlagQuiz = FlagQuiz(),
         private val settingProvider: ISettingsProvider = SettingsProvider(App.instance),
@@ -105,7 +105,7 @@ class FlagsViewModel(
     //начальное состояние не имеет предыдущего
     fun resetQuiz(){
         setNeedToCreateDialog(true) //возвращаем флаг разрешения создания диалога
-        dataFlagsToRegionFragment.value = dataFlags //для передачи в RegionFragment
+        dataFlagsToRegionFragment.value = dataFlags // //для передачи текущих данных в другие фрагменты
 
         dataFlags =  storage.resetQuiz(listOfStates, dataFlags, region) //подготовка переменных и списков
         currentQuizState.value =  ReadyState(dataFlags) //передаём полученные данные в состояние
@@ -170,7 +170,7 @@ class FlagsViewModel(
     fun saveRegion( newRegion:String){
         dataFlags.region = newRegion // в dataFlags
         region = newRegion  // в переменную ViewModel
-        dataFlagsToRegionFragment.value = dataFlags //для передачи в RegionFragment
+        dataFlagsToRegionFragment.value = dataFlags //для передачи текущих данных в другие фрагменты
     }
     fun getRegion( ):String{
       return  region
@@ -197,7 +197,7 @@ class FlagsViewModel(
     }
 
 //передаём данные во фрагмент со списками стран регионов
-    fun getDataFlagsToRegionFragment():LiveData<DataFlags>{
+    fun getDataFlagsToAnotherFragment():LiveData<DataFlags>{
         return dataFlagsToRegionFragment
     }
 
