@@ -1,10 +1,11 @@
-package com.bartex.quizday.ui.flags.regions
+package com.bartex.quizday.ui.flags.tabs.regions
 
 import androidx.preference.PreferenceManager
 import com.bartex.quizday.App
 import com.bartex.quizday.model.common.Constants
+import com.bartex.quizday.ui.flags.tabs.regions.IPreferenceHelper
 
-class PreferenceHelper(val app: App):IPreferenceHelper {
+class PreferenceHelper(val app: App): IPreferenceHelper {
 
     override fun savePositionState(position:Int) {
 

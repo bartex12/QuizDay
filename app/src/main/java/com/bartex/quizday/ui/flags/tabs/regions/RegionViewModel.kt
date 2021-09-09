@@ -1,4 +1,4 @@
-package com.bartex.quizday.ui.flags.regions
+package com.bartex.quizday.ui.flags.tabs.regions
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel

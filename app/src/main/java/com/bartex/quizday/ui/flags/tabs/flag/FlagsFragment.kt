@@ -133,7 +133,7 @@ class FlagsFragment: Fragment(){
                 flagsViewModel.saveRegion(newRegion)
                 flagsViewModel.resetQuiz()
 
-                model.update(newRegion)
+                model.update(newRegion) //обновляем регион
             }
         }
     }
@@ -151,6 +151,7 @@ class FlagsFragment: Fragment(){
     //состояние готовности к викторине - показываем первый флаг
     private fun showReadyState(data: DataFlags) {
         getNumberOnChipName(data) //показываем количество стран в регионе
+        model.update(data.region)  //обновляем регион  - в случае если без действий уходим на другой фрагмент
         flagsViewModel.loadNextFlag(data)
     }
 

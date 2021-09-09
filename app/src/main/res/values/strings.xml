@@ -3,7 +3,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">Знания на ладони</string>
+    <string name="nav_header_subtitle">Знание на ладони</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="newButton">NewButton</string>
     <string name="action_settings">Настройки</string>

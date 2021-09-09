@@ -1,4 +1,4 @@
-package com.bartex.quizday.ui.flags.regions
+package com.bartex.quizday.ui.flags.tabs.regions
 
 import android.content.Context
 import android.os.Bundle
@@ -21,7 +21,6 @@ import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.RegionAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
 import com.bartex.quizday.ui.flags.shared.SharedViewModel
-import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
 import com.google.android.material.chip.ChipGroup
 import java.util.*
 
@@ -44,7 +43,7 @@ class RegionFragment : Fragment(),
         private lateinit  var emptyViewRegion: TextView
         private lateinit var chipGroupRegion: ChipGroup
         private lateinit var progressBarRegion: ProgressBar
-        private var region:String = ""
+        private var region:String = Constants.REGION_EUROPE
 
         companion object {
         const val TAG = "33333"
@@ -80,13 +79,16 @@ class RegionFragment : Fragment(),
 
             regionViewModel.getAllDataLive()
                     .observe(viewLifecycleOwner, {data->
-                        listOfRegionStates =   data .map{
+                        listOfRegionStates =   data.map{
                         State(it.capital, it.flag, it.name, it.region, it.nameRus, it.capitalRus, it.regionRus)
                     }.filter {st->
                         st.name!=null && st.capital!=null && st.flag!=null &&
                                 st.name.isNotBlank() && st.capital.isNotBlank() && st.flag.isNotBlank()
                                 && st.name != "Puerto Rico" && st.name !=  "French Guiana"
                     } as MutableList<State>
+                        UtilRegions.showCountByRegion(chipGroupRegion, listOfRegionStates) //число на чипе
+                        chipGroupRegion.check(UtilRegions.getRegionId(region))//отметка на чипе
+                        renderDataWithRegion(region)
                     })
         }
 
