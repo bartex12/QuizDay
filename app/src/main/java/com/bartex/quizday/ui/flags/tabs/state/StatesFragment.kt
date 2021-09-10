@@ -102,6 +102,9 @@ class StatesFragment : Fragment(){
                             }
                         }
                     })
+        }else{
+            val title = model.toolbarTitleFromState.value
+            title?.let{model.updateToolbarTitleFromFlag(it)}//обновление тулбара при повороте экрана
         }
 
         //следим за состоянием конечного автомата
@@ -159,7 +162,7 @@ class StatesFragment : Fragment(){
     //следующий вопрос
     private fun showNextFlagState(data: DataFlags) {
         getNumberOnChipName(data)//показываем количество стран в регионе
-        statesViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromState(getToolbarTitle(data))//обновить номер текущего вопроса
         answerTextView.text = "" //не показывать пока ответ правильный/неправильный
         showNextCountry(data)  //показываем название страны которую нужно угадать*
         showAnswerButtonsNumberAndNames(data)// Добавление кнопок*
@@ -171,7 +174,7 @@ class StatesFragment : Fragment(){
         getNumberOnChipName(data)//показываем количество стран в регионе
         statesViewModel.writeMistakeInDatabase() //делаем отметку об ошибке в базе данных
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
-        statesViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromState(getToolbarTitle(data))//обновить номер текущего вопроса
         showIncorrectAnswer()//показать неправильный ответ
         //todo анимацию встряхивания сделать
         showNextCountry(data) //показываем название страны которую нужно угадать*
@@ -183,7 +186,7 @@ class StatesFragment : Fragment(){
     private fun showWellNotLastState(data: DataFlags) {
         getNumberOnChipName(data)//показываем количество стран в регионе
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 50) }.start()
-        statesViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromState(getToolbarTitle(data))//обновить номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons()  // Блокировка всех кнопок ответов
         handler.postDelayed(
@@ -197,7 +200,7 @@ class StatesFragment : Fragment(){
     private fun showWellAndLastState(data: DataFlags) {
         getNumberOnChipName(data)//показываем количество стран в регионе
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
-        statesViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromState(getToolbarTitle(data))//обновить номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons() //сделать иконки недоступными
         showNextCountry(data) //показываем название страны которую нужно угадать*

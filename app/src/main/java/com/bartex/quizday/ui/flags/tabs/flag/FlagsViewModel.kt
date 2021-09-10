@@ -190,18 +190,9 @@ class FlagsViewModel(
         return  "$region $regionSize"
     }
 
-
     //сохраняем текущее состояние
     fun saveCurrentState( newState:IFlagState){
         currentState = newState
-    }
-
-    fun updateToolbarTitle(title:String){
-        toolbarTitleInFlags.value = title
-    }
-
-    fun getFlagsToolbarTitle():LiveData<String>{
-        return  toolbarTitleInFlags
     }
 
     fun getDataFromDatabase(): LiveData<MutableList<State>>{

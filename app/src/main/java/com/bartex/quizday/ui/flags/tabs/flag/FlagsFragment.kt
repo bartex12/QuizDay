@@ -101,6 +101,9 @@ class FlagsFragment: Fragment(){
                             }
                         }
                     })
+        }else{
+            val title = model.toolbarTitleFromFlag.value
+            title?.let{model.updateToolbarTitleFromFlag(it)} //обновление тулбара при повороте экрана
         }
 
         //следим за состоянием конечного автомата
@@ -158,7 +161,7 @@ class FlagsFragment: Fragment(){
     //следующий вопрос
     private fun showNextFlagState(data: DataFlags) {
         getNumberOnChipName(data)//показываем количество стран в регионе
-        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromFlag(getToolbarTitle(data))//обновить номер текущего вопроса
         answerTextView.text = "" //не показывать пока ответ
         showNextCountryFlag(data)  //svg изображение флага data
         showAnswerButtonsNumberAndNames(data)// Добавление кнопок
@@ -170,7 +173,7 @@ class FlagsFragment: Fragment(){
         getNumberOnChipName(data)//показываем количество стран в регионе
         flagsViewModel.writeMistakeInDatabase() //делаем отметку об ошибке в базе данных
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
-        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromFlag(getToolbarTitle(data))//обновить номер текущего вопроса
         showIncorrectAnswer()//показать неправильный ответ
         //todo анимацию встряхивания сделать
         showNextCountryFlag(data) //svg изображение флага
@@ -182,7 +185,7 @@ class FlagsFragment: Fragment(){
     private fun showWellNotLastState(data: DataFlags) {
         getNumberOnChipName(data)//показываем количество стран в регионе
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 50) }.start()
-        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromFlag(getToolbarTitle(data))//обновить номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons()  // Блокировка всех кнопок ответов
         handler.postDelayed(
@@ -196,7 +199,7 @@ class FlagsFragment: Fragment(){
     private fun showWellAndLastState(data: DataFlags) {
         getNumberOnChipName(data)//показываем количество стран в регионе
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
-        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromFlag(getToolbarTitle(data))//обновить номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons() //сделать иконки недоступными
         showNextCountryFlag(data)  //svg изображение флага

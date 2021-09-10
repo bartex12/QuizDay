@@ -162,21 +162,6 @@ class StatesViewModel (
     }
 
     //по типу ответа при щелчке по кнопке задаём состояние
-    fun answer(guess:String){
-        dataFlags = storage.getTypeAnswer(guess, dataFlags)
-        when(dataFlags.typeAnswer){
-            Answer.NotWell -> {
-                currentQuizState.value = currentState.executeAction(Action.OnNotWellClicked(dataFlags))
-            }
-            Answer.WellNotLast -> {
-                currentQuizState.value =  currentState.executeAction(Action.OnWellNotLastClicked(dataFlags))
-            }
-            Answer.WellAndLast -> {
-                currentQuizState.value = currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
-            }
-        }
-    }
-
     fun answerImageButtonClick( tag: ButtonTag) {
         dataFlags = storage.getTypeAnswerWithTag(tag, dataFlags)
         when(dataFlags.typeAnswer){
@@ -190,14 +175,6 @@ class StatesViewModel (
                 currentQuizState.value = currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
             }
         }
-    }
-
-    fun updateToolbarTitle(title:String){
-        toolbarTitleInFlags.value = title
-    }
-
-    fun getFlagsToolbarTitle():LiveData<String>{
-        return  toolbarTitleInFlags
     }
 
     fun writeMistakeInDatabase() {

@@ -1,15 +1,18 @@
 package com.bartex.quizday.ui.flags.tabs
 
+import android.content.Context
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import com.bartex.quizday.R
 import com.bartex.quizday.ui.flags.tabs.regions.RegionFragment
 import com.bartex.quizday.ui.flags.tabs.flag.FlagsFragment
 import com.bartex.quizday.ui.flags.tabs.mistakes.MistakesFragment
 import com.bartex.quizday.ui.flags.tabs.state.StatesFragment
 
-class ViewPageAdapter(fragmentManager : FragmentManager)
-    :FragmentPagerAdapter(fragmentManager,BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+class ViewPageAdapter(val context:Context, fragmentManager : FragmentManager)
+    :FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     companion object {
         const val FLAGS = 0
@@ -41,11 +44,11 @@ class ViewPageAdapter(fragmentManager : FragmentManager)
 
     override fun getPageTitle(position: Int): CharSequence {
         return  when(position){
-            0->"Флаги"
-            1->"Страны"
-            2->"Ошибки"
-            3-> "Таблицы"
-            else -> "Флаги"
+            0-> context.getString(R.string.flags)
+            1->context.getString(R.string.states)
+            2->context.getString(R.string.mistakes)
+            3-> context.getString(R.string.regions)
+            else -> context.getString(R.string.flags)
         }
     }
 }

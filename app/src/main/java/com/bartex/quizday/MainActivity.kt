@@ -20,14 +20,15 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
+import androidx.viewpager.widget.ViewPager
 import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.network.NoInternetDialogFragment
 import com.bartex.quizday.network.OnlineLiveData
 import com.bartex.quizday.network.isInternetAvailable
-import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
-import com.bartex.quizday.ui.flags.tabs.state.StatesViewModel
+import com.bartex.quizday.ui.flags.shared.SharedViewModel
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.fragment_tabs.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener{
 
@@ -36,17 +37,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toolbar: Toolbar
     private lateinit var toolbarTitle: TextView
-    private  var toolbarTitleText: String = ""
-
+    //private  var toolbarTitleText: String = ""
+    private  var toolbarTitleFlag = ""
+    private  var toolbarTitleState = ""
     private lateinit var audioManager: AudioManager
     private var isNetworkAvailable: Boolean = true //Доступна ли сеть
+    private var navigationId: Int = 0
 
-    private val flagsViewModel by lazy{
-        ViewModelProvider(this).get(FlagsViewModel::class.java)
+
+    private val model by lazy{
+        ViewModelProvider(this).get(SharedViewModel::class.java)
     }
-    private val statesViewModel by lazy{
-        ViewModelProvider(this).get(StatesViewModel::class.java)
-    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -99,16 +101,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setNavigationItemSelectedListener(this)
 
-        //используем flagsViewModel для получения данных от фрагмента - вместо интерфейса
-        flagsViewModel.getFlagsToolbarTitle()
+
+
+        //передача данных о надписи на тулбаре из фрагмента викторины с флагами
+        model.toolbarTitleFromFlag
                 .observe(this, {newTitle->
-                    toolbarTitleText = newTitle
-                    toolbar.title = toolbarTitleText
+                    toolbarTitleFlag = newTitle
+                    if(getViewPager()?.currentItem ==0 ){
+                        toolbar.title = toolbarTitleFlag //здесь тоже, иначе не обновляется само
+                    }
                 })
-        statesViewModel.getFlagsToolbarTitle()
+        //передача данных о надписи на тулбаре из фрагмента викторины со странами
+        model.toolbarTitleFromState
                 .observe(this, {newTitle->
-                    toolbarTitleText = newTitle
-                    toolbar.title = toolbarTitleText
+                    toolbarTitleState = newTitle
+                    if(getViewPager()?.currentItem ==1 ){
+                        toolbar.title = toolbarTitleState //здесь тоже, иначе не обновляется само
+                    }
                 })
     }
 
@@ -135,7 +144,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    //todo  изменять при добавлении фрагментов
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         //нашел способ установить видимость иконок в тулбаре без перебора всех вариантов
         val id = navController.currentDestination?.id
@@ -152,14 +160,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.imagequizFragment -> getString(R.string.image_quiz)
                 R.id.settingsFragment -> getString(R.string.action_settings)
                 R.id.helpFragment -> getString(R.string.help)
-                R.id.flagsFragment ->  getString(R.string.flags)
-                R.id.tabsFragment ->toolbarTitleText //то что пришло из фрагмента флагов
-                R.id.regionFragment ->getString(R.string.states)
-                R.id.resultDialog -> toolbarTitleText //чтобы не просвечивало при повороте
-                else -> getString(R.string.app_name)
+                R.id.flagsFragment ->  toolbarTitleFlag
+                R.id.statesFragment -> toolbarTitleState
+                R.id.tabsFragment -> {
+                    when(getViewPager()?.currentItem){
+                        0-> toolbarTitleFlag
+                        1-> toolbarTitleState
+                        2-> getString(R.string.mistakes)
+                        3->  getString(R.string.regions)
+                        else-> getString(R.string.app_name)
+                    }
+                }
+                else-> getString(R.string.app_name)
             }
         }
         return super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun getViewPager(): ViewPager? {
+        val frag = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+        return frag?.view?.findViewById(R.id.view_pager_flags)
     }
 
     //так  как справка - настройки могут бесконечно вызываться друг из друга

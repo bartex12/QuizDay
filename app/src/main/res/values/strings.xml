@@ -92,5 +92,7 @@
     <string name="divider">divider</string>
     <string name="MediumTextStub">Правильно</string>
     <string name="questionsStub">Мадагаскар</string>
+    <string name="mistakes">Ошибки</string>
+    <string name="regions">Регионы</string>
 
 </resources>
