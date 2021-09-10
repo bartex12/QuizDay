@@ -132,7 +132,7 @@ class FlagsFragment: Fragment(){
     private fun initChipGroupListener() {
         chipGroup.setOnCheckedChangeListener { _, id ->
             val newRegion:String = getChipNameById(id)
-            if (newRegion != flagsViewModel.getRegion()){
+            if (newRegion != flagsViewModel.getCurrentRegion()){
                 flagsViewModel.saveRegion(newRegion)
                 flagsViewModel.resetQuiz()
 
@@ -205,7 +205,7 @@ class FlagsFragment: Fragment(){
         showNextCountryFlag(data)  //svg изображение флага
 
         //если диалог не создан - создаём и передаём данные
-        if(flagsViewModel.isNeedToCreateDialog()){
+        if(flagsViewModel.getNeedDialog()){
             val bundle = Bundle()
             bundle. putInt(Constants.TOTAL_QUESTIONS, data.flagsInQuiz )
             bundle. putInt(Constants.TOTAL_GUESSES, data.totalGuesses )

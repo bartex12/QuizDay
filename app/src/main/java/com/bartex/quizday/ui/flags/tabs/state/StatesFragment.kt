@@ -133,7 +133,7 @@ class StatesFragment : Fragment(){
     private fun initChipGroupListener() {
         chipGroup.setOnCheckedChangeListener { _, id ->
             val newRegion:String = getChipNameById(id)
-            if (newRegion != statesViewModel.getRegion()){
+            if (newRegion != statesViewModel.getCurrentRegion()){
                 statesViewModel.saveRegion(newRegion)
                 statesViewModel.resetQuiz()
 
@@ -206,15 +206,14 @@ class StatesFragment : Fragment(){
         showNextCountry(data) //показываем название страны которую нужно угадать*
 
         //если диалог не создан - создаём и передаём данные
-        if(statesViewModel.isNeedToCreateDialog()){
+        if(statesViewModel.getNeedDialog()){
             val bundle = Bundle()
             bundle. putInt(Constants.TOTAL_QUESTIONS, data.flagsInQuiz )
             bundle. putInt(Constants.TOTAL_GUESSES, data.totalGuesses )
             navController.navigate(R.id.resultDialogState, bundle)
         }
     }
-
-
+    
     private fun renderDataFromDatabase(data: List<State>?) {
         //сохраняем список стран во ViewModel на время жизни фрагмента
         statesViewModel.saveListOfStates(data as MutableList<State>)

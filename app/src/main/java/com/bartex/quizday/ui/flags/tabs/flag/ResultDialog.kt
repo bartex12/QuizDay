@@ -24,7 +24,7 @@ class ResultDialog: DialogFragment() {
             totalGuesses = it.getInt(Constants.TOTAL_GUESSES)
         }
         //предотвращаем повторное создание диалога при повороте экрана
-        flagsViewModel.setNeedToCreateDialog(false)
+        flagsViewModel.setNeedDialog(false)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

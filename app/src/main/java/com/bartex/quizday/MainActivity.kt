@@ -37,13 +37,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toolbar: Toolbar
     private lateinit var toolbarTitle: TextView
-    //private  var toolbarTitleText: String = ""
     private  var toolbarTitleFlag = ""
     private  var toolbarTitleState = ""
     private lateinit var audioManager: AudioManager
     private var isNetworkAvailable: Boolean = true //Доступна ли сеть
-    private var navigationId: Int = 0
-
 
     private val model by lazy{
         ViewModelProvider(this).get(SharedViewModel::class.java)
@@ -100,8 +97,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //работа гамбургера и стрелки вверх в toolbar
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setNavigationItemSelectedListener(this)
-
-
 
         //передача данных о надписи на тулбаре из фрагмента викторины с флагами
         model.toolbarTitleFromFlag
@@ -188,31 +183,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     //кроме того пришлось делать перебор всех вариантов (может лучше  убрать меню во фрагменты)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (navController.currentDestination?.id ){
-
             R.id.homeFragmentNew -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_homeFragmentNew_to_settingsFragment)
                 }
             }
-
             R.id.textquizFragment -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_textquizFragment_to_settingsFragment)
                 }
             }
-
             R.id.imagequizFragment -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_imagequizFragment_to_settingsFragment)
                 }
             }
-
             R.id.tabsFragment -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_tabsFragment_to_settingsFragment)
                 }
             }
-
             R.id.helpFragment -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_helpFragment_to_settingsFragment)
@@ -261,6 +251,5 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     fun getNetworkAvailable(): Boolean = isNetworkAvailable
-
 
 }
