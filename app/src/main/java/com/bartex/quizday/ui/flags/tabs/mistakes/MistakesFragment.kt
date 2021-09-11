@@ -63,9 +63,7 @@ class MistakesFragment: Fragment(),
         initViews(view)
         initAdapter()
         initChipGroupListener()
-
-        setHasOptionsMenu(true)
-        requireActivity().invalidateOptionsMenu()
+        initMenu()
 
         //чтобы получить текущий регион - сделал обмен данными через SharedViewModel
         // во FlagsFragment и StateFragment в initChipGroupListener() кладём значение, а здесь принимаем
@@ -91,12 +89,6 @@ class MistakesFragment: Fragment(),
                 })
     }
 
-    private fun initViews(view: View) {
-        rvStatesMistake = view.findViewById(R.id.rv_states_mistakes)
-        emptyViewMistake = view.findViewById(R.id.empty_view_mistakes)
-        chipGroupMistake = view.findViewById(R.id.chip_region_mistakes)
-    }
-
     //запоминаем  позицию списка, на которой сделан клик - на случай поворота экрана
     override fun onPause() {
         super.onPause()
@@ -105,6 +97,17 @@ class MistakesFragment: Fragment(),
         val firstPosition = manager.findFirstVisibleItemPosition()
         mistakesViewModel.savePositionState(firstPosition)
         Log.d(TAG, "MistakesFragment onPause firstPosition = $firstPosition")
+    }
+
+    private fun initMenu() {
+        setHasOptionsMenu(true)
+        requireActivity().invalidateOptionsMenu()
+    }
+
+    private fun initViews(view: View) {
+        rvStatesMistake = view.findViewById(R.id.rv_states_mistakes)
+        emptyViewMistake = view.findViewById(R.id.empty_view_mistakes)
+        chipGroupMistake = view.findViewById(R.id.chip_region_mistakes)
     }
 
     private fun initAdapter() {
@@ -184,6 +187,7 @@ class MistakesFragment: Fragment(),
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
+        model.update(Constants.REGION_ALL) // для поиска ставим Все регионы на чипы
         newText?. let {
             if (it.isNotBlank()) {
                 val listSearched = mutableListOf<State>()

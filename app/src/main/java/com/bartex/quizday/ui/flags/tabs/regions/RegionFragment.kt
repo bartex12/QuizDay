@@ -210,6 +210,7 @@ class RegionFragment : Fragment(),
         }
 
         override fun onQueryTextChange(newText: String?): Boolean {
+            model.update(Constants.REGION_ALL) // для поиска ставим Все регионы на чипы
             newText?. let {
                 if (it.isNotBlank()) {
                     val listSearched = mutableListOf<State>()

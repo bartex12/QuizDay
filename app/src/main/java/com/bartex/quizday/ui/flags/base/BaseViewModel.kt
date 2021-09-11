@@ -29,7 +29,6 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
-//todo убрать дублирование
 open class BaseViewModel(
         private var statesRepo: IStatesRepo = StatesRepo(
                 api= Retrofit.Builder()
@@ -49,17 +48,17 @@ open class BaseViewModel(
 ):ViewModel() {
 
     //список стран из сети
-     val listStatesFromNet = MutableLiveData<StatesSealed>()
+    private val listStatesFromNet = MutableLiveData<StatesSealed>()
     //список стран из базы
-     val listStatesFromDatabase = MutableLiveData<MutableList<State>>()
+    private val listStatesFromDatabase = MutableLiveData<MutableList<State>>()
     //состояние конечного автомата
      val currentQuizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
 
      var dataFlags: DataFlags = DataFlags() // здесь храним данные для состояний конечного автомата
-     var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
+     private var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
      var region:String = Constants.REGION_EUROPE //Здесь храним текущий регион
      var currentState: IFlagState = ReadyState(DataFlags()) //Здесь храним текущее состояние
-     var isNeedToCreateDialog:Boolean = true//Здесь храним флаг необходимости создания диалога
+     private var isNeedToCreateDialog:Boolean = true//Здесь храним флаг необходимости создания диалога
 
     fun getNeedDialog():Boolean{
         return isNeedToCreateDialog
@@ -189,7 +188,7 @@ open class BaseViewModel(
 
 
     companion object{
-        const val TAG = "33333"
+        const val TAG = "Quizday"
     }
 
 }
