@@ -31,7 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 //todo убрать дублирование
 open class BaseViewModel(
-         var statesRepo: IStatesRepo = StatesRepo(
+        private var statesRepo: IStatesRepo = StatesRepo(
                 api= Retrofit.Builder()
                         .baseUrl(Constants.baseUrl)
                         .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
@@ -43,9 +43,9 @@ open class BaseViewModel(
                                                 .create()
                                 )).build().create(IDataSourceState::class.java),
                 roomCash = RoomStateCash(Database.getInstance() as Database)),
-         val storage: IFlagQuiz = FlagQuiz(),
-         val settingProvider: ISettingsProvider = SettingsProvider(app=App.instance),
-         val roomCash: IRoomStateCash = RoomStateCash(db =Database.getInstance() as Database)
+        val storage: IFlagQuiz = FlagQuiz(),
+        private val settingProvider: ISettingsProvider = SettingsProvider(app=App.instance),
+        private val roomCash: IRoomStateCash = RoomStateCash(db =Database.getInstance() as Database)
 ):ViewModel() {
 
     //список стран из сети
@@ -54,8 +54,6 @@ open class BaseViewModel(
      val listStatesFromDatabase = MutableLiveData<MutableList<State>>()
     //состояние конечного автомата
      val currentQuizState: MutableLiveData<IFlagState> = MutableLiveData<IFlagState>()
-    //заголовок тулбара во FlagFragment
-     var toolbarTitleInFlags:MutableLiveData<String> = MutableLiveData<String>()
 
      var dataFlags: DataFlags = DataFlags() // здесь храним данные для состояний конечного автомата
      var listOfStates:MutableList<State> = mutableListOf() //Здесь храним список стран из сети
@@ -114,7 +112,6 @@ open class BaseViewModel(
                 })
     }
 
-
     //начальное состояние не имеет предыдущего
     fun resetQuiz(){
         setNeedDialog(true) //возвращаем флаг разрешения создания диалога
@@ -127,24 +124,6 @@ open class BaseViewModel(
         this.dataFlags =  storage.loadNextFlag(dataFlags)
         currentQuizState.value =  currentState.executeAction(Action.OnNextFlagClicked(this.dataFlags))
     }
-
-
-
-    //по типу ответа при щелчке по кнопке задаём состояние
-//    fun answer(guess:String){
-//        dataFlags = storage.getTypeAnswer(guess, dataFlags)
-//        when(dataFlags.typeAnswer){
-//            Answer.NotWell -> {
-//                currentQuizState.value = currentState.executeAction(Action.OnNotWellClicked(dataFlags))
-//            }
-//            Answer.WellNotLast -> {
-//                currentQuizState.value =  currentState.executeAction(Action.OnWellNotLastClicked(dataFlags))
-//            }
-//            Answer.WellAndLast -> {
-//                currentQuizState.value = currentState.executeAction(Action.OnWellAndLastClicked(dataFlags))
-//            }
-//        }
-//    }
 
     fun writeMistakeInDatabase() {
         dataFlags.correctAnswer?. let{
