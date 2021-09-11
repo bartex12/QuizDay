@@ -137,7 +137,7 @@ class StatesFragment : Fragment(){
                 statesViewModel.saveRegion(newRegion)
                 statesViewModel.resetQuiz()
 
-                model.update(newRegion) //обновляем регион и храним в model
+                model.updateRegion(newRegion) //обновляем регион и храним в model
             }
         }
     }
@@ -155,7 +155,7 @@ class StatesFragment : Fragment(){
     //состояние готовности к викторине - показываем первый флаг
     private fun showReadyState(data: DataFlags) {
         getNumberOnChipName(data) //показываем количество стран в регионе
-        model.update(data.region)  //обновляем регион  - в случае если без действий уходим на другой фрагмент
+        model.updateRegion(data.region)  //обновляем регион  - в случае если без действий уходим на другой фрагмент
         statesViewModel.loadNextFlag(data)
     }
 

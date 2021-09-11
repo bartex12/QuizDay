@@ -18,8 +18,6 @@ import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.MistakesAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
 import com.bartex.quizday.ui.flags.shared.SharedViewModel
-import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
-import com.bartex.quizday.ui.flags.tabs.state.StatesViewModel
 import com.google.android.material.chip.ChipGroup
 import java.util.*
 
@@ -187,7 +185,7 @@ class MistakesFragment: Fragment(),
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        model.update(Constants.REGION_ALL) // для поиска ставим Все регионы на чипы
+        model.updateRegion(Constants.REGION_ALL) // для поиска ставим Все регионы на чипы
         newText?. let {
             if (it.isNotBlank()) {
                 val listSearched = mutableListOf<State>()

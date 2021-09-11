@@ -8,7 +8,7 @@ class SharedViewModel : ViewModel() {
     val toolbarTitleFromFlag = MutableLiveData<String>()
     val toolbarTitleFromState = MutableLiveData<String>()
 
-    fun update(currentRegion: String) {
+    fun updateRegion(currentRegion: String) {
         newRegion.value = currentRegion
     }
 

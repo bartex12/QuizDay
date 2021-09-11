@@ -1,21 +1,20 @@
-package com.bartex.quizday.ui.flags.tabs.flag
+package com.bartex.quizday.ui.flags.base
 
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
+import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
 
-class ResultDialog: DialogFragment() {
+abstract class BaseResultDialog: DialogFragment(){
+     private var total:Int = 0
+     var totalGuesses:Int = 0
 
-    private var total:Int = 0
-    private var totalGuesses:Int = 0
-
-    private val flagsViewModel by lazy{
-        ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
-    }
+    abstract fun getCurrentViewModel(): BaseViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +23,7 @@ class ResultDialog: DialogFragment() {
             totalGuesses = it.getInt(Constants.TOTAL_GUESSES)
         }
         //предотвращаем повторное создание диалога при повороте экрана
-        flagsViewModel.setNeedDialog(false)
+        getCurrentViewModel().setNeedDialog(false)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -33,7 +32,7 @@ class ResultDialog: DialogFragment() {
                 getString(R.string.results, total, totalGuesses, total*100/totalGuesses.toDouble())
         )
         builder.setPositiveButton(R.string.reset_quiz) { _, _ ->
-            flagsViewModel.resetQuiz() //просто вызываем метод вьюмодели
+            getCurrentViewModel().resetQuiz() //просто вызываем метод вьюмодели
         }
         return builder.create().apply {
             setCanceledOnTouchOutside(false)
