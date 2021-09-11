@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/login_views"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/results"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/result"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:layout_margin="@dimen/layout_margin_8dp"
+            />
+
+        <TextView
+            android:id="@+id/questions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/questions"
+            android:fontFamily="@font/bressay_trial"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:layout_margin="@dimen/layout_margin_8dp"
+            />
+
+        <TextView
+            android:id="@+id/attempts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/attempts"
+            android:fontFamily="@font/bressay_trial"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:layout_margin="@dimen/layout_margin_8dp"
+            />
+
+        <TextView
+            android:id="@+id/performance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/performance"
+            android:fontFamily="@font/bressay_trial"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:layout_margin="@dimen/layout_margin_8dp"
+           />
+
+        <Button
+            android:id="@+id/button_ok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/background_dark"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="10dp"
+            android:text="@string/newQuestions"/>
+
+    </LinearLayout>
