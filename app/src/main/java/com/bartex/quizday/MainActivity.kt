@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         model.toolbarTitleFromFlag
                 .observe(this, {newTitle->
                     toolbarTitleFlag = newTitle
-                    if(getViewPager()?.currentItem ==0 ){
+                    if(getViewPagerCurrentItem() == 0){
                         toolbar.title = toolbarTitleFlag //здесь тоже, иначе не обновляется само
                     }
                 })
@@ -115,10 +115,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         model.toolbarTitleFromState
                 .observe(this, {newTitle->
                     toolbarTitleState = newTitle
-                    if(getViewPager()?.currentItem ==1 ){
+                    if(getViewPagerCurrentItem() == 1){
                         toolbar.title = toolbarTitleState //здесь тоже, иначе не обновляется само
                     }
                 })
+    }
+
+    private fun getViewPagerCurrentItem(): Int? {
+        val frag = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+        val vp:ViewPager? = frag?.view?.findViewById(R.id.view_pager_flags)
+        return vp?.currentItem
     }
 
     //щелчки по стрелке вверх - как appBarConfiguration и по гамбургеру - как super.onSupportNavigateUp()
@@ -160,10 +166,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.imagequizFragment -> getString(R.string.image_quiz)
                 R.id.settingsFragment -> getString(R.string.action_settings)
                 R.id.helpFragment -> getString(R.string.help)
-                R.id.flagsFragment ->  toolbarTitleFlag
-                R.id.statesFragment -> toolbarTitleState
                 R.id.tabsFragment -> {
-                    when(getViewPager()?.currentItem){
+                    when(getViewPagerCurrentItem()){
                         0-> toolbarTitleFlag
                         1-> toolbarTitleState
                         2-> getString(R.string.mistakes)
@@ -175,11 +179,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
         return super.onPrepareOptionsMenu(menu)
-    }
-
-    private fun getViewPager(): ViewPager? {
-        val frag = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-        return frag?.view?.findViewById(R.id.view_pager_flags)
     }
 
     //так  как справка - настройки могут бесконечно вызываться друг из друга
