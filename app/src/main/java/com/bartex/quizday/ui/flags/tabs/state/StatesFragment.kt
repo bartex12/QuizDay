@@ -353,7 +353,7 @@ class StatesFragment : Fragment(){
     private fun getNumberOnChipName(data: DataFlags) {
         for (i in 0 until chipGroup.childCount) {
             val chip = chipGroup.getChildAt(i) as Chip
-            val regionName = if (chip.isChecked) {
+            val regionName =  if (chip.isChecked) {
                 statesViewModel.getRegionNameAndNumber(data)
             }else{
                 getChipNameById(chip.id)
