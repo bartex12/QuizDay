@@ -1,6 +1,7 @@
 package com.bartex.quizday
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
 import android.media.AudioManager
 import android.os.Bundle
@@ -27,8 +28,11 @@ import com.bartex.quizday.network.OnlineLiveData
 import com.bartex.quizday.network.isInternetAvailable
 import com.bartex.quizday.ui.flags.shared.SharedViewModel
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.fragment_tabs.*
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener{
 
@@ -41,6 +45,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private  var toolbarTitleState = ""
     private lateinit var audioManager: AudioManager
     private var isNetworkAvailable: Boolean = true //Доступна ли сеть
+    private var lastPressTime:Long = 0
 
     private val model by lazy{
         ViewModelProvider(this).get(SharedViewModel::class.java)
@@ -251,5 +256,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     fun getNetworkAvailable(): Boolean = isNetworkAvailable
+
+    //выход по двойному щелчку
+    override fun onBackPressed() {
+        if( navController.currentDestination?.id  == R.id.homeFragmentNew) {
+            //закрываем шторку, если была открыта
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            }
+            //показываем Snackbar: Для выхода нажмите  НАЗАД  ещё раз
+            Snackbar.make(findViewById(android.R.id.content), getString(R.string.quit_from_app),
+                    Snackbar.LENGTH_SHORT).show()
+            val pressTime = System.currentTimeMillis()
+            if (pressTime - lastPressTime <= DOUBLE_PRESS_INTERVAL) {
+                // значит был двойной клик
+                exitProcess(0)
+            }
+            lastPressTime = pressTime
+        }else{
+            super.onBackPressed()
+        }
+    }
+
+    companion object{
+       const val DOUBLE_PRESS_INTERVAL:Long = 2000L
+    }
 
 }
