@@ -105,7 +105,8 @@
                 android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                android:contentDescription="@string/any_image"
+                android:layout_margin="@dimen/layout_margin_4dp"
                 tools:src="@tools:sample/avatars[0]"/>
 
             <ImageView
@@ -113,7 +114,8 @@
                 android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                android:contentDescription="@string/any_image"
+                android:layout_margin="@dimen/layout_margin_4dp"
                 tools:src="@tools:sample/avatars[1]"/>
         </LinearLayout>
 
@@ -129,7 +131,8 @@
                 android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                android:contentDescription="@string/any_image"
+                android:layout_margin="@dimen/layout_margin_4dp"
                 tools:src="@tools:sample/avatars[2]"/>
 
             <ImageView
@@ -137,7 +140,8 @@
                 android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                android:contentDescription="@string/any_image"
+                android:layout_margin="@dimen/layout_margin_4dp"
                 tools:src="@tools:sample/avatars[3]"/>
         </LinearLayout>
 
@@ -153,7 +157,8 @@
                 android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                android:contentDescription="@string/any_image"
+                android:layout_margin="@dimen/layout_margin_4dp"
                 tools:src="@tools:sample/avatars[4]"/>
 
             <ImageView
@@ -161,7 +166,8 @@
                 android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                android:contentDescription="@string/any_image"
+                android:layout_margin="@dimen/layout_margin_4dp"
                 tools:src="@tools:sample/avatars[5]"/>
         </LinearLayout>
 

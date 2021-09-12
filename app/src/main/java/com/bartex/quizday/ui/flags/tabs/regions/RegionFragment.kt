@@ -43,7 +43,7 @@ class RegionFragment : Fragment(),
         private lateinit  var emptyViewRegion: TextView
         private lateinit var chipGroupRegion: ChipGroup
         private lateinit var progressBarRegion: ProgressBar
-        private var region:String = Constants.REGION_EUROPE
+        private var region:String = Constants.REGION_ALL
 
         companion object {
         const val TAG = "33333"

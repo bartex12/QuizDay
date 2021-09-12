@@ -26,8 +26,7 @@
             android:fontFamily="@font/bressay_trial"
             android:textColor="@color/black"
             android:textSize="18sp"
-            android:layout_margin="@dimen/layout_margin_8dp"
-            />
+            android:layout_margin="@dimen/layout_margin_8dp"/>
 
         <TextView
             android:id="@+id/attempts"

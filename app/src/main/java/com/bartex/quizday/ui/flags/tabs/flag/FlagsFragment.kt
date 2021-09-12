@@ -9,6 +9,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -48,12 +50,12 @@ class FlagsFragment: Fragment(){
 
     private lateinit var handler : Handler   // Для задержки загрузки следующего флага
     private lateinit var quizLinearLayout  : LinearLayout // root макета фрагмента
-    private lateinit var answerTextView : TextView  //для правильного ответа
+    private lateinit var answerTextView : TextView  //для неправильного ответа
     private lateinit var flagImageView  : ImageView  //Для вывода флага
     private lateinit var guessButton:Button  // текущая кнопка ответа
     private lateinit var progressBarFlags:ProgressBar
     private var guessLinearLayouts : Array<LinearLayout?> = arrayOfNulls(3) //кнопки ответов
-
+    private var shakeAnimation : Animation? = null  // Анимация неправильного ответа
     private lateinit var chipGroup:ChipGroup
     private lateinit var navController:NavController
 
@@ -69,6 +71,7 @@ class FlagsFragment: Fragment(){
         navController = Navigation.findNavController(view)
 
         initHandler()
+        initAnimation()
         initViews(view)
         initChipGroupListener()
         initButtonsListeners()
@@ -113,6 +116,14 @@ class FlagsFragment: Fragment(){
                     renderViewState(newQuizState)
                     Log.d(TAG, "FlagsFragment onViewCreated: newQuizState = $newQuizState")
                 })
+    }
+
+    private fun initAnimation() {
+        // Загрузка анимации для неправильных ответов
+        shakeAnimation = AnimationUtils.loadAnimation(
+                activity,
+                R.anim.incorrect_answer
+        )
     }
 
     // метод onStart вызывается после onViewCreated.
@@ -175,7 +186,7 @@ class FlagsFragment: Fragment(){
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
         model.updateToolbarTitleFromFlag(getToolbarTitle(data))//обновить номер текущего вопроса
         showIncorrectAnswer()//показать неправильный ответ
-        //todo анимацию встряхивания сделать
+        flagImageView.startAnimation(shakeAnimation)
         showNextCountryFlag(data) //svg изображение флага
         showAnswerButtonsNumberAndNames(data) // Добавление кнопок
         showCorrectAnswerButtom(data)
@@ -357,8 +368,7 @@ class FlagsFragment: Fragment(){
     private fun getNumberOnChipName(data: DataFlags) {
         for (i in 0 until chipGroup.childCount) {
             val chip = chipGroup.getChildAt(i) as Chip
-            var regionName = ""
-            regionName = if (chip.isChecked) {
+            val regionName = if (chip.isChecked) {
                 flagsViewModel.getRegionNameAndNumber(data)
             }else{
                 getChipNameById(chip.id)

@@ -103,5 +103,6 @@
     <string name="attempts">attempts</string>
     <string name="questions">questions</string>
     <string name="quit_from_app">Для выхода нажмите НАЗАД ещё раз</string>
+    <string name="any_image">"Изображение "</string>
 
 </resources>

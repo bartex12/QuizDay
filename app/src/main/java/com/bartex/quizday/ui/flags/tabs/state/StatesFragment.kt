@@ -9,6 +9,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -55,7 +57,7 @@ class StatesFragment : Fragment(){
     private lateinit var guessButton: ImageView  // текущая кнопка ответа
     private lateinit var progressBarStates: ProgressBar
     private var guessLinearLayouts : Array<LinearLayout?> = arrayOfNulls(3) //кнопки ответов
-
+    private var shakeAnimation : Animation? = null  // Анимация неправильного ответа
     private lateinit var chipGroup: ChipGroup
     private lateinit var navController: NavController
 
@@ -70,6 +72,7 @@ class StatesFragment : Fragment(){
         navController = Navigation.findNavController(view)
 
         initHandler()
+        initAnimation()
         initViews(view)
         initChipGroupListener()
         initButtonsListeners()
@@ -114,6 +117,14 @@ class StatesFragment : Fragment(){
                     renderViewState(newQuizState)
                     Log.d(FlagsFragment.TAG, "FlagsFragment onViewCreated: newQuizState = $newQuizState")
                 })
+    }
+
+    private fun initAnimation() {
+        // Загрузка анимации для неправильных ответов
+        shakeAnimation = AnimationUtils.loadAnimation(
+                activity,
+                R.anim.incorrect_answer
+        )
     }
 
     // метод onStart вызывается после onViewCreated.
@@ -176,7 +187,7 @@ class StatesFragment : Fragment(){
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
         model.updateToolbarTitleFromState(getToolbarTitle(data))//обновить номер текущего вопроса
         showIncorrectAnswer()//показать неправильный ответ
-        //todo анимацию встряхивания сделать
+        questionTextView.startAnimation(shakeAnimation)
         showNextCountry(data) //показываем название страны которую нужно угадать*
         showAnswerButtonsNumberAndNames(data) // Добавление кнопок*
         showCorrectAnswerButtom(data)//вешаем правильный ответ на случайную кнопку*
@@ -188,7 +199,6 @@ class StatesFragment : Fragment(){
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 50) }.start()
         model.updateToolbarTitleFromState(getToolbarTitle(data))//обновить номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
-        disableButtons()  // Блокировка всех кнопок ответов
         handler.postDelayed(
                 { //todo сделать анимацию исчезновения флага
                     statesViewModel.loadNextFlag(data)
@@ -202,7 +212,6 @@ class StatesFragment : Fragment(){
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
         model.updateToolbarTitleFromState(getToolbarTitle(data))//обновить номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
-        disableButtons() //сделать иконки недоступными
         showNextCountry(data) //показываем название страны которую нужно угадать*
 
         //если диалог не создан - создаём и передаём данные
@@ -250,16 +259,16 @@ class StatesFragment : Fragment(){
     }
 
     private fun initViews(view: View) {
-        chipGroup =view.findViewById<ChipGroup>(R.id.chip_region_states)
+        chipGroup =view.findViewById(R.id.chip_region_states)
 
-        quizLinearLayout = view.findViewById<View>(R.id.quizLinearLayoutStates) as LinearLayout
-        answerTextView = view.findViewById<View>(R.id.answerTextView_states) as TextView
-        questionTextView = view.findViewById<View>(R.id.questionTextView_states) as TextView
-        progressBarStates = view.findViewById<View>(R.id.progressBarStates) as ProgressBar
+        quizLinearLayout = view.findViewById(R.id.quizLinearLayoutStates)
+        answerTextView = view.findViewById(R.id.answerTextView_states)
+        questionTextView = view.findViewById(R.id.questionTextView_states)
+        progressBarStates = view.findViewById(R.id.progressBarStates)
 
-        guessLinearLayouts[0] = view.findViewById<View>(R.id.row1LinearLayout_states) as LinearLayout
-        guessLinearLayouts[1] = view.findViewById<View>(R.id.row2LinearLayout_states) as LinearLayout
-        guessLinearLayouts[2] = view.findViewById<View>(R.id.row3LinearLayout_states) as LinearLayout
+        guessLinearLayouts[0] = view.findViewById(R.id.row1LinearLayout_states)
+        guessLinearLayouts[1] = view.findViewById(R.id.row2LinearLayout_states)
+        guessLinearLayouts[2] = view.findViewById(R.id.row3LinearLayout_states)
     }
 
     //показываем страну, которую нужно угадать
@@ -284,8 +293,11 @@ class StatesFragment : Fragment(){
                 answerImageView.tag = nameRusState?.let { ButtonTag(row,column, it) }
                 //показываем изображение флага
                 GlideToVectorYou.justLoadImage(requireActivity(), Uri.parse(flag), answerImageView)
-                //доступность в зависимости от содержания в списке неправильных ответов
-                answerImageView.isEnabled = !data.buttonNotWellAnswerList.contains(nameRusState)
+                //изображение  в зависимости от содержания в списке неправильных ответов
+                //todo почему то при повороте исчезает и появляется только при щелчке на флагах
+                if(data.buttonNotWellAnswerList.contains(nameRusState)){
+                    answerImageView.setImageResource(R.drawable.answer100)
+                }
             }
         }
     }
@@ -306,7 +318,7 @@ class StatesFragment : Fragment(){
         //Перебираем строки в Array<LinearLayout?> - в каждой строке проходим
         // по всем детям LinearLayout, соторых считаем в row.childCount
         //В каждой строке находим кнопку по индексу колонки и устанавливаем слушатель
-        for ((index, row) in guessLinearLayouts.withIndex()) {
+        for (row in guessLinearLayouts) {
             for (column in 0 until row!!.childCount) {
                 val button = row.getChildAt(column) as ImageView
                 button.setOnClickListener(answerButtonListener)
@@ -341,8 +353,7 @@ class StatesFragment : Fragment(){
     private fun getNumberOnChipName(data: DataFlags) {
         for (i in 0 until chipGroup.childCount) {
             val chip = chipGroup.getChildAt(i) as Chip
-            var regionName = ""
-            regionName = if (chip.isChecked) {
+            val regionName = if (chip.isChecked) {
                 statesViewModel.getRegionNameAndNumber(data)
             }else{
                 getChipNameById(chip.id)
