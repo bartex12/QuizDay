@@ -5,7 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bartex.quizday.App
-import com.bartex.quizday.model.api.IDataSourceState
+import com.bartex.quizday.model.api.ApiService
+import com.bartex.quizday.model.api.DataSourceRetrofit
 import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.fsm.Action
@@ -31,16 +32,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 open class BaseViewModel(
         private var statesRepo: IStatesRepo = StatesRepo(
-                api= Retrofit.Builder()
-                        .baseUrl(Constants.baseUrl)
-                        .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-                        .addConverterFactory(
-                                GsonConverterFactory.create(
-                                        GsonBuilder()
-                                                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                                                .excludeFieldsWithoutExposeAnnotation()
-                                                .create()
-                                )).build().create(IDataSourceState::class.java),
+                dataSource = DataSourceRetrofit(),
                 roomCash = RoomStateCash(Database.getInstance() as Database)),
         val storage: IFlagQuiz = FlagQuiz(),
         private val settingProvider: ISettingsProvider = SettingsProvider(app=App.instance),
