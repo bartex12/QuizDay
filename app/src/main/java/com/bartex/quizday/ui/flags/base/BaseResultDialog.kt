@@ -26,11 +26,12 @@ abstract class BaseResultDialog: DialogFragment(){
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(activity )
         val inflater = requireActivity().layoutInflater
         val view: View = inflater.inflate(R.layout.dialog_statistica, null)
+        val builder = AlertDialog.Builder(activity )
+        dialog?.requestWindowFeature(STYLE_NO_TITLE);
+        isCancelable = false
         builder.setView(view)
-        builder.setCancelable(false)
 
         view.findViewById<TextView>(R.id.results).text = getString(R.string.result)
             view.findViewById<TextView>(R.id.questions).text = getString(R.string.results_questions, total)
