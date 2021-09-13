@@ -5,6 +5,8 @@ object Constants {
     const val SOUND = "pref_cbSound"
     const val CHOICES = "pref_numberOfChoices"
     const val FLAGS_IN_QUIZ = "pref_numberOfFlags"
+    const val IMAGE_STUB = "pref_incorrect"
+
     const val DIALOG_FRAGMENT = "DIALOG_FRAGMENT_TAG"
 
     const val  REGION_EUROPE = "Европа"

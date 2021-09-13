@@ -172,6 +172,10 @@ open class BaseViewModel(
         return  "$region $regionSize"
     }
 
+    fun updateImageStub() {
+      dataFlags =  settingProvider.updateImageStub(dataFlags)
+    }
+
 
     companion object{
         const val TAG = "Quizday"

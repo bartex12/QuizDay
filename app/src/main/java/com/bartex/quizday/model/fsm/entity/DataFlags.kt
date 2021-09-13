@@ -16,6 +16,7 @@ data class DataFlags(
         var nextCountry:State? = null, //следующая страна для угадывания флага
         var randomRow:Int = 0,  //строка кнопки правильного ответа
         var randomColumn:Int = 0, //столбец кнопки правильного ответа
+        var incorrectImageStub:Int = 1, //картинка-заполнитель неправильного ответа
         var buttonNotWellAnswerList: MutableList<String> =  mutableListOf(), //список неправильных ответов
         var listStatesFromNet: MutableList<State> = mutableListOf(),//список стран из сети
         var listStates: MutableList<State> = mutableListOf(), //список стран с учётом выбранного региона

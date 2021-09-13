@@ -133,6 +133,7 @@ class StatesFragment : Fragment(){
         statesViewModel.updateSoundOnOff() //обновляем звук
         statesViewModel.updateNumberFlagsInQuiz() //обновляем число вопросов в викторине
         updateGuessRows(statesViewModel.getGuessRows()) //обновляем число выриантов ответов в викторине
+        statesViewModel.updateImageStub()//обновляем картинку-заполнитель неправильного ответа
     }
 
     private fun showAlertDialog(title: String?, message: String?) {
@@ -295,7 +296,11 @@ class StatesFragment : Fragment(){
                 //изображение  в зависимости от содержания в списке неправильных ответов
                 //todo почему то при повороте исчезает и появляется только при щелчке на флагах
                 if(data.buttonNotWellAnswerList.contains(nameRusState)){
-                    answerImageView.setImageResource(R.drawable.answer100)
+                    if(data.incorrectImageStub == 1){
+                        answerImageView.setImageResource(R.drawable.answer101)
+                    }else  if(data.incorrectImageStub == 2){
+                        answerImageView.setImageResource(R.drawable.pirat2)
+                    }
                 }
             }
         }

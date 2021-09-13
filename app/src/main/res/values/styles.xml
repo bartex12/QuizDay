@@ -27,6 +27,7 @@
 
     <style name="ImageAnswerStyleLand" parent = "ImageAnswerStyle">
         <item name="android:layout_height"> @dimen/layout_height_small </item>
+        <item name="android:scaleType"> centerInside </item>
     </style>
 
     <style name="ToolbarTitleStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">

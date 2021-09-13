@@ -104,5 +104,10 @@
     <string name="questions">questions</string>
     <string name="quit_from_app">Для выхода нажмите НАЗАД ещё раз</string>
     <string name="any_image">"Изображение "</string>
+    <string name="quest">Вопросы</string>
+    <string name="answers">Ответы</string>
+    <string name="incorrect">Неправильные ответы</string>
+    <string name="incorrect_stub">Заменитель флага</string>
+    <string name="incorrect_stub_description">Изображение-заменитель флага при неправильном ответе</string>
 
 </resources>
