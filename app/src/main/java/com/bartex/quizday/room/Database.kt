@@ -3,10 +3,8 @@ package com.bartex.quizday.room
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.bartex.quizday.room.dao.StateDao
-import com.bartex.quizday.room.tables.MigrationFromDb
+import com.bartex.quizday.room.tables.MigrationDb
 import com.bartex.quizday.room.tables.RoomState
 
 @androidx.room.Database(entities = [RoomState::class], version = 2)
@@ -24,7 +22,7 @@ abstract class Database : RoomDatabase() {
         fun create(context:Context) {
            if(instance == null) {
                instance = Room.databaseBuilder(context, Database::class.java, DB_NAME )
-                   .addMigrations(MigrationFromDb().migration1to2)
+                   .addMigrations(MigrationDb().migration1to2)
                    .build()
            }
         }
