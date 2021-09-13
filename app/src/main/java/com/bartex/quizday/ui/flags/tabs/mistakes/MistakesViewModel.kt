@@ -44,6 +44,6 @@ class MistakesViewModel(
     }
 
     companion object{
-        const val TAG = "33333"
+        const val TAG = "Quizday"
     }
 }
