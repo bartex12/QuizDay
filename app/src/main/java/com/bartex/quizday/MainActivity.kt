@@ -258,6 +258,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     //выход по двойному щелчку
     override fun onBackPressed() {
+
         if( navController.currentDestination?.id  == R.id.homeFragmentNew) {
             //закрываем шторку, если была открыта
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -272,7 +273,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 exitProcess(0)
             }
             lastPressTime = pressTime
-        }else{
+        }else {
             super.onBackPressed()
         }
     }

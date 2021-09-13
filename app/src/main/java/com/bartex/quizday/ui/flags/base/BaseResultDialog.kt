@@ -30,6 +30,7 @@ abstract class BaseResultDialog: DialogFragment(){
         val inflater = requireActivity().layoutInflater
         val view: View = inflater.inflate(R.layout.dialog_statistica, null)
         builder.setView(view)
+        builder.setCancelable(false)
 
         view.findViewById<TextView>(R.id.results).text = getString(R.string.result)
             view.findViewById<TextView>(R.id.questions).text = getString(R.string.results_questions, total)
