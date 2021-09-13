@@ -35,7 +35,7 @@ import com.google.android.material.chip.ChipGroup
 class FlagsFragment: Fragment(){
 
     companion object{
-        const val TAG = "33333"
+        const val TAG = "Quizday"
     }
 
     private val flagsViewModel by lazy{
@@ -60,13 +60,11 @@ class FlagsFragment: Fragment(){
     private lateinit var navController:NavController
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.d(TAG, "FlagsFragment onCreateView")
         return inflater.inflate(R.layout.fragment_flags, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "FlagsFragment onViewCreated")
 
         navController = Navigation.findNavController(view)
 
@@ -129,7 +127,6 @@ class FlagsFragment: Fragment(){
     // метод onStart вызывается после onViewCreated.
     override fun onStart() {
         super.onStart()
-        Log.d(TAG, "FlagsFragment onStart")
         flagsViewModel.updateSoundOnOff() //обновляем звук
         flagsViewModel.updateNumberFlagsInQuiz() //обновляем число вопросов в викторине
         updateGuessRows(flagsViewModel.getGuessRows()) //обновляем число выриантов ответов в викторине

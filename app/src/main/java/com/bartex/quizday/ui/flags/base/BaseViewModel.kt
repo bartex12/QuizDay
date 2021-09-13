@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bartex.quizday.App
-import com.bartex.quizday.model.api.ApiService
 import com.bartex.quizday.model.api.DataSourceRetrofit
 import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
@@ -23,12 +22,7 @@ import com.bartex.quizday.model.repositories.state.roomcash.IRoomStateCash
 import com.bartex.quizday.model.repositories.state.roomcash.RoomStateCash
 import com.bartex.quizday.room.Database
 import com.bartex.quizday.ui.flags.StatesSealed
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.GsonBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 
 open class BaseViewModel(
         private var statesRepo: IStatesRepo = StatesRepo(

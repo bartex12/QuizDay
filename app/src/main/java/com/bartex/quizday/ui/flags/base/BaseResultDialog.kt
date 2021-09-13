@@ -6,11 +6,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
-import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
 
 abstract class BaseResultDialog: DialogFragment(){
      private var total:Int = 0

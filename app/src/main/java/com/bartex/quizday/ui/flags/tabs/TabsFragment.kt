@@ -20,8 +20,6 @@ class TabsFragment: Fragment() {
     lateinit var tabLayout: TabLayout
     lateinit var navController: NavController
 
-    private val model: SharedViewModel by activityViewModels()
-
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,

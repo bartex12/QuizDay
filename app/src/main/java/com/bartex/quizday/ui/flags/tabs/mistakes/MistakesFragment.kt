@@ -40,18 +40,12 @@ class MistakesFragment: Fragment(),
     private lateinit var chipGroupMistake: ChipGroup
     private var region:String = Constants.REGION_ALL
 
-    companion object {
-        const val TAG = "33333"
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        Log.d(TAG, "MistakesFragment onCreateView ")
         return inflater.inflate(R.layout.fragment_mistakes, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "MistakesFragment onViewCreated ")
 
         navController = Navigation.findNavController(view)
 
@@ -94,7 +88,6 @@ class MistakesFragment: Fragment(),
         val manager = rvStatesMistake.layoutManager as LinearLayoutManager
         val firstPosition = manager.findFirstVisibleItemPosition()
         mistakesViewModel.savePositionState(firstPosition)
-        Log.d(TAG, "MistakesFragment onPause firstPosition = $firstPosition")
     }
 
     private fun initMenu() {
@@ -135,7 +128,6 @@ class MistakesFragment: Fragment(),
             adapter?.listOfMistakes = listOfMistakeStates
 
             rvStatesMistake.layoutManager?.scrollToPosition(position) //крутим в запомненную позицию списка
-            Log.d(TAG, "MistakesFragment renderData scrollToPosition = $position")
         }
     }
 

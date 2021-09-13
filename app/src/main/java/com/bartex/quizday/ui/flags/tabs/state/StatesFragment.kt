@@ -37,7 +37,7 @@ import com.google.android.material.chip.ChipGroup
 class StatesFragment : Fragment(){
 
     companion object{
-        const val TAG = "33333"
+        const val TAG = "Quizday"
     }
 
     private val statesViewModel by lazy{
@@ -115,7 +115,7 @@ class StatesFragment : Fragment(){
                 .observe(viewLifecycleOwner, { newQuizState ->
                     statesViewModel.saveCurrentState(newQuizState)
                     renderViewState(newQuizState)
-                    Log.d(FlagsFragment.TAG, "FlagsFragment onViewCreated: newQuizState = $newQuizState")
+                    Log.d(TAG, "StatesFragment onViewCreated: newQuizState = $newQuizState")
                 })
     }
 
@@ -130,7 +130,6 @@ class StatesFragment : Fragment(){
     // метод onStart вызывается после onViewCreated.
     override fun onStart() {
         super.onStart()
-        Log.d(FlagsFragment.TAG, "FlagsFragment onStart")
         statesViewModel.updateSoundOnOff() //обновляем звук
         statesViewModel.updateNumberFlagsInQuiz() //обновляем число вопросов в викторине
         updateGuessRows(statesViewModel.getGuessRows()) //обновляем число выриантов ответов в викторине

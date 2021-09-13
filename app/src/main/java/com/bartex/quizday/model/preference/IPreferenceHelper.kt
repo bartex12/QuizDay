@@ -1,4 +1,4 @@
-package com.bartex.quizday.ui.flags.tabs.regions
+package com.bartex.quizday.model.preference
 
 interface IPreferenceHelper {
     fun savePositionState(position:Int)

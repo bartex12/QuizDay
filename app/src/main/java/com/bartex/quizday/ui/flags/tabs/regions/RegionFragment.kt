@@ -45,10 +45,6 @@ class RegionFragment : Fragment(),
         private lateinit var progressBarRegion: ProgressBar
         private var region:String = Constants.REGION_ALL
 
-        companion object {
-        const val TAG = "33333"
-    }
-
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
             return inflater.inflate(R.layout.fragment_regions, container, false)
         }
@@ -153,7 +149,6 @@ class RegionFragment : Fragment(),
             val manager = rvStatesRegion.layoutManager as LinearLayoutManager
             val firstPosition = manager.findFirstVisibleItemPosition()
             regionViewModel.savePositionState(firstPosition)
-            Log.d(TAG, "RegionFragment onPause firstPosition = $firstPosition")
         }
 
         private fun initAdapter() {
@@ -177,7 +172,6 @@ class RegionFragment : Fragment(),
                 adapter?.listOfRegion = listOfStates
 
                 rvStatesRegion.layoutManager?.scrollToPosition(position) //крутим в запомненную позицию списка
-                Log.d(TAG, "RegionFragment renderData scrollToPosition = $position")
             }
         }
 
