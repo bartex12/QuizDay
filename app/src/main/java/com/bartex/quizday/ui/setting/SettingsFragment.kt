@@ -1,5 +1,6 @@
 package com.bartex.quizday.ui.setting
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.preference.PreferenceFragmentCompat
@@ -16,5 +17,8 @@ class SettingsFragment: PreferenceFragmentCompat() {
 
         setHasOptionsMenu(true)
         requireActivity().invalidateOptionsMenu()
+
+        //BackgroundColor экрана настроек
+        listView.setBackgroundColor(Color.argb(80, 160,244,186));
     }
 }

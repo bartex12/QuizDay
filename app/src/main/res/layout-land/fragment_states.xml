@@ -115,8 +115,9 @@
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin_middle"
             android:layout_weight="1"
+            android:gravity="center"
             tools:ignore="RtlSymmetry">
 
         <LinearLayout
@@ -128,18 +129,14 @@
 
             <ImageView
                 android:id="@+id/button_states"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/layout_height_small"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                style="@style/ImageAnswerStyleLand"
+                android:contentDescription="@string/any_image"
                 tools:src="@tools:sample/avatars[0]"/>
 
             <ImageView
                 android:id="@+id/button2_states"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/layout_height_small"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                style="@style/ImageAnswerStyleLand"
+                android:contentDescription="@string/any_image"
                 tools:src="@tools:sample/avatars[1]"/>
         </LinearLayout>
 
@@ -152,18 +149,14 @@
 
             <ImageView
                 android:id="@+id/button3_states"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/layout_height_small"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                style="@style/ImageAnswerStyleLand"
+                android:contentDescription="@string/any_image"
                 tools:src="@tools:sample/avatars[2]"/>
 
             <ImageView
                 android:id="@+id/button4_states"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/layout_height_small"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                style="@style/ImageAnswerStyleLand"
+                android:contentDescription="@string/any_image"
                 tools:src="@tools:sample/avatars[3]"/>
         </LinearLayout>
 
@@ -176,18 +169,14 @@
 
             <ImageView
                 android:id="@+id/button5_states"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/layout_height_small"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                style="@style/ImageAnswerStyleLand"
+                android:contentDescription="@string/any_image"
                 tools:src="@tools:sample/avatars[4]"/>
 
             <ImageView
                 android:id="@+id/button6_states"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/layout_height_small"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/layout_margin_8dp"
+                style="@style/ImageAnswerStyleLand"
+                android:contentDescription="@string/any_image"
                 tools:src="@tools:sample/avatars[5]"/>
         </LinearLayout>
     </LinearLayout>
