@@ -2,6 +2,7 @@ package com.bartex.quizday.ui.textquiz
 
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -85,11 +86,12 @@ class TextQuizFragment : Fragment() {
         when (data) {
             is GuessState.Success -> {
                 val states = data.states
-                text_stub.text = states.answer
+                text_stub.text = states.get(0).question
                 answerInputLayout.visibility = View.VISIBLE
                 buttonSend.visibility = View.VISIBLE
             }
             is GuessState.Error -> {
+                Log.d("QWE", "${data.error.message}")
                 Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT)
                     .show()
             }

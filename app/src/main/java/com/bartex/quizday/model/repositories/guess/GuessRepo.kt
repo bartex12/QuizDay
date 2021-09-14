@@ -6,5 +6,5 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class GuessRepo(private val api: IDataSourceText): IGuessRepo {
-    override fun getGuess(): Single<TextEntity> = api.getRandomGuess().subscribeOn(Schedulers.io())
+    override fun getGuess(): Single<List<TextEntity>> = api.getRandomGuess().subscribeOn(Schedulers.io())
 }

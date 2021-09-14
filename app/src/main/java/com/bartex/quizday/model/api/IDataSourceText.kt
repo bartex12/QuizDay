@@ -6,5 +6,5 @@ import retrofit2.http.GET
 
 interface IDataSourceText {
     @GET("api/random")
-    fun getRandomGuess(): Single<TextEntity>
+    fun getRandomGuess(): Single<List<TextEntity>>
 }

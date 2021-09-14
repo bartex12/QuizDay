@@ -4,5 +4,5 @@ import com.bartex.quizday.model.entity.TextEntity
 import io.reactivex.rxjava3.core.Single
 
 interface IGuessRepo {
-    fun getGuess(): Single<TextEntity>
+    fun getGuess(): Single<List<TextEntity>>
 }
