@@ -3,13 +3,46 @@ package com.bartex.quizday.ui.textquiz
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.bartex.quizday.App
-import com.bartex.quizday.R
+import com.bartex.quizday.model.api.IDataSourceText
+import com.bartex.quizday.model.common.Constants
+import com.bartex.quizday.model.repositories.guess.GuessRepo
+import com.google.gson.FieldNamingPolicy
+import com.google.gson.GsonBuilder
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 
-class TextQuizViewModel : ViewModel() {
+class TextQuizViewModel(
+    private var guessRepo: GuessRepo = GuessRepo(
+        Retrofit.Builder()
+            .baseUrl(Constants.baseUrlText)
+            .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+            .addConverterFactory(
+                GsonConverterFactory.create(
+                    GsonBuilder()
+                        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                        .excludeFieldsWithoutExposeAnnotation()
+                        .create()
+                )
+            ).build().create(IDataSourceText::class.java)
+    )
+) : ViewModel() {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = App.instance.resources.getString(R.string.no_now)
+    private val guessState = MutableLiveData<GuessState>()
+
+    fun getStateGuess(): LiveData<GuessState> {
+        loadData()
+        return guessState
     }
-    val text: LiveData<String> = _text
+
+    fun loadData() {
+        guessRepo.getGuess()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ result ->
+                guessState.value = GuessState.Success(states = result)
+            }, {
+                guessState.value = GuessState.Error(error = it)
+            })
+    }
 }

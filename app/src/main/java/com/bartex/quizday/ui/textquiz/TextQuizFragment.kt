@@ -8,12 +8,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bartex.quizday.MainActivity
 import com.bartex.quizday.R
+import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
-import com.bartex.quizday.ui.flags.StatesSealed
+import com.bartex.quizday.model.entity.TextEntity
+import com.bartex.quizday.network.NoInternetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.fragment_textquiz.*
@@ -44,21 +45,21 @@ class TextQuizFragment : Fragment() {
         initViews(view)
         initButtonListener()
 
-        val  isNetworkAvailable = (requireActivity() as MainActivity).getNetworkAvailable()
+        val isNetworkAvailable = (requireActivity() as MainActivity).getNetworkAvailable()
 
-        if (savedInstanceState == null){
-//            textQuizViewModel.getStatesSealed(isNetworkAvailable)
-//                .observe(viewLifecycleOwner,  {
-//                    renderData(it)
-//                })
+        if (savedInstanceState == null) {
+            if (isNetworkAvailable) { //если сеть есть
+                textQuizViewModel.getStateGuess()
+                    .observe(viewLifecycleOwner, {
+                        renderData(it)
+                    })
+            } else {
+                showAlertDialog(
+                    getString(R.string.dialog_title_device_is_offline),
+                    getString(R.string.dialog_message_load_impossible)
+                )
+            }
         }
-
-        textQuizViewModel.text.observe(viewLifecycleOwner, Observer {
-            questionTextView.text = it
-        })
-
-        setHasOptionsMenu(true)
-        requireActivity().invalidateOptionsMenu()
     }
 
     private fun initHandler() {
@@ -80,24 +81,27 @@ class TextQuizFragment : Fragment() {
         }
     }
 
-    private fun renderData(data: StatesSealed?) {
-        when(data){
-            is StatesSealed.Success -> {
-                val states = data.states as MutableList<State>
-                //сохраняем ответ во ViewModel на время жизни фрагмента
-                //textQuizViewModel.saveAnswerOfStates(states)
-                //переводим конечный автомат в состояние ReadyState
-                //textQuizViewModel.resetQuiz()
+    private fun renderData(data: GuessState?) {
+        when (data) {
+            is GuessState.Success -> {
+                val states = data.states
+                text_stub.text = states.answer
                 answerInputLayout.visibility = View.VISIBLE
                 buttonSend.visibility = View.VISIBLE
             }
-            is StatesSealed.Error ->{
-                Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT).show()
+            is GuessState.Error -> {
+                Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT)
+                    .show()
             }
-            is StatesSealed.Loading ->{
+            is GuessState.Loading -> {
                 answerInputLayout.visibility = View.GONE
                 buttonSend.visibility = View.GONE
             }
         }
+    }
+
+    private fun showAlertDialog(title: String?, message: String?) {
+        NoInternetDialogFragment.newInstance(title, message)
+            .show(requireActivity().supportFragmentManager, Constants.DIALOG_FRAGMENT)
     }
 }
