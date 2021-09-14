@@ -105,6 +105,11 @@ class RoomStateCash(val db:Database):IRoomStateCash {
     override fun getAllMistakesLive(): LiveData<List<RoomState>> {
         return db.stateDao.getAllMistakesLive()
     }
+
+    override fun getAllDataLive(): LiveData<List<RoomState>> {
+        return db.stateDao.getAllRegionsLive()
+    }
+
 }
 
 

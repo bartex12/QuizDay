@@ -69,7 +69,7 @@
     </fragment>
     <dialog
         android:id="@+id/resultDialog"
-        android:name="com.bartex.quizday.ui.flags.tabs.flag.ResultDialog"
+        android:name="com.bartex.quizday.ui.flags.tabs.flag.ResultDialogFlags"
         android:label="@string/resultDialog" />
     <fragment
         android:id="@+id/tabsFragment"
@@ -94,7 +94,7 @@
     </fragment>
     <fragment
         android:id="@+id/regionFragment"
-        android:name="com.bartex.quizday.ui.flags.regions.RegionFragment"
+        android:name="com.bartex.quizday.ui.flags.tabs.regions.RegionFragment"
         android:label="@string/states" >
         <action
             android:id="@+id/action_regionFragment_to_helpFragment"

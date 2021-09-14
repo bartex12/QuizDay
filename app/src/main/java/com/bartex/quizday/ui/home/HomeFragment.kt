@@ -1,27 +1,26 @@
 package com.bartex.quizday.ui.home
 
   import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ListView
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
-import com.bartex.quizday.R
-import com.bartex.quizday.ui.adapters.ItemList
+  import android.view.LayoutInflater
+  import android.view.View
+  import android.view.ViewGroup
+  import android.widget.ListView
+  import androidx.fragment.app.Fragment
+  import androidx.lifecycle.Observer
+  import androidx.lifecycle.ViewModelProvider
+  import androidx.navigation.NavController
+  import androidx.navigation.Navigation
+  import com.bartex.quizday.R
+  import com.bartex.quizday.ui.adapters.ItemList
 
 class HomeFragment: Fragment() {
 
     private val homeViewModel by lazy {
         ViewModelProvider(this).get(HomeViewModel::class.java)
     }
+
     lateinit var navController: NavController
     lateinit var listView:ListView
-    lateinit var tv01:TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,7 +37,7 @@ class HomeFragment: Fragment() {
 
         homeViewModel.loadData()
         //наблюдение на всякий случай, вдруг потом данные будут меняться
-        homeViewModel.getMainList().observe(viewLifecycleOwner, Observer {
+        homeViewModel.getMainList().observe(viewLifecycleOwner, {
             renderData(it)
         })
 

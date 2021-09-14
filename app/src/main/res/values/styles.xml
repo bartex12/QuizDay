@@ -17,8 +17,25 @@
         <item name="android:layout_weight"> 1 </item>
     </style>
 
+    <style name="ImageAnswerStyle">
+        <item name="android:layout_width"> 0dp </item>
+        <item name="android:layout_height"> 100dp </item>
+        <item name="android:layout_weight"> 1 </item>
+        <item name="android:scaleType"> centerInside </item>
+        <item name="android:layout_margin"> @dimen/layout_margin_4dp </item>
+    </style>
+
+    <style name="ImageAnswerStyleLand" parent = "ImageAnswerStyle">
+        <item name="android:layout_height"> @dimen/layout_height_small </item>
+        <item name="android:scaleType"> centerInside </item>
+    </style>
+
     <style name="ToolbarTitleStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="TabWidget" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">13sp</item>
     </style>
 
 </resources>

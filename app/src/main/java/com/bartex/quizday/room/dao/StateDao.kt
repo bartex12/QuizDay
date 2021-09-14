@@ -58,4 +58,7 @@ interface StateDao {
     @Query("SELECT*FROM RoomState WHERE mistake = 1")
     fun getAllMistakesLive():LiveData<List<RoomState>>
 
+    @Query("SELECT*FROM RoomState ")
+    fun getAllRegionsLive():LiveData<List<RoomState>>
+
 }

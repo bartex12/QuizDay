@@ -39,4 +39,13 @@ class SettingsProvider(val app: App) :ISettingsProvider{
         }
         return dataFlags
     }
+
+    override fun updateImageStub(dataFlags:DataFlags):DataFlags {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
+        val imageStub: String? = sharedPreferences.getString(Constants.IMAGE_STUB, 1.toString())
+        imageStub?. let{
+            dataFlags.incorrectImageStub =it.toInt()
+        }
+        return dataFlags
+    }
 }

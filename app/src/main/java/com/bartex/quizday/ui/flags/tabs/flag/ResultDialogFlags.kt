@@ -1,11 +1,13 @@
-package com.bartex.quizday.ui.flags.tabs.state
+package com.bartex.quizday.ui.flags.tabs.flag
 
 import androidx.lifecycle.ViewModelProvider
 import com.bartex.quizday.ui.flags.base.BaseResultDialog
 import com.bartex.quizday.ui.flags.base.BaseViewModel
 
-class ResultDialogState: BaseResultDialog() {
+class ResultDialogFlags: BaseResultDialog() {
+
     override fun getCurrentViewModel(): BaseViewModel {
-      return ViewModelProvider(requireActivity()).get(StatesViewModel::class.java)
+      return  ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
     }
+
 }
