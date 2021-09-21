@@ -9,9 +9,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -23,6 +27,7 @@ import com.bartex.quizday.model.fsm.IFlagState
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.substates.*
 import com.bartex.quizday.network.NoInternetDialogFragment
+import com.bartex.quizday.ui.flags.shared.SharedViewModel
 import com.bartex.quizday.ui.flags.StatesSealed
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import com.google.android.material.chip.Chip
@@ -31,39 +36,41 @@ import com.google.android.material.chip.ChipGroup
 class FlagsFragment: Fragment(){
 
     companion object{
-        const val TAG = "33333"
+        const val TAG = "Quizday"
     }
 
     private val flagsViewModel by lazy{
         ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
     }
+
+    private val model: SharedViewModel by activityViewModels()
+
     private val  mToneGenerator: ToneGenerator by lazy{
         ToneGenerator(AudioManager.STREAM_MUSIC, 100)
     }
 
     private lateinit var handler : Handler   // Для задержки загрузки следующего флага
     private lateinit var quizLinearLayout  : LinearLayout // root макета фрагмента
-    private lateinit var answerTextView : TextView  //для правильного ответа
+    private lateinit var answerTextView : TextView  //для неправильного ответа
     private lateinit var flagImageView  : ImageView  //Для вывода флага
     private lateinit var guessButton:Button  // текущая кнопка ответа
     private lateinit var progressBarFlags:ProgressBar
     private var guessLinearLayouts : Array<LinearLayout?> = arrayOfNulls(3) //кнопки ответов
-
+    private var shakeAnimation : Animation? = null  // Анимация неправильного ответа
     private lateinit var chipGroup:ChipGroup
     private lateinit var navController:NavController
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.d(TAG, "FlagsFragment onCreateView")
         return inflater.inflate(R.layout.fragment_flags, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "FlagsFragment onViewCreated")
 
         navController = Navigation.findNavController(view)
 
         initHandler()
+        initAnimation()
         initViews(view)
         initChipGroupListener()
         initButtonsListeners()
@@ -78,15 +85,15 @@ class FlagsFragment: Fragment(){
             chipGroup.check(R.id.chip_Europa)
 
             flagsViewModel.getDataFromDatabase()
-                    .observe(viewLifecycleOwner, {
-                        if (it.size >200){ //если в базе есть записи
-                            renderDataFromDatabase(it)  //берём из базы
+                    .observe(viewLifecycleOwner, {listOfState->
+                        if (listOfState.size >200){ //если в базе есть записи
+                            renderDataFromDatabase(listOfState)  //берём из базы
                         }else{ //если в базе ничего нет
                             if (isNetworkAvailable){ //если сеть есть
                                 //получаем страны из сети и после этого запускаем викторину
                                 flagsViewModel.getStatesSealed()
-                                        .observe(viewLifecycleOwner,  {
-                                            renderData(it)
+                                        .observe(viewLifecycleOwner,  {stateSealed->
+                                            renderData(stateSealed)
                                         })
                             }else{//если нет ни сети ни данных в базе - показываем предупреждение
                                 showAlertDialog(
@@ -96,6 +103,9 @@ class FlagsFragment: Fragment(){
                             }
                         }
                     })
+        }else{
+            val title = model.toolbarTitleFromFlag.value
+            title?.let{model.updateToolbarTitleFromFlag(it)} //обновление тулбара при повороте экрана
         }
 
         //следим за состоянием конечного автомата
@@ -107,10 +117,17 @@ class FlagsFragment: Fragment(){
                 })
     }
 
+    private fun initAnimation() {
+        // Загрузка анимации для неправильных ответов
+        shakeAnimation = AnimationUtils.loadAnimation(
+                activity,
+                R.anim.incorrect_answer
+        )
+    }
+
     // метод onStart вызывается после onViewCreated.
     override fun onStart() {
         super.onStart()
-        Log.d(TAG, "FlagsFragment onStart")
         flagsViewModel.updateSoundOnOff() //обновляем звук
         flagsViewModel.updateNumberFlagsInQuiz() //обновляем число вопросов в викторине
         updateGuessRows(flagsViewModel.getGuessRows()) //обновляем число выриантов ответов в викторине
@@ -124,9 +141,11 @@ class FlagsFragment: Fragment(){
     private fun initChipGroupListener() {
         chipGroup.setOnCheckedChangeListener { _, id ->
             val newRegion:String = getChipNameById(id)
-            if (newRegion != flagsViewModel.getRegion()){
+            if (newRegion != flagsViewModel.getCurrentRegion()){
                 flagsViewModel.saveRegion(newRegion)
                 flagsViewModel.resetQuiz()
+
+                model.updateRegion(newRegion) //обновляем регион
             }
         }
     }
@@ -144,13 +163,14 @@ class FlagsFragment: Fragment(){
     //состояние готовности к викторине - показываем первый флаг
     private fun showReadyState(data: DataFlags) {
         getNumberOnChipName(data) //показываем количество стран в регионе
+        model.updateRegion(data.region)  //обновляем регион  - в случае если без действий уходим на другой фрагмент
         flagsViewModel.loadNextFlag(data)
     }
 
     //следующий вопрос
     private fun showNextFlagState(data: DataFlags) {
         getNumberOnChipName(data)//показываем количество стран в регионе
-        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromFlag(getToolbarTitle(data))//обновить номер текущего вопроса
         answerTextView.text = "" //не показывать пока ответ
         showNextCountryFlag(data)  //svg изображение флага data
         showAnswerButtonsNumberAndNames(data)// Добавление кнопок
@@ -162,9 +182,9 @@ class FlagsFragment: Fragment(){
         getNumberOnChipName(data)//показываем количество стран в регионе
         flagsViewModel.writeMistakeInDatabase() //делаем отметку об ошибке в базе данных
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_CDMA_LOW_PBX_L, 100) }.start()
-        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromFlag(getToolbarTitle(data))//обновить номер текущего вопроса
         showIncorrectAnswer()//показать неправильный ответ
-        //todo анимацию встряхивания сделать
+        flagImageView.startAnimation(shakeAnimation)
         showNextCountryFlag(data) //svg изображение флага
         showAnswerButtonsNumberAndNames(data) // Добавление кнопок
         showCorrectAnswerButtom(data)
@@ -174,7 +194,7 @@ class FlagsFragment: Fragment(){
     private fun showWellNotLastState(data: DataFlags) {
         getNumberOnChipName(data)//показываем количество стран в регионе
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 50) }.start()
-        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromFlag(getToolbarTitle(data))//обновить номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons()  // Блокировка всех кнопок ответов
         handler.postDelayed(
@@ -188,13 +208,13 @@ class FlagsFragment: Fragment(){
     private fun showWellAndLastState(data: DataFlags) {
         getNumberOnChipName(data)//показываем количество стран в регионе
         Thread { mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 100) }.start()
-        flagsViewModel.updateToolbarTitle(getToolbarTitle(data))//обновить номер текущего вопроса
+        model.updateToolbarTitleFromFlag(getToolbarTitle(data))//обновить номер текущего вопроса
         showCorrectAnswer(data) //показать правильный ответ
         disableButtons() //сделать иконки недоступными
         showNextCountryFlag(data)  //svg изображение флага
 
         //если диалог не создан - создаём и передаём данные
-        if(flagsViewModel.isNeedToCreateDialog()){
+        if(flagsViewModel.getNeedDialog()){
             val bundle = Bundle()
             bundle. putInt(Constants.TOTAL_QUESTIONS, data.flagsInQuiz )
             bundle. putInt(Constants.TOTAL_GUESSES, data.totalGuesses )
@@ -346,8 +366,7 @@ class FlagsFragment: Fragment(){
     private fun getNumberOnChipName(data: DataFlags) {
         for (i in 0 until chipGroup.childCount) {
             val chip = chipGroup.getChildAt(i) as Chip
-            var regionName = ""
-            regionName = if (chip.isChecked) {
+            val regionName = if (chip.isChecked) {
                 flagsViewModel.getRegionNameAndNumber(data)
             }else{
                 getChipNameById(chip.id)

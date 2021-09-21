@@ -15,4 +15,5 @@ interface IRoomStateCash {
 
     fun  getAllMistakesLive(): LiveData<List<RoomState>> //получение списка ошибок в виде LiveData
     fun removeMistakeFromDatabase(nameRus: String): Single<Boolean> //удаляем отметку об ошибке
+    fun getAllDataLive(): LiveData<List<RoomState>>
 }

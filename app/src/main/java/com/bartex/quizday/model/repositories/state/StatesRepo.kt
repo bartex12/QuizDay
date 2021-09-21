@@ -1,6 +1,6 @@
 package com.bartex.quizday.model.repositories.state
 
-import com.bartex.quizday.model.api.IDataSourceState
+import com.bartex.quizday.model.api.IDataSource
 import com.bartex.quizday.model.common.MapOfCapital
 import com.bartex.quizday.model.common.MapOfRegion
 import com.bartex.quizday.model.common.MapOfState
@@ -9,10 +9,10 @@ import com.bartex.quizday.model.repositories.state.roomcash.IRoomStateCash
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-class StatesRepo(private val api: IDataSourceState, private val roomCash: IRoomStateCash): IStatesRepo {
+class StatesRepo(private val dataSource: IDataSource, private val roomCash: IRoomStateCash): IStatesRepo {
 
     override fun getStates(): Single<List<State>> =
-            api.getStates()
+            dataSource.getStates()
                 .flatMap {states->
                     //отбираем только те, где значения не равны null
                     val statesFiltered = states.filter { st->

@@ -1,6 +1,7 @@
 package com.bartex.quizday
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
 import android.media.AudioManager
 import android.os.Bundle
@@ -20,14 +21,18 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.preference.PreferenceManager
+import androidx.viewpager.widget.ViewPager
 import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.network.NoInternetDialogFragment
 import com.bartex.quizday.network.OnlineLiveData
 import com.bartex.quizday.network.isInternetAvailable
-import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
-import com.bartex.quizday.ui.flags.tabs.state.StatesViewModel
+import com.bartex.quizday.ui.flags.shared.SharedViewModel
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.fragment_tabs.*
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener{
 
@@ -36,17 +41,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toolbar: Toolbar
     private lateinit var toolbarTitle: TextView
-    private  var toolbarTitleText: String = ""
-
+    private  var toolbarTitleFlag = ""
+    private  var toolbarTitleState = ""
     private lateinit var audioManager: AudioManager
     private var isNetworkAvailable: Boolean = true //Доступна ли сеть
+    private var lastPressTime:Long = 0
 
-    private val flagsViewModel by lazy{
-        ViewModelProvider(this).get(FlagsViewModel::class.java)
+    private val model by lazy{
+        ViewModelProvider(this).get(SharedViewModel::class.java)
     }
-    private val statesViewModel by lazy{
-        ViewModelProvider(this).get(StatesViewModel::class.java)
-    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -99,17 +103,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setNavigationItemSelectedListener(this)
 
-        //используем flagsViewModel для получения данных от фрагмента - вместо интерфейса
-        flagsViewModel.getFlagsToolbarTitle()
+        //передача данных о надписи на тулбаре из фрагмента викторины с флагами
+        model.toolbarTitleFromFlag
                 .observe(this, {newTitle->
-                    toolbarTitleText = newTitle
-                    toolbar.title = toolbarTitleText
+                    toolbarTitleFlag = newTitle
+                    if(getViewPagerCurrentItem() == 0){
+                        toolbar.title = toolbarTitleFlag //здесь тоже, иначе не обновляется само
+                    }
                 })
-        statesViewModel.getFlagsToolbarTitle()
+        //передача данных о надписи на тулбаре из фрагмента викторины со странами
+        model.toolbarTitleFromState
                 .observe(this, {newTitle->
-                    toolbarTitleText = newTitle
-                    toolbar.title = toolbarTitleText
+                    toolbarTitleState = newTitle
+                    if(getViewPagerCurrentItem() == 1){
+                        toolbar.title = toolbarTitleState //здесь тоже, иначе не обновляется само
+                    }
                 })
+    }
+
+    private fun getViewPagerCurrentItem(): Int? {
+        val frag = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+        val vp:ViewPager? = frag?.view?.findViewById(R.id.view_pager_flags)
+        return vp?.currentItem
     }
 
     //щелчки по стрелке вверх - как appBarConfiguration и по гамбургеру - как super.onSupportNavigateUp()
@@ -135,7 +150,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    //todo  изменять при добавлении фрагментов
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         //нашел способ установить видимость иконок в тулбаре без перебора всех вариантов
         val id = navController.currentDestination?.id
@@ -152,11 +166,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.imagequizFragment -> getString(R.string.image_quiz)
                 R.id.settingsFragment -> getString(R.string.action_settings)
                 R.id.helpFragment -> getString(R.string.help)
-                R.id.flagsFragment ->  getString(R.string.flags)
-                R.id.tabsFragment ->toolbarTitleText //то что пришло из фрагмента флагов
-                R.id.regionFragment ->getString(R.string.states)
-                R.id.resultDialog -> toolbarTitleText //чтобы не просвечивало при повороте
-                else -> getString(R.string.app_name)
+                R.id.tabsFragment -> {
+                    when(getViewPagerCurrentItem()){
+                        0-> toolbarTitleFlag
+                        1-> toolbarTitleState
+                        2-> getString(R.string.mistakes)
+                        3->  getString(R.string.regions)
+                        else-> getString(R.string.app_name)
+                    }
+                }
+                else-> getString(R.string.app_name)
             }
         }
         return super.onPrepareOptionsMenu(menu)
@@ -168,31 +187,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     //кроме того пришлось делать перебор всех вариантов (может лучше  убрать меню во фрагменты)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (navController.currentDestination?.id ){
-
             R.id.homeFragmentNew -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_homeFragmentNew_to_settingsFragment)
                 }
             }
-
             R.id.textquizFragment -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_textquizFragment_to_settingsFragment)
                 }
             }
-
             R.id.imagequizFragment -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_imagequizFragment_to_settingsFragment)
                 }
             }
-
             R.id.tabsFragment -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_tabsFragment_to_settingsFragment)
                 }
             }
-
             R.id.helpFragment -> {
                 when (item.itemId) {
                     R.id.action_settings -> navController.navigate(R.id.action_helpFragment_to_settingsFragment)
@@ -242,5 +256,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     fun getNetworkAvailable(): Boolean = isNetworkAvailable
 
+    //выход по двойному щелчку
+    override fun onBackPressed() {
+
+        if( navController.currentDestination?.id  == R.id.homeFragmentNew) {
+            //закрываем шторку, если была открыта
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            }
+            //показываем Snackbar: Для выхода нажмите  НАЗАД  ещё раз
+            Snackbar.make(findViewById(android.R.id.content), getString(R.string.quit_from_app),
+                    Snackbar.LENGTH_SHORT).show()
+            val pressTime = System.currentTimeMillis()
+            if (pressTime - lastPressTime <= DOUBLE_PRESS_INTERVAL) {
+                // значит был двойной клик
+                exitProcess(0)
+            }
+            lastPressTime = pressTime
+        }else {
+            super.onBackPressed()
+        }
+    }
+
+    companion object{
+       const val DOUBLE_PRESS_INTERVAL:Long = 2000L
+    }
 
 }

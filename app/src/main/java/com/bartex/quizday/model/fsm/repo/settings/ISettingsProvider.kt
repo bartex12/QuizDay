@@ -7,5 +7,5 @@ interface ISettingsProvider {
     fun updateSoundOnOff()
     fun updateNumberFlagsInQuiz(dataFlags: DataFlags): DataFlags
     fun getGuessRows(dataFlags:DataFlags):DataFlags
-
+    fun updateImageStub(dataFlags:DataFlags):DataFlags
 }

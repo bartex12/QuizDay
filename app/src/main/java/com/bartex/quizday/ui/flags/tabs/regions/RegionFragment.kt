@@ -1,4 +1,4 @@
-package com.bartex.quizday.ui.flags.regions
+package com.bartex.quizday.ui.flags.tabs.regions
 
 import android.content.Context
 import android.os.Bundle
@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -19,7 +20,7 @@ import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.RegionAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
-import com.bartex.quizday.ui.flags.tabs.flag.FlagsViewModel
+import com.bartex.quizday.ui.flags.shared.SharedViewModel
 import com.google.android.material.chip.ChipGroup
 import java.util.*
 
@@ -30,23 +31,19 @@ class RegionFragment : Fragment(),
     private var position = 0
     private var adapter: RegionAdapter? = null
     private lateinit var navController: NavController
+
     private val regionViewModel by lazy{
         ViewModelProvider(requireActivity()).get(RegionViewModel::class.java)
     }
 
-    private val flagsViewModel by lazy {
-        ViewModelProvider(requireActivity()).get(FlagsViewModel::class.java)
-    }
+    private val model: SharedViewModel by activityViewModels()
+
         private var listOfRegionStates  = mutableListOf<State>() //список стран региона
         private lateinit var rvStatesRegion: RecyclerView
         private lateinit  var emptyViewRegion: TextView
         private lateinit var chipGroupRegion: ChipGroup
         private lateinit var progressBarRegion: ProgressBar
-        private var region:String = ""
-
-        companion object {
-        const val TAG = "33333"
-    }
+        private var region:String = Constants.REGION_ALL
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
             return inflater.inflate(R.layout.fragment_regions, container, false)
@@ -67,14 +64,26 @@ class RegionFragment : Fragment(),
             setHasOptionsMenu(true)
             requireActivity().invalidateOptionsMenu()
 
-            //чтобы получить текущий регион - сделал обмен данными через flagsViewModel
-            // во flagsViewModel в методе resetQuiz() кладём значение, а здесь принимаем
-            flagsViewModel.getDataFlagsToRegionFragment()
+            //чтобы получить текущий регион - сделал обмен данными через SharedViewModel
+            // в других фрагментах кладём значение, а здесь принимаем
+            model.newRegion.observe(viewLifecycleOwner, {newRegion ->
+                region = newRegion //текущий регион
+                chipGroupRegion.check(getRegionId(region))
+                //не убирать эту строку иначе при повороте данные пропадают!
+                renderDataWithRegion(region)
+            })
+
+            regionViewModel.getAllDataLive()
                     .observe(viewLifecycleOwner, {data->
-                        listOfRegionStates = data.listStatesFromNet  // полный список стран
-                        region = data.region //текущий регион
-                        chipGroupRegion.check(getRegionId(region))
-                        //не убирать эту строку иначе при повороте данные пропадают!
+                        listOfRegionStates =   data.map{
+                        State(it.capital, it.flag, it.name, it.region, it.nameRus, it.capitalRus, it.regionRus)
+                    }.filter {st->
+                        st.name!=null && st.capital!=null && st.flag!=null &&
+                                st.name.isNotBlank() && st.capital.isNotBlank() && st.flag.isNotBlank()
+                                && st.name != "Puerto Rico" && st.name !=  "French Guiana"
+                    } as MutableList<State>
+                        UtilRegions.showCountByRegion(chipGroupRegion, listOfRegionStates) //число на чипе
+                        chipGroupRegion.check(UtilRegions.getRegionId(region))//отметка на чипе
                         renderDataWithRegion(region)
                     })
         }
@@ -140,7 +149,6 @@ class RegionFragment : Fragment(),
             val manager = rvStatesRegion.layoutManager as LinearLayoutManager
             val firstPosition = manager.findFirstVisibleItemPosition()
             regionViewModel.savePositionState(firstPosition)
-            Log.d(TAG, "RegionFragment onPause firstPosition = $firstPosition")
         }
 
         private fun initAdapter() {
@@ -164,7 +172,6 @@ class RegionFragment : Fragment(),
                 adapter?.listOfRegion = listOfStates
 
                 rvStatesRegion.layoutManager?.scrollToPosition(position) //крутим в запомненную позицию списка
-                Log.d(TAG, "RegionFragment renderData scrollToPosition = $position")
             }
         }
 
@@ -197,6 +204,7 @@ class RegionFragment : Fragment(),
         }
 
         override fun onQueryTextChange(newText: String?): Boolean {
+            model.updateRegion(Constants.REGION_ALL) // для поиска ставим Все регионы на чипы
             newText?. let {
                 if (it.isNotBlank()) {
                     val listSearched = mutableListOf<State>()

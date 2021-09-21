@@ -3,7 +3,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">Знания на ладони</string>
+    <string name="nav_header_subtitle">Знание на ладони</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="newButton">NewButton</string>
     <string name="action_settings">Настройки</string>
@@ -54,6 +54,10 @@
     <string name="restarting_new_block">Загружаем новый блок вопросов викторины</string>
 
     <string name="results">Вопросов: %1$d\nПопыток: %2$d\n%3$.01f%% правильных ответов</string>
+    <string name="result">РЕЗУЛЬТАТЫ</string>
+    <string name="results_questions">Вопросов: %1$d</string>
+    <string name="results_attempts">Попыток: %1$d</string>
+    <string name="results_performance">%1$.0f%% правильных ответов</string>
     <string name="reset_quiz">Новые вопросы</string>
     <string name="no_now">Не сегодня!</string>
     <string name="all">Все</string>
@@ -92,5 +96,18 @@
     <string name="divider">divider</string>
     <string name="MediumTextStub">Правильно</string>
     <string name="questionsStub">Мадагаскар</string>
+    <string name="mistakes">Ошибки</string>
+    <string name="regions">Регионы</string>
+    <string name="newQuestions">Новые вопросы</string>
+    <string name="performance">performance</string>
+    <string name="attempts">attempts</string>
+    <string name="questions">questions</string>
+    <string name="quit_from_app">Для выхода нажмите НАЗАД ещё раз</string>
+    <string name="any_image">"Изображение "</string>
+    <string name="quest">Вопросы</string>
+    <string name="answers">Ответы</string>
+    <string name="incorrect">Неправильные ответы</string>
+    <string name="incorrect_stub">Заменитель флага</string>
+    <string name="incorrect_stub_description">Изображение-заменитель флага при неправильном ответе</string>
 
 </resources>
