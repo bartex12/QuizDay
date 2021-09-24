@@ -1,17 +1,13 @@
-package com.bartex.quizday.model.fsm.repo.settings
+package com.bartex.quizday.ui.setting
 
 import android.content.Context
 import android.media.AudioManager
-import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.bartex.quizday.App
-import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
 import com.bartex.quizday.model.fsm.entity.DataFlags
-import com.bartex.quizday.ui.adapters.ItemList
-import java.security.SecureRandom
 
-class SettingsProvider(val app: App) :ISettingsProvider{
+class SettingsProvider(val app: App) : ISettingsProvider {
 
     override fun updateSoundOnOff() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
