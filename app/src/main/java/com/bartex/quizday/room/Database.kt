@@ -23,6 +23,7 @@ abstract class Database : RoomDatabase() {
            if(instance == null) {
                instance = Room.databaseBuilder(context, Database::class.java, DB_NAME )
                    .addMigrations(MigrationDb().migration1to2)
+//                   .addMigrations(MigrationDb().migration2to3)
                    .build()
            }
         }

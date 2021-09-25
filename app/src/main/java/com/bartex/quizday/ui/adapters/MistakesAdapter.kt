@@ -57,7 +57,7 @@ class MistakesAdapter(
 
         fun bind(state: State) {
             tvNameMistake.text = state.nameRus
-            state.flag?.let {imageLoader.loadInto(it, ivFlagMistake)}
+            state.flags?.get(0).let {imageLoader.loadInto(it.toString(), ivFlagMistake)}
 
             if (!isOPenList.contains(state.nameRus)){
                 setInvisibleName()

@@ -1,4 +1,4 @@
-package com.bartex.quizday.ui.flags.tabs.regions
+package com.bartex.quizday.ui.flags.utils
 
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants

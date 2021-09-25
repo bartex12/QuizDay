@@ -61,4 +61,7 @@ interface StateDao {
     @Query("SELECT*FROM RoomState ")
     fun getAllRegionsLive():LiveData<List<RoomState>>
 
+    @Query("SELECT * FROM RoomState WHERE flag LIKE '%' ||:oldFlag || '%'")
+    fun findByFlag(oldFlag:String): List<RoomState>
+
 }

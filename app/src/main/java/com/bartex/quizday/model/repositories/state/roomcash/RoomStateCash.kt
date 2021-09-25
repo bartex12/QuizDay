@@ -7,23 +7,29 @@ import com.bartex.quizday.model.common.MapOfState
 import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.room.Database
 import com.bartex.quizday.room.tables.RoomState
+import com.bartex.quizday.ui.flags.utils.UtilFilters
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class RoomStateCash(val db:Database):IRoomStateCash {
 
+    companion object{
+        const val TAG = "Quizday"
+    }
+
     //запись в базу данных и возвращение исходного списка
     override fun doStatesCash(listStates: List<State>): Single<List<State>> {
        return Single.fromCallable {
            val roomState  = listStates.map {
+               //Log.d(TAG, "RoomStateCash doStatesCash: ${it.flags?.get(0).toString()}")
                RoomState(
                    it.capital ?: "",
-                   it.flag ?: "",
+                   it.flags?.get(0).toString() ?: "",
                    it.name ?: "",
-                   it.region ?: "",
+                   it.continent ?: "",
                    MapOfState.mapStates[it.name] ?:"Unknown",
                    MapOfCapital.mapCapital[it.capital] ?:"Unknown",
-                   MapOfRegion.mapRegion[it.region] ?:"Unknown"
+                   MapOfRegion.mapRegion[it.continent] ?:"Unknown"
                )
            }
            db.stateDao.insert(roomState)
@@ -35,7 +41,7 @@ class RoomStateCash(val db:Database):IRoomStateCash {
     override fun getStatesFromDatabase(): Single<MutableList<State>> =
         Single.fromCallable {
             db.stateDao.getAll().map{
-                State(it.capital,it.flag, it.name, it.region,
+                State(it.capital, listOf(it.flag), it.name, it.region,
                         it.nameRus, it.capitalRus, it.regionRus
                 )
             }.toMutableList()
@@ -45,7 +51,7 @@ class RoomStateCash(val db:Database):IRoomStateCash {
     override fun getRegionStatesFromCash(region: String): Single<List<State>>  =
         Single.fromCallable {
             db.stateDao.getRegionStates(region).map{
-                State(it.capital,it.flag, it.name, it.region,
+                State(it.capital, listOf(it.flag), it.name, it.region,
                         it.nameRus, it.capitalRus, it.regionRus )
             }
         }
@@ -84,7 +90,7 @@ class RoomStateCash(val db:Database):IRoomStateCash {
             Single.fromCallable {
               val listOfMistakes:List<RoomState> =  db.stateDao.getMistakesList()
                val states =  listOfMistakes.map{
-                    State(it.capital, it.flag, it.name, it.region, it.nameRus, it.capitalRus, it.regionRus
+                    State(it.capital, listOf(it.flag), it.name, it.region, it.nameRus, it.capitalRus, it.regionRus
                     )
                 }
                 states
@@ -94,11 +100,9 @@ class RoomStateCash(val db:Database):IRoomStateCash {
     override fun loadAllData(): Single<MutableList<State>> =
          Single.fromCallable {
             db.stateDao.getAll().map{
-                State(it.capital, it.flag, it.name, it.region, it.nameRus, it.capitalRus, it.regionRus)
-            }.filter {st->
-                st.name!=null && st.capital!=null && st.flag!=null &&
-                        st.name.isNotBlank() && st.capital.isNotBlank() && st.flag.isNotBlank()
-                        && st.name != "Puerto Rico" && st.name !=  "French Guiana"
+                State(it.capital, listOf(it.flag), it.name, it.region, it.nameRus, it.capitalRus, it.regionRus)
+            }.filter {st-> //отбираем только те, где полные данные
+                UtilFilters.filterData(st)
             }.toMutableList()
          }.subscribeOn(Schedulers.io())
 

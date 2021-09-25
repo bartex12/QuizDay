@@ -13,7 +13,6 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -229,8 +228,9 @@ class FlagsFragment: Fragment(){
 
     //показываем векторное изображение флага
     private fun showNextCountryFlag(data: DataFlags) {
-        data.nextCountry?.flag?.let { flag ->
-            GlideToVectorYou.justLoadImage(requireActivity(), Uri.parse(flag), flagImageView)
+        data.nextCountry?.flags.let { flags->
+            GlideToVectorYou.justLoadImage(requireActivity(),
+                    Uri.parse(flags?.get(0).toString()), flagImageView)
         }
     }
 
