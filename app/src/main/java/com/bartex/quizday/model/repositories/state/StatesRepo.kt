@@ -1,5 +1,6 @@
 package com.bartex.quizday.model.repositories.state
 
+import android.util.Log
 import com.bartex.quizday.model.api.IDataSource
 import com.bartex.quizday.model.common.MapOfCapital
 import com.bartex.quizday.model.common.MapOfRegion
