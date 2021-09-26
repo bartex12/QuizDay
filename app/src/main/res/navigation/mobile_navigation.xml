@@ -52,6 +52,9 @@
             app:destination="@id/settingsFragment"
             app:popUpTo="@id/helpFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_helpFragment_to_tabsFragment"
+            app:destination="@id/tabsFragment" />
     </fragment>
     <fragment
         android:id="@+id/flagsFragment"
@@ -91,6 +94,9 @@
         <action
             android:id="@+id/action_tabsFragment_to_statesFragment"
             app:destination="@id/statesFragment" />
+        <action
+            android:id="@+id/action_tabsFragment_to_mistakesFragment"
+            app:destination="@id/mistakesFragment" />
     </fragment>
     <fragment
         android:id="@+id/regionFragment"
@@ -126,4 +132,15 @@
         android:id="@+id/resultDialogState"
         android:name="com.bartex.quizday.ui.flags.tabs.state.ResultDialogState"
         android:label="ResultDialogState" />
+    <fragment
+        android:id="@+id/mistakesFragment"
+        android:name="com.bartex.quizday.ui.flags.tabs.mistakes.MistakesFragment"
+        android:label="MistakesFragment" >
+        <action
+            android:id="@+id/action_mistakesFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_mistakesFragment_to_helpFragment"
+            app:destination="@id/helpFragment" />
+    </fragment>
 </navigation>

@@ -87,7 +87,7 @@ class StatesFragment : Fragment(){
 
             statesViewModel.getDataFromDatabase()
                     .observe(viewLifecycleOwner, {listOfState->
-                        if (listOfState.size >2000){ //если в базе есть записи
+                        if (listOfState.size >200){ //если в базе есть записи
                             renderDataFromDatabase(listOfState)  //берём из базы
                         }else{ //если в базе ничего нет
                             if (isNetworkAvailable){ //если сеть есть
