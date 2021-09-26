@@ -80,11 +80,6 @@ open class BaseViewModel(
     fun saveListOfStates( listStates:MutableList<State>){
         dataFlags.listStatesFromNet = listStates //для удобства храним в данных
         listOfStates = listStates //а также храним во ViewModel
-//        Log.d(TAG, "BaseViewModel saveListOfStates: listOfStates")
-//        for(state in listOfStates){
-//            Log.d(TAG, "${ state.name} ${ state.nameRus} ${ state.continent} " +
-//                    "${ state.regionRus} ${ state.flags?.get(0)} ")
-//        }
     }
 
     fun getDataFromDatabase(): LiveData<MutableList<State>> {
@@ -163,8 +158,7 @@ open class BaseViewModel(
     }
 
     fun getRegionNameAndNumber( data: DataFlags):String{
-        var regionSize = 0
-        regionSize = when (region) {
+        val regionSize: Int = when (region) {
             Constants.REGION_ALL -> {
                 data.listStatesFromNet.size
             }
@@ -181,9 +175,7 @@ open class BaseViewModel(
       dataFlags =  settingProvider.updateImageStub(dataFlags)
     }
 
-
     companion object{
         const val TAG = "Quizday"
     }
-
 }
