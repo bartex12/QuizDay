@@ -15,7 +15,7 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        image_view.animate().rotationX(500f)
+        image_view.animate().rotationX(490f)
             .setInterpolator(LinearInterpolator()).duration = 10000
 
         handler.postDelayed({
