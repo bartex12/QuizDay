@@ -29,7 +29,6 @@ import com.bartex.quizday.model.fsm.substates.*
 import com.bartex.quizday.network.NoInternetDialogFragment
 import com.bartex.quizday.ui.flags.shared.SharedViewModel
 import com.bartex.quizday.ui.flags.StatesSealed
-import com.bartex.quizday.ui.flags.tabs.flag.FlagsFragment
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -286,7 +285,7 @@ class StatesFragment : Fragment(){
                 // Получение ссылки на ImageView ответа
                 val answerImageView = guessLinearLayouts[row]!!.getChildAt(column) as ImageView
                 // флаг на этой позиции
-                val flag = data.listStates[row * 2 + column].flag
+                val flag = data.listStates[row * 2 + column].flags?.get(0).toString()
                 // название страны на этой позиции
                 val nameRusState =  data.listStates[row * 2 + column].nameRus
                 // тэг- пригодится при щелчке на кнопке
@@ -314,7 +313,7 @@ class StatesFragment : Fragment(){
         val randomImageView = randomRow?.getChildAt(data.randomColumn) as ImageView
         randomImageView.tag = data.correctAnswer?.let {
             ButtonTag(row = data.randomRow, column = data.randomColumn, nameRus = it)}
-        val correctFlag = data.nextCountry?.flag
+        val correctFlag = data.nextCountry?.flags?.get(0).toString()
         GlideToVectorYou.justLoadImage(requireActivity(), Uri.parse(correctFlag), randomImageView)
     }
 

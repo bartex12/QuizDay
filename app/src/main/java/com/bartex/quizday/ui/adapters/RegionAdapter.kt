@@ -42,8 +42,8 @@ class RegionAdapter(
 
         fun bind(state: State){
             itemView.findViewById<TextView>(R.id.tv_name_list).text = state.nameRus
-            state.flag?. let{
-                imageLoader.loadInto(it, itemView.findViewById(R.id.iv_flag_list))
+            state.flags?.get(0). let{
+                imageLoader.loadInto(it.toString(), itemView.findViewById(R.id.iv_flag_list))
 
                 itemView.setOnClickListener {
                     onItemClickListener.onItemClick(state)

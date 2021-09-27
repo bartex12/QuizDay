@@ -22,6 +22,7 @@ class FlagQuiz:IFlagQuiz {
             val filteredList =   listStates.filter { state->
                 state.regionRus == region
             } as MutableList<State>
+            val size =filteredList.size
             dataFlags.listStates = filteredList //передаём список в класс данных
         }
         //сбрасываем все остальные данные

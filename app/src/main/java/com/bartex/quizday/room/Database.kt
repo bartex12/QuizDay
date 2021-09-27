@@ -7,7 +7,7 @@ import com.bartex.quizday.room.dao.StateDao
 import com.bartex.quizday.room.tables.MigrationDb
 import com.bartex.quizday.room.tables.RoomState
 
-@androidx.room.Database(entities = [RoomState::class], version = 2)
+@androidx.room.Database(entities = [RoomState::class], version =2)
 abstract class Database : RoomDatabase() {
     abstract val stateDao:StateDao
 
@@ -23,6 +23,7 @@ abstract class Database : RoomDatabase() {
            if(instance == null) {
                instance = Room.databaseBuilder(context, Database::class.java, DB_NAME )
                    .addMigrations(MigrationDb().migration1to2)
+ //                  .addMigrations(MigrationDb().migration2to3)
                    .build()
            }
         }

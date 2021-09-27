@@ -1,4 +1,4 @@
-package com.bartex.quizday.model.fsm.repo.settings
+package com.bartex.quizday.ui.setting
 
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.ui.adapters.ItemList

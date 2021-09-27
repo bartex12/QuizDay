@@ -1,7 +1,7 @@
 package com.bartex.quizday.model.common
 
 object Constants {
-    const val baseUrl =  "https://restcountries.eu/rest/v2/"
+    const val baseUrl =  "https://restcountries.com/v2/"
     const val baseUrlText =  "https://jservice.io/"
     const val SOUND = "pref_cbSound"
     const val CHOICES = "pref_numberOfChoices"

@@ -13,8 +13,8 @@ import com.bartex.quizday.model.fsm.IFlagState
 import com.bartex.quizday.model.fsm.entity.DataFlags
 import com.bartex.quizday.model.fsm.repo.FlagQuiz
 import com.bartex.quizday.model.fsm.repo.IFlagQuiz
-import com.bartex.quizday.model.fsm.repo.settings.ISettingsProvider
-import com.bartex.quizday.model.fsm.repo.settings.SettingsProvider
+import com.bartex.quizday.ui.setting.ISettingsProvider
+import com.bartex.quizday.ui.setting.SettingsProvider
 import com.bartex.quizday.model.fsm.substates.ReadyState
 import com.bartex.quizday.model.repositories.state.IStatesRepo
 import com.bartex.quizday.model.repositories.state.StatesRepo
@@ -158,8 +158,7 @@ open class BaseViewModel(
     }
 
     fun getRegionNameAndNumber( data: DataFlags):String{
-        var regionSize = 0
-        regionSize = when (region) {
+        val regionSize: Int = when (region) {
             Constants.REGION_ALL -> {
                 data.listStatesFromNet.size
             }
@@ -176,9 +175,7 @@ open class BaseViewModel(
       dataFlags =  settingProvider.updateImageStub(dataFlags)
     }
 
-
     companion object{
         const val TAG = "Quizday"
     }
-
 }

@@ -1,7 +1,6 @@
 package com.bartex.quizday.ui.flags.tabs.mistakes
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
@@ -18,6 +17,8 @@ import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.ui.adapters.MistakesAdapter
 import com.bartex.quizday.ui.adapters.SvgImageLoader
 import com.bartex.quizday.ui.flags.shared.SharedViewModel
+import com.bartex.quizday.ui.flags.utils.UtilFilters
+import com.bartex.quizday.ui.flags.utils.UtilMistakes
 import com.google.android.material.chip.ChipGroup
 import java.util.*
 
@@ -70,11 +71,14 @@ class MistakesFragment: Fragment(),
         mistakesViewModel.getAllMistakesLive()
                 .observe(viewLifecycleOwner, {
                     listOfMistakeStates =   it.map {room->
-                        State(capital =room.capital, flag = room.flag,name =room.name,
-                            region = room.region, nameRus = room.nameRus,
+                        State(capital =room.capital, flags = listOf(room.flag), name =room.name,
+                            continent = room.region, nameRus = room.nameRus,
                             capitalRus = room.capitalRus, regionRus = room.regionRus
                         )
-                    } as MutableList<State>
+                    }.filter {st-> //отбираем только те, где полные данные
+                        UtilFilters.filterData(st)
+                    }  as MutableList<State>
+
                     UtilMistakes.showCountByRegion(chipGroupMistake, listOfMistakeStates)
                     chipGroupMistake.check(UtilMistakes.getRegionId(region))//отметка на чипе
                     renderDataWithRegion(region)

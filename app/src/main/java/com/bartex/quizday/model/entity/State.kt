@@ -9,11 +9,11 @@ import kotlinx.android.parcel.Parcelize
 //Для того, чтобы работала аннотация @Parcelize нужно добавить plugin с id 'kotlin-android-extensions'
 @Parcelize
 data class State(
-    @Expose val capital :String? = null,
-    @Expose val flag :String? = null,
-    @Expose val name :String? = null,
-    @Expose var region :String? = null,
-    var nameRus:String? = null,
-    var capitalRus:String? = null,
-    var regionRus:String? = null
+        @Expose val capital :String? = null,
+        @Expose val flags :List<String>? = null,
+        @Expose val name :String? = null,
+        @Expose var continent :String? = null,
+        var nameRus:String? = null,
+        var capitalRus:String? = null,
+        var regionRus:String? = null
 ): Parcelable

@@ -30,7 +30,7 @@ abstract class BaseResultDialog: DialogFragment(){
         val view: View = inflater.inflate(R.layout.dialog_statistica, null)
         val builder = AlertDialog.Builder(activity )
         dialog?.requestWindowFeature(STYLE_NO_TITLE);
-        isCancelable = false
+        isCancelable = false //отключаем закрытие диалога по кнопке Назад
         builder.setView(view)
 
         view.findViewById<TextView>(R.id.results).text = getString(R.string.result)
