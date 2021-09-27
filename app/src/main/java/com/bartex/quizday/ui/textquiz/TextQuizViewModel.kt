@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.bartex.quizday.model.api.IDataSourceText
 import com.bartex.quizday.model.common.Constants
+import com.bartex.quizday.model.entity.TextEntity
 import com.bartex.quizday.model.repositories.guess.GuessRepo
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
@@ -29,6 +30,7 @@ class TextQuizViewModel(
     )
 ) : ViewModel() {
 
+    private var dataGuess: TextEntity? = null
     private val guessState = MutableLiveData<GuessState>()
 
     fun getStateGuess(): LiveData<GuessState> {
@@ -41,6 +43,7 @@ class TextQuizViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ result ->
                 guessState.value = GuessState.Success(states = result)
+                dataGuess = result.get(0)
             }, {
                 guessState.value = GuessState.Error(error = it)
             })

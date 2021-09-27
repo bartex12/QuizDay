@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.bartex.quizday.MainActivity
 import com.bartex.quizday.R
 import com.bartex.quizday.model.common.Constants
-import com.bartex.quizday.model.entity.State
 import com.bartex.quizday.model.entity.TextEntity
 import com.bartex.quizday.network.NoInternetDialogFragment
 import com.google.android.material.button.MaterialButton
@@ -26,10 +25,12 @@ class TextQuizFragment : Fragment() {
         ViewModelProvider(requireActivity()).get(TextQuizViewModel::class.java)
     }
 
+    private var states: TextEntity? = null
     private lateinit var handler: Handler   // Для задержки загрузки
     private lateinit var questionTextView: TextView
     private lateinit var answerInputLayout: TextInputLayout
     private lateinit var buttonSend: MaterialButton
+    private lateinit var answer: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,27 +72,55 @@ class TextQuizFragment : Fragment() {
         questionTextView = view.findViewById<View>(R.id.text_stub) as TextView
         answerInputLayout = view.findViewById<View>(R.id.input_answer) as TextInputLayout
         buttonSend = view.findViewById<View>(R.id.button_send) as MaterialButton
+        answer = view.findViewById(R.id.answer) as TextView
+
     }
 
     private fun initButtonListener() {
         buttonSend.setOnClickListener {
-            val guess: String = answerInputLayout.editText?.text.toString()
-            if (guess.isNotEmpty())
-                text_stub.text = guess //удалить когда появится ViewModel
-            //textQuizViewModel.answer(guess)
+            val answer: String = answerInputLayout.editText?.text.toString()
+            if (answer.isNotEmpty()) {
+                Log.d("exp", states?.answer.toString())
+                Log.d("act", answer)
+                if (states?.answer.equals(answer))
+                    correctAnswer()
+                else notCorrectAnswer()
+                handler.postDelayed(
+                    { //todo сделать анимацию исчезновения флага
+                        textQuizViewModel.loadData()
+                    }, 1000
+                )
+            }
         }
+    }
+
+    private fun correctAnswer() {
+        answer.text = "Правильно!"
+        answer.visibility = View.VISIBLE
+        buttonSend.visibility = View.GONE
+        answerInputLayout.visibility = View.GONE
+    }
+
+    private fun notCorrectAnswer() {
+        answer.text = "Неправильно!"
+        answer.visibility = View.VISIBLE
+        buttonSend.visibility = View.GONE
+        answerInputLayout.visibility = View.GONE
     }
 
     private fun renderData(data: GuessState?) {
         when (data) {
             is GuessState.Success -> {
                 val states = data.states
+                states.get(0).answer?.let { Log.d("Answer", it) }
                 text_stub.text = states.get(0).question
                 answerInputLayout.visibility = View.VISIBLE
                 buttonSend.visibility = View.VISIBLE
+                answer.visibility = View.GONE
+                answerInputLayout.editText?.text = null
             }
             is GuessState.Error -> {
-                Log.d("QWE", "${data.error.message}")
+                Log.d("DEBAG", "${data.error.message}")
                 Toast.makeText(requireActivity(), "${data.error.message}", Toast.LENGTH_SHORT)
                     .show()
             }
